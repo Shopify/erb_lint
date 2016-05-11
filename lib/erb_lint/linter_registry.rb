@@ -7,8 +7,8 @@ module ERBLint
     class << self
       attr_reader :linters
 
-      def included(custom_linter_class)
-        @linters << custom_linter_class
+      def included(linter_class)
+        @linters << linter_class
       end
 
       def load_linters

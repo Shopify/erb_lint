@@ -17,12 +17,6 @@ module ERBLint
       end
     end
 
-    # Return the human-friendly name of this linter as specified in the
-    # configuration file and in lint descriptions.
-    def self.name
-      self.class.simple_name
-    end
-
     # The lint method that contains the logic for linter and returns a list of errors.
     # Must be implemented by the concrete inheriting class.
     def self.lint(_file_content)
