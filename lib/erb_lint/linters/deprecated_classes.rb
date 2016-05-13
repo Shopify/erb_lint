@@ -61,6 +61,7 @@ module ERBLint
     @@tag_name_pattern = /[A-Za-z0-9]+/ # maybe add _ < ? etc later since it gets interpreted by some browsers
     @@start_tag_pattern = /<(#{@@tag_name_pattern})(\s+(#{@@attribute_pattern}\s*)*)?\/?>/ # start tag must have a space after tag name if attributes exist. /> or > to end the tag.
 
+    # TODO: Implement String Scanner to track quotes before the start tag begins to ensure that it is not enclosed inside of a string. Alternatively this problem would be solved by using a 3rd party parser like Nokogiri::XML
 
     def self.start_tags(line)
       start_tag_matching_groups = line.scan(/(#{@@start_tag_pattern})/)
