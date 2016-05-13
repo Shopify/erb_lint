@@ -7,10 +7,10 @@ module ERBLint
       @deprecated_ruleset = []
       config['rule_set'].each do |rule|
         rule['deprecated'].each do |class_expr|
-          @deprecated_ruleset.push {
+          @deprecated_ruleset.push({
             class_expr: class_expr,
             suggestion: rule['suggestion']
-          }
+          })
         end
       end
       @deprecated_ruleset.freeze
@@ -29,14 +29,15 @@ module ERBLint
           start_tag.attributes.select(&:is_class?).each do |class_attr|
             class_attr.value.split(' ').each do |class_name|
               violated_rules(class_name).each do |violated_rule|
-                errors.push {
+                errors.push({
                   line: index + 1,
                   message: "Deprecated class `#{class_name}` detected matching the pattern `#{violated_rule[:class_expr]}`. #{violated_rule[:suggestion]} #{@addendum}"
-                }
+                })
               end
             end
           end
         end
+      end
       errors
     end
 
@@ -61,7 +62,7 @@ module ERBLint
     @@start_tag_pattern = /<(#{@@tag_name_pattern})(\s+(#{@@attribute_pattern}\s*)*)?\/?>/ # start tag must have a space after tag name if attributes exist. /> or > to end the tag.
 
 
-    def start_tags(line)
+    def self.start_tags(line)
       start_tag_matching_groups = line.scan(/(#{@@start_tag_pattern})/)
       start_tag_matching_groups.map do |start_tag_matching_group| 
         tag_name = start_tag_matching_group[1]

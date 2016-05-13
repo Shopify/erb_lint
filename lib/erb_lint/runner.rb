@@ -7,7 +7,7 @@ module ERBLint
       @config = config
       LinterRegistry.load_linters
       @linters = LinterRegistry.linters.select { |linter| linter_enabled?(linter) }
-      @linters.map do |linter_class|
+      @linters.map! do |linter_class|
         linter_config = @config['linters'][linter_class.simple_name]
         linter_class.new(linter_config)
       end
