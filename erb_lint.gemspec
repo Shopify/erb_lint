@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   
   s.files = Dir['lib/**/*.rb']
 
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec', '~> 3.4.4'
 end
