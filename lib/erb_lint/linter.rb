@@ -17,10 +17,17 @@ module ERBLint
       end
     end
 
+    # Must be implemented by the concrete inheriting class.
+    def initialize(_config)
+      raise NotImplementedError, "must implement ##{__method__}"
+    end
+
     def lint_file(file_content)
       lines = file_content.scan(/[^\n]*\n|[^\n]+/)
       lint_lines(lines)
     end
+
+    protected
 
     # The lint_lines method that contains the logic for the linter and returns a list of errors.
     # Must be implemented by the concrete inheriting class.

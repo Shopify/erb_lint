@@ -1,11 +1,9 @@
 module ERBLint
   # Runs all enabled linters against an html.erb file.
   class Runner
-    attr_reader :lints
-
     def initialize(config)
       @config = config
-      LinterRegistry.load_linters
+      LinterRegistry.load_custom_linters
       @linters = LinterRegistry.linters.select { |linter| linter_enabled?(linter) }
       @linters.map! do |linter_class|
         linter_config = @config['linters'][linter_class.simple_name]

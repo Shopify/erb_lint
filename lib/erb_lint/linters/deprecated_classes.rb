@@ -18,6 +18,8 @@ module ERBLint
       @addendum = config['addendum']
     end
 
+    protected
+
     def lint_lines(lines)
       errors = []
 
@@ -29,9 +31,11 @@ module ERBLint
           start_tag.attributes.select(&:is_class?).each do |class_attr|
             class_attr.value.split(' ').each do |class_name|
               violated_rules(class_name).each do |violated_rule|
+                message = "Deprecated class `#{class_name}` detected matching the pattern `#{violated_rule[:class_expr]}`. #{violated_rule[:suggestion]}"
+                message << " #{@addendum}" if @addendum
                 errors.push({
                   line: index + 1,
-                  message: "Deprecated class `#{class_name}` detected matching the pattern `#{violated_rule[:class_expr]}`. #{violated_rule[:suggestion]} #{@addendum}"
+                  message: message
                 })
               end
             end

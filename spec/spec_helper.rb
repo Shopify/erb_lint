@@ -1,0 +1,1 @@
+require 'erb_lint'

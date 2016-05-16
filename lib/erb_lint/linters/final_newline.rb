@@ -7,6 +7,8 @@ module ERBLint
       @new_lines_should_be_present = config['present']
     end
 
+    protected
+
     def lint_lines(lines)
       errors = []
       return errors if lines.empty?

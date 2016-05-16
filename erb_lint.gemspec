@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.authors = ['Justin Chan']
   s.email = ['justin.the.c@gmail.com']
   s.summary = 'ERB lint tool'
-  s.description = 'ERB Linter tool that supports custom linters.'
+  s.description = 'ERB Linter tool.'
   s.homepage = 'https://github.com/justinthec/erb-lint'
   s.license = 'MIT'
   
