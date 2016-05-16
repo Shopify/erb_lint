@@ -1,4 +1,4 @@
 language: ruby
 rvm:
-  - 2.3
+  - 2.3.0
 script: bundle exec rspec spec
