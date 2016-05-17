@@ -37,7 +37,7 @@ gem 'erb_lint'
 2. Next instantiate a Runner with the configuration.
 
   ```ruby
-  runner = Policial::Runner.new(config)
+  runner = ERBLint::Runner.new(config)
   ```
 
 3. Finally, we can run the Runner against a file:
