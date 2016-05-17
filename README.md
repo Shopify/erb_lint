@@ -166,9 +166,9 @@ config = {
 
 ## Contributing
 1. Fork this repo.
-2. Create a new branch. `git checkout -b new_branch_name`
+2. Create a new branch. `git checkout -b new-branch-name`
 3. Add and commit your changes. `git add .` `git commit -m "Added these cool things."`
-4. Push to Github. `git push -u origin new_branch_name`
+4. Push to Github. `git push -u origin new-branch-name`
 5. Create a Pull Request on this repo against your branch.
 
 Please write tests!
