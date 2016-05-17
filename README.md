@@ -4,7 +4,7 @@
 
 ## Requirements
 
-* Ruby 1.9.3+ (Runtime)
+* Ruby 2.2.0+ (Runtime)
 * Ruby 2.3.0+ (Development)
  - This is due to the use of the tilde-heredoc `<<~` syntax in some tests.
 
