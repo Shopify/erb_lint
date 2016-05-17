@@ -71,11 +71,11 @@ module ERBLint
       start_tag_matching_groups = line.scan(/(#{@@start_tag_pattern})/)
       start_tag_matching_groups.map do |start_tag_matching_group| 
         tag_name = start_tag_matching_group[1]
-        attributes_string = start_tag_matching_group[2] 
+        attributes_string = start_tag_matching_group[2] || ''
 
         attributes = attributes_string.scan(/(#{@@attribute_pattern})/).map do |attribute_matching_group|
           entire_string = attribute_matching_group[0]
-          value_with_equal_sign = attribute_matching_group[1]
+          value_with_equal_sign = attribute_matching_group[1] || ''
           name = entire_string.sub(value_with_equal_sign, '')
           possible_value_formats = attribute_matching_group[3..5] # These 3 captures are the ones in @@attribute_value
           value = possible_value_formats.reduce {|a, b| a.nil? ? b : a}
