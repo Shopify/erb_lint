@@ -37,11 +37,11 @@ describe ERBLint::Runner do
       it 'returns each linter with their errors' do
         expect(subject).to eq [
             {
-              linter: ERBLint::Linter::FakeLinter1,
+              linter: 'FakeLinter1',
               errors: fake_linter_1_errors
             },
             {
-              linter: ERBLint::Linter::FakeLinter2,
+              linter: 'FakeLinter2',
               errors: fake_linter_2_errors
             }
         ]
@@ -61,7 +61,7 @@ describe ERBLint::Runner do
       it 'returns only enabled linters with their errors' do
         expect(subject).to eq [
             {
-              linter: ERBLint::Linter::FakeLinter1,
+              linter: 'FakeLinter1',
               errors: fake_linter_1_errors
             }
         ]

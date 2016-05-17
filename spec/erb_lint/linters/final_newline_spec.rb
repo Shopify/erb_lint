@@ -70,4 +70,36 @@ describe ERBLint::Linter::FinalNewline do
       end
     end
   end
+
+  context 'when trailing newline preference is not stated' do
+    let(:linter_config) { {} }
+
+    context 'when the file is empty' do
+      let(:file) { '' }
+
+      it 'should not report any errors' do
+        expect(linter_errors).to eq []
+      end
+    end
+
+    context 'when the file ends with a newline' do
+      let(:file) { "<div id=\"a\">\nContent\n</div>\n" }
+
+      it 'should not report any errors' do
+        expect(linter_errors).to eq []
+      end
+    end
+
+    context 'when the file does not end with a newline' do
+      let(:file) { "<div id=\"a\">\nContent\n</div>" }
+
+      it 'should report 1 error' do
+        expect(linter_errors.size).to eq 1
+      end
+
+      it 'should report an error on the last line' do
+        expect(linter_errors.first[:line]).to eq 3
+      end
+    end
+  end
 end

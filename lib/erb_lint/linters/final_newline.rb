@@ -4,7 +4,7 @@ module ERBLint
     include LinterRegistry
 
     def initialize(config)
-      @new_lines_should_be_present = config['present']
+      @new_lines_should_be_present = (config['present'].nil?) ? true : config['present']
     end
 
     protected
