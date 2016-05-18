@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ERBLint::LinterRegistry do
@@ -16,11 +18,11 @@ describe ERBLint::LinterRegistry do
   end
 
   describe '.load_custom_linters' do
-    let(:custom_directory) { File.expand_path('../fixtures', __FILE__) } 
+    let(:custom_directory) { File.expand_path('../fixtures', __FILE__) }
 
     it 'adds the custom linter to the set of registered linters' do
       expect(described_class).to receive(:require)
-                              .with(File.join(custom_directory, 'custom_linter.rb')).once
+        .with(File.join(custom_directory, 'custom_linter.rb')).once
       described_class.load_custom_linters(custom_directory)
     end
   end

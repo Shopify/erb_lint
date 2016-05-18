@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ERBLint
   # Stores all linters available to the application.
   module LinterRegistry

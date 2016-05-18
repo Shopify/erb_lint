@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ERBLint
   # Defines common functionality available to all linters.
   class Linter

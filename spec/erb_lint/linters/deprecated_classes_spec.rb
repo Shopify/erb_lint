@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ERBLint::Linter::DeprecatedClasses do
   let(:linter_config) do
-    { 
+    {
       'rule_set' => rule_set
     }
   end
 
   let(:linter) { described_class.new(linter_config) }
-  
+
   subject(:linter_errors) { linter.lint_file(file) }
 
   context 'when the rule set is empty' do
@@ -17,15 +19,19 @@ describe ERBLint::Linter::DeprecatedClasses do
     context 'when the file is empty' do
       let(:file) { '' }
 
-      it 'should not report any errors' do
+      it 'does not report any errors' do
         expect(linter_errors).to eq []
       end
     end
 
-    context 'when the file has classes in tags' do
-      let(:file) { "<div class=\"a\">\nContent\n</div>" }
+    context 'when the file has classes in start tags' do
+      let(:file) { <<~FILE }
+        <div class="a">
+          Content
+        </div>
+      FILE
 
-      it 'should not report any errors' do
+      it 'does not report any errors' do
         expect(linter_errors).to eq []
       end
     end
@@ -38,67 +44,84 @@ describe ERBLint::Linter::DeprecatedClasses do
     suggestion_2 = 'Suggestion2'
 
     let(:rule_set) do
-      [{
-        'deprecated' => deprecated_set_1,
-        'suggestion' => suggestion_1
-      },
-      {
-        'deprecated' => deprecated_set_2,
-        'suggestion' => suggestion_2
-      }]
+      [
+        {
+          'deprecated' => deprecated_set_1,
+          'suggestion' => suggestion_1
+        },
+        {
+          'deprecated' => deprecated_set_2,
+          'suggestion' => suggestion_2
+        }
+      ]
     end
 
     context 'when the file is empty' do
       let(:file) { '' }
 
-      it 'should not report any errors' do
+      it 'does not report any errors' do
         expect(linter_errors).to eq []
       end
     end
 
     context 'when the file contains no classes from either set' do
-      let(:file) { "<div class=\"unknown\">\nContent\n</div>" }
+      let(:file) { <<~FILE }
+        <div class="unkown">
+          Content
+        </div>
+      FILE
 
-      it 'should not report any errors' do
+      it 'does not report any errors' do
         expect(linter_errors).to eq []
       end
     end
 
     context 'when the file contains a class from set 1' do
-      let(:file) { "<div class=\"#{deprecated_set_1.first}\">\nContent\n</div>" }
+      let(:file) { <<~FILE }
+        <div class="#{deprecated_set_1.first}">
+          Content
+        </div>
+      FILE
 
-      it 'should report 1 error' do
+      it 'reports 1 error' do
         expect(linter_errors.size).to eq 1
       end
 
-      it 'should report an error with message containing suggestion 1' do
+      it 'reports an error with message containing suggestion 1' do
         expect(linter_errors.first[:message]).to include suggestion_1
       end
     end
 
     context 'when the file contains both classes from set 1' do
       context 'when both classes are on the same tag' do
-        let(:file) { "<div class=\"#{deprecated_set_1[0]} #{deprecated_set_1[1]}\">\nContent\n</div>" }
+        let(:file) { <<~FILE }
+          <div class="#{deprecated_set_1[0]} #{deprecated_set_1[1]}">
+            Content
+          </div>
+        FILE
 
-        it 'should report 2 errors' do
+        it 'reports 2 errors' do
           expect(linter_errors.size).to eq 2
         end
 
-        it 'should report errors with messages containing suggestion 1' do
+        it 'reports errors with messages containing suggestion 1' do
           expect(linter_errors[0][:message]).to include suggestion_1
           expect(linter_errors[1][:message]).to include suggestion_1
         end
-
       end
 
       context 'when both classes are on different tags' do
-        let(:file) { "<div class=\"#{deprecated_set_1[0]}\">\n<a href=\"#\" class=\"#{deprecated_set_1[1]}\"></a>\n</div>" }
+        let(:file) { <<~FILE }
+          <div class="#{deprecated_set_1[0]}">
+            <a href="#" class="#{deprecated_set_1[1]}"></a>
+          </div>
+        FILE
 
-        it 'should report 2 errors' do
+        it 'reports 2 errors' do
           expect(linter_errors.size).to eq 2
         end
 
-        it 'should report errors with messages containing suggestion 1' do
+        it 'reports errors with messages containing suggestion 1' do
           expect(linter_errors[0][:message]).to include suggestion_1
           expect(linter_errors[1][:message]).to include suggestion_1
         end
@@ -106,13 +129,17 @@ describe ERBLint::Linter::DeprecatedClasses do
     end
 
     context 'when the file contains a class matching both expressions from set 2' do
-      let(:file) { "<div class=\"expr\">\nContent\n</div>" }
+      let(:file) { <<~FILE }
+        <div class="expr">
+          Content
+        </div>
+      FILE
 
-      it 'should report 2 errors' do
+      it 'reports 2 errors' do
         expect(linter_errors.size).to eq 2
       end
 
-      it 'should report errors with messages containing suggestion 2' do
+      it 'reports errors with messages containing suggestion 2' do
         expect(linter_errors[0][:message]).to include suggestion_2
         expect(linter_errors[1][:message]).to include suggestion_2
       end
@@ -130,19 +157,23 @@ describe ERBLint::Linter::DeprecatedClasses do
       context 'when the file is empty' do
         let(:file) { '' }
 
-        it 'should not report any errors' do
+        it 'does not report any errors' do
           expect(linter_errors).to eq []
         end
       end
 
       context 'when the file contains a class from a deprecated set' do
-      let(:file) { "<div class=\"#{deprecated_set_1.first}\">\nContent\n</div>" }
+        let(:file) { <<~FILE }
+          <div class="#{deprecated_set_1.first}">
+            Content
+          </div>
+        FILE
 
-        it 'should report 1 error' do
+        it 'reports 1 error' do
           expect(linter_errors.size).to eq 1
         end
 
-        it 'should report an error with its message ending with the addendum' do
+        it 'reports an error with its message ending with the addendum' do
           expect(linter_errors.first[:message]).to end_with addendum
         end
       end
@@ -158,19 +189,23 @@ describe ERBLint::Linter::DeprecatedClasses do
       context 'when the file is empty' do
         let(:file) { '' }
 
-        it 'should not report any errors' do
+        it 'does not report any errors' do
           expect(linter_errors).to eq []
         end
       end
 
       context 'when the file contains a class from a deprecated set' do
-      let(:file) { "<div class=\"#{deprecated_set_1.first}\">\nContent\n</div>" }
+        let(:file) { <<~FILE }
+          <div class="#{deprecated_set_1.first}">
+            Content
+          </div>
+        FILE
 
-        it 'should report 1 error' do
+        it 'reports 1 error' do
           expect(linter_errors.size).to eq 1
         end
 
-        it 'should report an error with its message ending with the suggestion' do
+        it 'reports an error with its message ending with the suggestion' do
           expect(linter_errors.first[:message]).to end_with suggestion_1
         end
       end

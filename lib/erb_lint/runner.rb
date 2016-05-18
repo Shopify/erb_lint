@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ERBLint
   # Runs all enabled linters against an html.erb file.
   class Runner

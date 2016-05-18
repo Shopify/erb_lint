@@ -1,0 +1,17 @@
+AllCops:
+  TargetRubyVersion: 2.3
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 20
+
+Style/IndentArray:
+  EnforcedStyle: consistent
+
+Style/IndentHash:
+  EnforcedStyle: consistent
+
+Style/RegexpLiteral:
+  EnforcedStyle: mixed

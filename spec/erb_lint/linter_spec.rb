@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ERBLint::Linter do
@@ -38,11 +40,11 @@ describe ERBLint::Linter do
         FILE
 
         it 'calls lint_lines with the list of lines' do
-          expect(subject).to receive(:lint_lines).with([
-            "Line1\n",
-            "Line2\n",
-            "Line3"
-          ])
+          expect(subject).to receive(:lint_lines).with(%W(
+            Line1\n
+            Line2\n
+            Line3
+          ))
         end
       end
 
@@ -54,11 +56,11 @@ describe ERBLint::Linter do
         FILE
 
         it 'calls lint_lines with the list of lines' do
-          expect(subject).to receive(:lint_lines).with([
-            "Line1\n",
-            "Line2\n",
-            "Line3\n"
-          ])
+          expect(subject).to receive(:lint_lines).with(%W(
+            Line1\n
+            Line2\n
+            Line3\n
+          ))
         end
       end
     end

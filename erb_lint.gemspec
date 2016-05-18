@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |s|
   s.name = 'erb_lint'
   s.version = '0.0.0'
@@ -7,8 +9,9 @@ Gem::Specification.new do |s|
   s.description = 'ERB Linter tool.'
   s.homepage = 'https://github.com/justinthec/erb-lint'
   s.license = 'MIT'
-  
+
   s.files = Dir['lib/**/*.rb']
 
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rubocop'
 end

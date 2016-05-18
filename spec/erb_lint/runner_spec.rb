@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ERBLint::Runner do
@@ -5,12 +7,16 @@ describe ERBLint::Runner do
 
   before do
     allow(ERBLint::LinterRegistry).to receive(:linters)
-                                  .and_return([ERBLint::Linter::FakeLinter1,
-                                               ERBLint::Linter::FakeLinter2])
+      .and_return([ERBLint::Linter::FakeLinter1,
+                   ERBLint::Linter::FakeLinter2])
   end
 
-  class ERBLint::Linter::FakeLinter1 < ERBLint::Linter; def initialize(_config) end end
-  class ERBLint::Linter::FakeLinter2 < ERBLint::Linter; def initialize(_config) end end
+  class ERBLint::Linter::FakeLinter1 < ERBLint::Linter
+    def initialize(_config) end
+  end
+  class ERBLint::Linter::FakeLinter2 < ERBLint::Linter
+    def initialize(_config) end
+  end
 
   describe '#run' do
     let(:file) { 'DummyFileContent' }
@@ -20,8 +26,10 @@ describe ERBLint::Runner do
     fake_linter_2_errors = ['FakeLinter2DummyErrors']
 
     before do
-      allow_any_instance_of(ERBLint::Linter::FakeLinter1).to receive(:lint_file).with(file).and_return fake_linter_1_errors
-      allow_any_instance_of(ERBLint::Linter::FakeLinter2).to receive(:lint_file).with(file).and_return fake_linter_2_errors
+      allow_any_instance_of(ERBLint::Linter::FakeLinter1).to receive(:lint_file)
+        .with(file).and_return fake_linter_1_errors
+      allow_any_instance_of(ERBLint::Linter::FakeLinter2).to receive(:lint_file)
+        .with(file).and_return fake_linter_2_errors
     end
 
     context 'when all linters are enabled' do
@@ -36,14 +44,14 @@ describe ERBLint::Runner do
 
       it 'returns each linter with their errors' do
         expect(subject).to eq [
-            {
-              linter: 'FakeLinter1',
-              errors: fake_linter_1_errors
-            },
-            {
-              linter: 'FakeLinter2',
-              errors: fake_linter_2_errors
-            }
+          {
+            linter: 'FakeLinter1',
+            errors: fake_linter_1_errors
+          },
+          {
+            linter: 'FakeLinter2',
+            errors: fake_linter_2_errors
+          }
         ]
       end
     end
@@ -60,10 +68,10 @@ describe ERBLint::Runner do
 
       it 'returns only enabled linters with their errors' do
         expect(subject).to eq [
-            {
-              linter: 'FakeLinter1',
-              errors: fake_linter_1_errors
-            }
+          {
+            linter: 'FakeLinter1',
+            errors: fake_linter_1_errors
+          }
         ]
       end
     end
