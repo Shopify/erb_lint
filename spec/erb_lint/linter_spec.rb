@@ -8,13 +8,15 @@ describe ERBLint::Linter do
     subject             { ERBLint::Linter::Fake.new(linter_config) }
 
     module ERBLint
-      class Linter::Fake < ERBLint::Linter
-        def initialize(_config)
-        end
+      class Linter
+        class Fake < ERBLint::Linter
+          def initialize(_config)
+          end
 
-        protected
+          protected
 
-        def lint_lines(_lines)
+          def lint_lines(_lines)
+          end
         end
       end
     end

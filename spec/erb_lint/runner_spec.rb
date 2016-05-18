@@ -11,11 +11,15 @@ describe ERBLint::Runner do
                    ERBLint::Linter::FakeLinter2])
   end
 
-  class ERBLint::Linter::FakeLinter1 < ERBLint::Linter
-    def initialize(_config) end
-  end
-  class ERBLint::Linter::FakeLinter2 < ERBLint::Linter
-    def initialize(_config) end
+  module ERBLint
+    class Linter
+      class FakeLinter1 < Linter
+        def initialize(_config) end
+      end
+      class FakeLinter2 < Linter
+        def initialize(_config) end
+      end
+    end
   end
 
   describe '#run' do
