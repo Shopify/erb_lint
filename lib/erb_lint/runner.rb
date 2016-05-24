@@ -16,7 +16,7 @@ module ERBLint
     def run(file)
       @linters.map do |linter|
         {
-          linter: linter.class.simple_name,
+          linter_name: linter.class.simple_name,
           errors: linter.lint_file(file)
         }
       end

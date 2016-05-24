@@ -55,7 +55,7 @@ gem 'erb_lint'
   ```ruby
   violations
   # => [{
-  #   linter: 'FinalNewline',
+  #   linter_name: 'FinalNewline',
   #   errors: [
   #     { line: 1, message: 'Missing a trailing newline at the end of the file.' }
   #   ]
