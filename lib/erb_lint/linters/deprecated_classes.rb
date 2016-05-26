@@ -79,9 +79,9 @@ module ERBLint
       ATTRIBUTE_PATTERN = %r{
         #{ATTRIBUTE_NAME_PATTERN}        # attribute name
         (
-          \s*=\s*                 # any whitespace around equals sign
+          \s*=\s*                        # any whitespace around equals sign
           (#{ATTRIBUTE_VALUE_PATTERN})   # attribute value
-        )?                        # attributes can be empty or have an assignemnt.
+        )?                               # attributes can be empty or have an assignemnt.
       }x
 
       # Start tag Patterns
@@ -92,10 +92,10 @@ module ERBLint
       START_TAG_PATTERN = %r{
         <(#{TAG_NAME_PATTERN})         # start of tag with tag name
         (
-          \s+                           # required whitespace between tag name and attributes
+          \s+                          # required whitespace between tag name and attributes
           (#{ATTRIBUTE_PATTERN}\s*)*   # attributes
-        )?                              # having attributes is optional
-        \/?>                            # void or foreign element can have slash before tag close
+        )?                             # having an attribute block is optional
+        \/?>                           # void or foreign elements can have a slash before tag close
       }x
 
       # Represents and provides an interface for a start tag found in the HTML.
