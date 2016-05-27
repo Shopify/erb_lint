@@ -69,7 +69,7 @@ module ERBLint
       # https://www.w3.org/TR/html5/syntax.html#syntax-attributes
 
       # attribute names must be non empty and can't contain a certain set of special characters
-      ATTRIBUTE_NAME_PATTERN = /{[^\s"'>\/=]+/
+      ATTRIBUTE_NAME_PATTERN = /[^\s"'>\/=]+/
 
       ATTRIBUTE_VALUE_PATTERN = %r{
         "([^"]*)" |           # double-quoted value
