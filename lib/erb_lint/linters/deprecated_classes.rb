@@ -102,7 +102,7 @@ module ERBLint
 
       # Represents and provides an interface for a start tag found in the HTML.
       class StartTag
-        attr_accessor :tag_name, :attributes
+        attr_reader :tag_name, :attributes
 
         def initialize(tag_name, attributes)
           @tag_name = tag_name
@@ -113,7 +113,7 @@ module ERBLint
       # Represents and provides an interface for an attribute found in a start tag in the HTML.
       class Attribute
         ATTR_NAME_CLASS_PATTERN = /\Aclass\z/i # attribute names are case-insensitive
-        attr_accessor :attribute_name, :value
+        attr_reader :attribute_name, :value
 
         def initialize(attribute_name, value)
           @attribute_name = attribute_name
