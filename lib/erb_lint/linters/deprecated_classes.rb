@@ -154,7 +154,9 @@ module ERBLint
 
             # The 3 captures [3..5] are the possibilities specified in ATTRIBUTE_VALUE_PATTERN
             possible_value_formats = attribute_matching_group[3..5]
-            value = possible_value_formats.reduce { |a, e| a.nil? ? e : a }
+            value = possible_value_formats.reduce do |first_val, second_val|
+              first_val.nil? ? second_val : first_val
+            end
 
             Attribute.new(name, value)
           end
