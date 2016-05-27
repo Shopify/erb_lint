@@ -69,7 +69,6 @@ module ERBLint
       # https://www.w3.org/TR/html5/syntax.html#syntax-attributes
 
       # attribute names must be non empty and can't contain a certain set of special characters
-      ATTRIBUTE_NAME_PATTERN = /[^\s"'>\/=]+/
 
       ATTRIBUTE_VALUE_PATTERN = %r{
         "([^"]*)" |           # double-quoted value
@@ -79,7 +78,7 @@ module ERBLint
 
       # attributes can be empty or have an attribute value
       ATTRIBUTE_PATTERN = %r{
-        #{ATTRIBUTE_NAME_PATTERN}        # attribute name
+        [^\s"'>\/=]+                     # attribute name
         (
           \s*=\s*                        # any whitespace around equals sign
           (#{ATTRIBUTE_VALUE_PATTERN})   # attribute value
@@ -89,10 +88,8 @@ module ERBLint
       # Start tag Patterns
       # https://www.w3.org/TR/html5/syntax.html#syntax-start-tag
 
-      TAG_NAME_PATTERN = /[A-Za-z0-9]+/ # maybe add _ < ? etc later since it gets interpreted by some browsers
-
       START_TAG_PATTERN = %r{
-        <(#{TAG_NAME_PATTERN})         # start of tag with tag name
+        <([A-Za-z0-9]+)                # tag name
         (
           \s+                          # required whitespace between tag name and attributes
           (#{ATTRIBUTE_PATTERN}\s*)*   # attributes
