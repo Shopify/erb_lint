@@ -85,7 +85,7 @@ module ERBLint
         )?                               # attributes can be empty or have an assignemnt.
       }x
 
-      # Start tag Patterns
+      # Start tag Pattern
       # https://www.w3.org/TR/html5/syntax.html#syntax-start-tag
 
       START_TAG_PATTERN = %r{
