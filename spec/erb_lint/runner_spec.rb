@@ -8,7 +8,8 @@ describe ERBLint::Runner do
   before do
     allow(ERBLint::LinterRegistry).to receive(:linters)
       .and_return([ERBLint::Linter::FakeLinter1,
-                   ERBLint::Linter::FakeLinter2])
+                   ERBLint::Linter::FakeLinter2,
+                   ERBLint::Linter::FinalNewline])
   end
 
   module ERBLint
@@ -28,12 +29,15 @@ describe ERBLint::Runner do
 
     fake_linter_1_errors = ['FakeLinter1DummyErrors']
     fake_linter_2_errors = ['FakeLinter2DummyErrors']
+    fake_final_newline_errors = ['FakeFinalNewlineDummyErrors']
 
     before do
       allow_any_instance_of(ERBLint::Linter::FakeLinter1).to receive(:lint_file)
         .with(file).and_return fake_linter_1_errors
       allow_any_instance_of(ERBLint::Linter::FakeLinter2).to receive(:lint_file)
         .with(file).and_return fake_linter_2_errors
+      allow_any_instance_of(ERBLint::Linter::FinalNewline).to receive(:lint_file)
+        .with(file).and_return fake_final_newline_errors
     end
 
     context 'when all linters are enabled' do
@@ -92,6 +96,32 @@ describe ERBLint::Runner do
 
       it 'returns no linters' do
         expect(subject).to be_empty
+      end
+    end
+
+    context 'when the config has no linters' do
+      let(:config) { {} }
+
+      it 'returns default linters with their errors' do
+        expect(subject).to eq [
+          {
+            linter_name: 'FinalNewline',
+            errors: fake_final_newline_errors
+          }
+        ]
+      end
+    end
+
+    context 'when the config is nil' do
+      let(:config) { nil }
+
+      it 'returns default linters with their errors' do
+        expect(subject).to eq [
+          {
+            linter_name: 'FinalNewline',
+            errors: fake_final_newline_errors
+          }
+        ]
       end
     end
   end

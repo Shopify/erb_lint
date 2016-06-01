@@ -8,17 +8,21 @@ module ERBLint
 
       def initialize(config)
         @deprecated_ruleset = []
-        config['rule_set'].each do |rule|
-          rule['deprecated'].each do |class_expr|
-            @deprecated_ruleset.push(
-              class_expr: class_expr,
-              suggestion: rule['suggestion']
-            )
+        unless config['rule_set'].nil?
+          config['rule_set'].each do |rule|
+            break if rule['deprecated'].nil?
+            suggestion = pad_with_left_space(rule['suggestion'])
+            rule['deprecated'].each do |class_expr|
+              @deprecated_ruleset.push(
+                class_expr: class_expr,
+                suggestion: suggestion
+              )
+            end
           end
         end
         @deprecated_ruleset.freeze
 
-        @addendum = config['addendum']
+        @addendum = pad_with_left_space(config['addendum'])
       end
 
       protected
@@ -43,7 +47,7 @@ module ERBLint
 
       def generate_errors(class_name, line_number)
         violated_rules(class_name).map do |violated_rule|
-          message = "Deprecated class `%s` detected matching the pattern `%s`. %s#{' ' + @addendum if @addendum}"
+          message = "Deprecated class `%s` detected matching the pattern `%s`.%s#{@addendum}"
           {
             line: line_number,
             message: format(message, class_name, violated_rule[:class_expr], violated_rule[:suggestion])
@@ -55,6 +59,10 @@ module ERBLint
         @deprecated_ruleset.select do |deprecated_rule|
           /\A#{deprecated_rule[:class_expr]}\z/.match(class_name)
         end
+      end
+
+      def pad_with_left_space(message)
+        message ? " #{message}" : ''
       end
     end
 
