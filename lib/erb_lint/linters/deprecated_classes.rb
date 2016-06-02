@@ -44,9 +44,8 @@ module ERBLint
 
       def generate_errors(class_name, line_number)
         violated_rules(class_name).map do |violated_rule|
-          suggestion = pad_with_left_space(violated_rule[:suggestion])
-          addendum = pad_with_left_space(@addendum)
-          message = "Deprecated class `%s` detected matching the pattern `%s`.%s#{addendum}"
+          suggestion = " #{violated_rule[:suggestion]}".rstrip
+          message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
           {
             line: line_number,
             message: format(message, class_name, violated_rule[:class_expr], suggestion)
@@ -58,10 +57,6 @@ module ERBLint
         @deprecated_ruleset.select do |deprecated_rule|
           /\A#{deprecated_rule[:class_expr]}\z/.match(class_name)
         end
-      end
-
-      def pad_with_left_space(message)
-        message.empty? ? message : " #{message}"
       end
     end
 
