@@ -8,21 +8,18 @@ module ERBLint
 
       def initialize(config)
         @deprecated_ruleset = []
-        unless config['rule_set'].nil?
-          config['rule_set'].each do |rule|
-            break if rule['deprecated'].nil?
-            suggestion = pad_with_left_space(rule['suggestion'])
-            rule['deprecated'].each do |class_expr|
-              @deprecated_ruleset.push(
-                class_expr: class_expr,
-                suggestion: suggestion
-              )
-            end
+        config.fetch('rule_set', []).each do |rule|
+          suggestion = rule.fetch('suggestion', '')
+          rule.fetch('deprecated', []).each do |class_expr|
+            @deprecated_ruleset.push(
+              class_expr: class_expr,
+              suggestion: suggestion
+            )
           end
         end
         @deprecated_ruleset.freeze
 
-        @addendum = pad_with_left_space(config['addendum'])
+        @addendum = config.fetch('addendum', '')
       end
 
       protected
@@ -47,10 +44,12 @@ module ERBLint
 
       def generate_errors(class_name, line_number)
         violated_rules(class_name).map do |violated_rule|
-          message = "Deprecated class `%s` detected matching the pattern `%s`.%s#{@addendum}"
+          suggestion = pad_with_left_space(violated_rule[:suggestion])
+          addendum = pad_with_left_space(@addendum)
+          message = "Deprecated class `%s` detected matching the pattern `%s`.%s#{addendum}"
           {
             line: line_number,
-            message: format(message, class_name, violated_rule[:class_expr], violated_rule[:suggestion])
+            message: format(message, class_name, violated_rule[:class_expr], suggestion)
           }
         end
       end
