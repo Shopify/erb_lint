@@ -22,7 +22,13 @@ gem 'erb_lint'
 
 ## Usage
 
-1. First prepare your configurations to specify which Linters you want to use. Configuration details can be found [here](#configuration).
+1. First instantiate a Runner with or without a configuration.
+
+  ```ruby
+  runner = ERBLint::Runner.new() # uses default configs
+  ```
+  
+  Use configurations to specify which Linters you want to use. Configuration details can be found [here](#configuration).
 
   ```ruby
   config = {
@@ -32,15 +38,11 @@ gem 'erb_lint'
       }
     }
   }
-  ```
-  
-2. Next instantiate a Runner with the configuration.
-
-  ```ruby
   runner = ERBLint::Runner.new(config)
   ```
 
-3. Finally, we can run the Runner against a file:
+
+2. Now, we can run the Runner against a file:
   ```erb
   <!-- file.html.erb -->
   <div class="foo"></div>
@@ -86,6 +88,20 @@ config = {
 
 All linters have an `enabled` option which can be `true` or `false`, which
 controls whether the linter is run, along with linter-specific options.
+
+The default configuration is:
+
+```ruby
+default_config = {
+  'linters' => {
+    'FinalNewline' => {
+      'enabled' => true
+    }
+  }
+}
+```
+
+which gets used when you create a `Runner` with no config.
 
 ## Linters
 
