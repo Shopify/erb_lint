@@ -61,7 +61,7 @@ module ERBLint
       end
 
       def pad_with_left_space(message)
-        message ? " #{message}" : ''
+        message.empty? ? message : " #{message}"
       end
     end
 
