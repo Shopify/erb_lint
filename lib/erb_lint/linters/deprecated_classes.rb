@@ -32,7 +32,7 @@ module ERBLint
           start_tags.each do |start_tag|
             start_tag.attributes.select(&:class?).each do |class_attr|
               class_attr.value.split(' ').each do |class_name|
-                errors.push(*generate_errors(class_name, index + 1))
+                errors.push(*generate_errors(class_name, line_number: index + 1))
               end
             end
           end
@@ -42,7 +42,7 @@ module ERBLint
 
       private
 
-      def generate_errors(class_name, line_number)
+      def generate_errors(class_name, line_number:)
         violated_rules(class_name).map do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
