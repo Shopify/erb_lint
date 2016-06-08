@@ -94,8 +94,10 @@ module ERBLint
       START_TAG_PATTERN = %r{
         <(#{TAG_NAME_PATTERN})         # start of tag with tag name
         (
-          \s+                          # required whitespace between tag name and attributes
-          (#{ATTRIBUTE_PATTERN}\s*)*   # attributes
+          (
+            \s+                        # required whitespace between tag name and first attribute and between attributes
+            #{ATTRIBUTE_PATTERN}       # attributes
+          )*
         )?                             # having an attribute block is optional
         \/?>                           # void or foreign elements can have a slash before tag close
       }x
