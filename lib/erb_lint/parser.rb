@@ -10,10 +10,12 @@ module ERBLint
         require 'nokogiri'
         require 'htmlentities'
 
-        file_content = file_content + "<#{END_MARKER_NAME}>This is used to calculate the line number of the last line</#{END_MARKER_NAME}>"
+        file_content += "<#{END_MARKER_NAME}>"\
+          'This is used to calculate the line number of the last line'\
+          "</#{END_MARKER_NAME}>"
 
-        file_content_with_erb_tags = file_content.gsub(/<%(.+?)%>/m) do |_match| 
-          "<erb>#{ HTMLEntities.new.encode($1) }</erb>"
+        file_content_with_erb_tags = file_content.gsub(/<%(.+?)%>/m) do |_match|
+          "<erb>#{HTMLEntities.new.encode($1)}</erb>"
         end
 
         file_content_with_erb_tags = escape_erb_tags_in_strings(file_content_with_erb_tags)
@@ -50,7 +52,6 @@ module ERBLint
               '_erb_'
             when '</erb>'
               '_/erb_'
-            else
             end
           end
 
@@ -61,7 +62,7 @@ module ERBLint
       end
 
       def validate_tree(file_tree)
-        if file_tree.children.size == 0 || file_tree.children.last.name != END_MARKER_NAME
+        if file_tree.children.empty? || file_tree.children.last.name != END_MARKER_NAME
           raise ParsingError, 'File could not be successfully parsed. Ensure all tags are properly closed.'
         end
       end

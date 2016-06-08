@@ -27,7 +27,7 @@ module ERBLint
 
         html_elements = file_tree.search('*').select { |element| element.name != 'erb' }
         html_elements.each do |html_element|
-          html_element.attribute_nodes.select { |attribute| attribute.name.downcase == "class" }.each do |class_attr|
+          html_element.attribute_nodes.select { |attribute| attribute.name.casecmp('class') == 0 }.each do |class_attr|
             Parser.remove_escaped_erb_tags(class_attr.value).split(' ').each do |class_name|
               errors.push(*generate_errors(html_element, class_name, line_number: class_attr.line))
             end
@@ -41,7 +41,8 @@ module ERBLint
       def generate_errors(element, class_name, line_number:)
         violated_rules(class_name).map do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
-          message = "Deprecated class `%s` detected matching the pattern `%s` on the surrounding `%s` element.%s #{@addendum}".strip
+          message = 'Deprecated class `%s` detected matching the pattern `%s` on the surrounding `%s` element.'\
+            "%s #{@addendum}".strip
           {
             line: line_number,
             message: format(message, class_name, violated_rule[:class_expr], element.name, suggestion)
