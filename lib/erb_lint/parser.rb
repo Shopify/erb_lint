@@ -26,8 +26,10 @@ module ERBLint
         file_tree
       end
 
-      def remove_escaped_erb_tags(string)
-        string.gsub(/_erb_.*?_\/erb_/, '')
+      def filter_erb_nodes(node)
+        node.search('*').select do |element|
+          element.name != 'erb' && element.name != END_MARKER_NAME
+        end
       end
 
       private
