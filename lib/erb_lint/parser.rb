@@ -26,10 +26,14 @@ module ERBLint
         file_tree
       end
 
-      def filter_erb_nodes(node)
-        node.search('*').select do |element|
+      def filter_erb_nodes(node_list)
+        node_list.select do |element|
           element.name != 'erb' && element.name != END_MARKER_NAME
         end
+      end
+
+      def remove_escaped_erb_tags(string)
+        string.gsub(/_erb_.*?_\/erb_/, '')
       end
 
       private
@@ -37,11 +41,11 @@ module ERBLint
       def escape_erb_tags_in_strings(file_content)
         scanner = StringScanner.new(file_content)
 
-        while scanner.skip_until(/'|"/)
-          open_string_type = scanner.matched
+        while scanner.skip_until(/([^\\]|\A)('|")/)
+          open_string_type = scanner.matched[-1]
 
           string_start = scanner.pos - 1
-          if scanner.skip_until(/#{open_string_type}/).nil?
+          if scanner.skip_until(/([^\\]|\A)#{open_string_type}/).nil?
             raise ParsingError, 'Unclosed string found.'
           end
           string_end = scanner.pos - 1

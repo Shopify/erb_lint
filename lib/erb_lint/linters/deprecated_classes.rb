@@ -25,10 +25,10 @@ module ERBLint
       def lint_file(file_tree)
         errors = []
 
-        html_elements = Parser.filter_erb_nodes(file_tree)
+        html_elements = Parser.filter_erb_nodes(file_tree.search('*'))
         html_elements.each do |html_element|
           html_element.attribute_nodes.select { |attribute| attribute.name.casecmp('class') == 0 }.each do |class_attr|
-            remove_escaped_erb_tags(class_attr.value).split(' ').each do |class_name|
+            Parser.remove_escaped_erb_tags(class_attr.value).split(' ').each do |class_name|
               errors.push(*generate_errors(html_element, class_name, line_number: class_attr.line))
             end
           end
@@ -37,10 +37,6 @@ module ERBLint
       end
 
       private
-
-      def remove_escaped_erb_tags(string)
-        string.gsub(/_erb_.*?_\/erb_/, '')
-      end
 
       def generate_errors(element, class_name, line_number:)
         violated_rules(class_name).map do |violated_rule|
