@@ -15,7 +15,4 @@ Style/IndentHash:
 
 Style/RegexpLiteral:
   EnforcedStyle: mixed
-  AllowInnerSlashes: true
 
-Style/PerlBackrefs:
-  Enabled: false

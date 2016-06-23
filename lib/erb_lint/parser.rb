@@ -72,8 +72,8 @@ module ERBLint
       end
 
       def escape_erb_tag_literals(file_content)
-        file_content.gsub(/(<%%|%%>)/) do |_match|
-          HTMLEntities.new.encode($1)
+        file_content.gsub(/(<%%|%%>)/) do |tag_literal|
+          HTMLEntities.new.encode(tag_literal)
         end
       end
 
