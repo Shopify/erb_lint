@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'nokogiri'
+require 'htmlentities'
 
 module ERBLint
   # Contains the logic for generating the file tree structure used by linters.
@@ -7,74 +9,91 @@ module ERBLint
 
     class << self
       def parse(file_content)
-        require 'nokogiri'
-        require 'htmlentities'
+        clean_file_content = strip_erb_tags(file_content)
 
-        file_content += "<#{END_MARKER_NAME}>"\
-          'This is used to calculate the line number of the last line'\
-          "</#{END_MARKER_NAME}>"
+        xml_ready_file_content = add_end_marker(clean_file_content)
 
-        file_content_with_erb_tags = file_content.gsub(/<%(.+?)%>/m) do |_match|
-          "<erb>#{HTMLEntities.new.encode($1)}</erb>"
-        end
+        file_tree = Nokogiri::XML.fragment(xml_ready_file_content)
 
-        file_content_with_erb_tags = escape_erb_tags_in_strings(file_content_with_erb_tags)
-
-        file_tree = Nokogiri::XML.fragment(file_content_with_erb_tags)
-        validate_tree(file_tree)
+        ensure_valid_tree(file_tree)
 
         file_tree
       end
 
-      def filter_erb_nodes(node_list)
-        node_list.select do |element|
-          element.name != 'erb' && element.name != END_MARKER_NAME
-        end
-      end
-
-      def remove_escaped_erb_tags(string)
-        string.gsub(/_erb_.*?_\/erb_/, '')
+      def file_is_empty?(file_tree)
+        top_level_elements = file_tree.children
+        top_level_elements.size == 1 && top_level_elements.last.name == END_MARKER_NAME
       end
 
       private
 
-      def escape_erb_tags_in_strings(file_content)
+      def strip_erb_tags(file_content)
         scanner = StringScanner.new(file_content)
 
-        while scanner.skip_until(/([^\\]|\A)('|")/)
-          open_string_type = scanner.matched[-1]
+        while scanner.skip_until(/<%/)
+          start_tag_index = scanner.pos - 2
 
-          string_start = scanner.pos - 1
-          if scanner.skip_until(/([^\\]|\A)#{open_string_type}/).nil?
-            raise ParsingError, 'Unclosed string found.'
-          end
-          string_end = scanner.pos - 1
-
-          string_content = file_content.byteslice(string_start..string_end)
-
-          string_content_with_erb_tags_escaped = string_content.gsub(/(<erb>|<\/erb>)/m) do |_match|
-            case $1
-            when '<erb>'
-              '_erb_'
-            when '</erb>'
-              '_/erb_'
-            end
+          is_start_tag_literal = scanner.peek(1) == '%'
+          if is_start_tag_literal
+            scanner.pos += 1
+            next
           end
 
-          file_content[string_start..string_end] = string_content_with_erb_tags_escaped
+          end_tag_index = find_end_tag_index(file: file_content, scanner: scanner)
+
+          file_content = remove_tag(file: file_content, start_index: start_tag_index, end_index: end_tag_index)
         end
+
+        file_content = escape_erb_tag_literals(file_content)
 
         file_content
       end
 
-      def validate_tree(file_tree)
+      def find_end_tag_index(file:, scanner:)
+        end_tag_not_found = true
+
+        while end_tag_not_found
+          raise ParseError, 'Unclosed ERB tag found.' if scanner.skip_until(/%>/).nil?
+          is_end_tag_literal = file[scanner.pos - 3] == '%'
+          end_tag_not_found = false unless is_end_tag_literal
+        end
+
+        scanner.pos - 1
+      end
+
+      def remove_tag(file:, start_index:, end_index:)
+        erb_tag = file.byteslice(start_index..end_index)
+
+        whitespace_filler = erb_tag.gsub(/[^\n]/, ' ')
+
+        file_copy = file.dup
+        file_copy[start_index..end_index] = whitespace_filler
+        file_copy
+      end
+
+      def escape_erb_tag_literals(file_content)
+        file_content.gsub(/(<%%|%%>)/) do |_match|
+          HTMLEntities.new.encode($1)
+        end
+      end
+
+      def add_end_marker(file_content)
+        file_content + <<~END_MARKER.chomp
+          <#{END_MARKER_NAME}>
+            This is used to calculate the line number of the last line.
+            This is only necessary until Text#line is fixed in Nokogiri.
+          </#{END_MARKER_NAME}>
+        END_MARKER
+      end
+
+      def ensure_valid_tree(file_tree)
         if file_tree.children.empty? || file_tree.children.last.name != END_MARKER_NAME
-          raise ParsingError, 'File could not be successfully parsed. Ensure all tags are properly closed.'
+          raise ParseError, 'File could not be successfully parsed. Ensure all tags are properly closed.'
         end
       end
     end
 
-    class ParsingError < StandardError
+    class ParseError < StandardError
     end
   end
 end

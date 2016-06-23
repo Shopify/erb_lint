@@ -25,12 +25,12 @@ module ERBLint
       def lint_file(file_tree)
         errors = []
 
-        html_elements = Parser.filter_erb_nodes(file_tree.search('*'))
-        html_elements.each do |html_element|
-          html_element.attribute_nodes.select { |attribute| attribute.name.casecmp('class') == 0 }.each do |class_attr|
-            Parser.remove_escaped_erb_tags(class_attr.value).split(' ').each do |class_name|
-              errors.push(*generate_errors(html_element, class_name, line_number: class_attr.line))
-            end
+        elements_with_class_attr = file_tree.search('[class]')
+        elements_with_class_attr.each do |element|
+          class_names = element.attribute('class').value.split(' ')
+          line_number = element.attribute('class').line
+          class_names.each do |class_name|
+            errors.push(*generate_errors(element_name: element.name, class_name: class_name, line_number: line_number))
           end
         end
         errors
@@ -38,14 +38,15 @@ module ERBLint
 
       private
 
-      def generate_errors(element, class_name, line_number:)
+      def generate_errors(element_name:, class_name:, line_number:)
         violated_rules(class_name).map do |violated_rule|
-          suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = 'Deprecated class `%s` detected matching the pattern `%s` on the surrounding `%s` element.'\
             "%s #{@addendum}".strip
+          suggestion = " #{violated_rule[:suggestion]}".rstrip
+
           {
             line: line_number,
-            message: format(message, class_name, violated_rule[:class_expr], element.name, suggestion)
+            message: format(message, class_name, violated_rule[:class_expr], element_name, suggestion)
           }
         end
       end
