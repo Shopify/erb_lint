@@ -11,9 +11,9 @@ module ERBLint
       def parse(file_content)
         clean_file_content = strip_erb_tags(file_content)
 
-        xml_ready_file_content = add_end_marker(clean_file_content)
+        html_ready_file_content = add_end_marker(clean_file_content)
 
-        file_tree = Nokogiri::XML.fragment(xml_ready_file_content)
+        file_tree = Nokogiri::HTML.fragment(html_ready_file_content)
 
         ensure_valid_tree(file_tree)
 

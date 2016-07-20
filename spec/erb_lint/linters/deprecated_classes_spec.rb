@@ -213,7 +213,7 @@ describe ERBLint::Linter::DeprecatedClasses do
 
     context 'when invalid attributes have really long names' do
       let(:file) { <<~FILE }
-        <div superlongpotentialattributename"small">
+        <div superlongpotentialattributename"small"></div>
       FILE
 
       it 'does not report any errors' do
@@ -260,8 +260,12 @@ describe ERBLint::Linter::DeprecatedClasses do
           </div>
         FILE
 
-        it 'does not report any errors' do
-          expect(linter_errors).to eq []
+        it 'reports 1 error' do
+          expect(linter_errors.size).to eq 1
+        end
+
+        it 'reports an error with its message ending with the suggestion' do
+          expect(linter_errors.first[:message]).to end_with suggestion_1
         end
       end
     end

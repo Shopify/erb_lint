@@ -8,7 +8,7 @@ describe ERBLint::Parser do
       let(:file) { '' }
 
       it 'returns a document fragment with only the end marker as a child' do
-        expect(described_class.parse(file).class).to eq Nokogiri::XML::DocumentFragment
+        expect(described_class.parse(file).class).to eq Nokogiri::HTML::DocumentFragment
         expect(described_class.parse(file).children.size).to eq 1
         expect(described_class.parse(file).child.name).to eq ERBLint::Parser::END_MARKER_NAME
       end
