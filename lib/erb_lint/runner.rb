@@ -9,7 +9,7 @@ module ERBLint
       LinterRegistry.load_custom_linters
       @linters = LinterRegistry.linters.select { |linter_class| linter_enabled?(linter_class) }
       @linters.map! do |linter_class|
-        linter_config = @config['linters'][linter_class.simple_name]
+        linter_config = @config.dig('linters', linter_class.simple_name)
         linter_class.new(linter_config)
       end
     end
@@ -27,14 +27,13 @@ module ERBLint
     private
 
     def linter_enabled?(linter_class)
-      linter_classes = @config['linters']
-      linter_class_found = linter_classes[linter_class.simple_name]
-      return false if linter_class_found.nil?
-      linter_class_found['enabled'] || false
+      linter_config = @config.dig('linters', linter_class.simple_name)
+      return false if linter_config.nil?
+      linter_config['enabled'] || false
     end
 
     def linter_excludes_file?(linter, filename)
-      excluded_filepaths = linter['exclude'] || []
+      excluded_filepaths = @config.dig('linters', linter.class.simple_name, 'exclude') || []
       excluded_filepaths.each do |path|
         if File.fnmatch?(path, filename)
           return true
