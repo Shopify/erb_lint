@@ -25,7 +25,8 @@ describe ERBLint::Runner do
 
   describe '#run' do
     let(:file) { 'DummyFileContent' }
-    subject { runner.run(file) }
+    let(:filename) { 'somefolder/otherfolder/dummyfile.html.erb' }
+    subject { runner.run(filename, file) }
 
     fake_linter_1_errors = ['FakeLinter1DummyErrors']
     fake_linter_2_errors = ['FakeLinter2DummyErrors']
@@ -90,6 +91,21 @@ describe ERBLint::Runner do
           'linters' => {
             'FakeLinter1' => { 'enabled' => false },
             'FakeLinter2' => { 'enabled' => false }
+          }
+        }
+      end
+
+      it 'returns no linters' do
+        expect(subject).to be_empty
+      end
+    end
+
+    context 'when all linters exclude the file' do
+      let(:config) do
+        {
+          'linters' => {
+            'FakeLinter1' => { 'enabled' => true, 'exclude' => ['**/otherfolder/**'] },
+            'FakeLinter2' => { 'enabled' => true, 'exclude' => ['somefolder/**.html.erb'] }
           }
         }
       end

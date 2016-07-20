@@ -35,9 +35,7 @@ module ERBLint
     def linter_excludes_file?(linter, filename)
       excluded_filepaths = @config.dig('linters', linter.class.simple_name, 'exclude') || []
       excluded_filepaths.each do |path|
-        if File.fnmatch?(path, filename)
-          return true
-        end
+        return true if File.fnmatch?(path, filename)
       end
       false
     end
