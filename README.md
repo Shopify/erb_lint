@@ -50,7 +50,7 @@ gem 'erb_lint'
 
   ```ruby
   file = File.read('file.html.erb')
-  violations = runner.run(file)
+  violations = runner.run('file.html.erb', file)
   ```
   
   The runner returns a violation list containing each linter that was run and its corresponding list of errors.
@@ -73,6 +73,7 @@ config = {
   'linters' => {
     'Linter1' => {
       'enabled' => true,
+      'exclude' => ['**/exclude_this_directory/**', 'app/views/and_this_one/**.html.erb']
       'linter_specific_option' => 'value',
       ...
     },
@@ -86,10 +87,14 @@ config = {
 }
 ```
 
-All linters have an `enabled` option which can be `true` or `false`, which
-controls whether the linter is run, along with linter-specific options.
+All linters have an `enabled` option which can be `true` or `false`, and controls whether the linter is run.
 
-The default configuration is:
+In addition, linters have an optional `exclude` option which specifies a list of paths that this linter should ignore.
+The format for specifying path patterns follows the [Ruby glob pattern](http://ruby-doc.org/core-2.3.0/File.html#method-c-fnmatch).
+
+Lastly, linters have a set of options that are specific to that linter's functionality and are defined down below for each linter.
+
+By default, ERBLint will enable `FinalNewLine`, even if the `Runner` has no config passed in:
 
 ```ruby
 default_config = {
@@ -100,8 +105,6 @@ default_config = {
   }
 }
 ```
-
-which gets used when you create a `Runner` with no config.
 
 ## Linters
 
