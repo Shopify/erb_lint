@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'nokogiri'
 require 'htmlentities'
+require 'securerandom'
 
 module ERBLint
   # Contains the logic for generating the file tree structure used by linters.
@@ -9,11 +10,14 @@ module ERBLint
 
     class << self
       def parse(file_content)
-        clean_file_content = strip_erb_tags(file_content)
+        seed = SecureRandom.hex(10)
+        html_ready_file_content = escape_erb_tags(file_content, seed)
 
-        html_ready_file_content = add_end_marker(clean_file_content)
+        final_file_content = add_end_marker(html_ready_file_content)
 
-        file_tree = Nokogiri::HTML.fragment(html_ready_file_content)
+        file_tree = Nokogiri::HTML.fragment(final_file_content)
+
+        restore_erb_tags(file_tree, seed)
 
         ensure_valid_tree(file_tree)
 
@@ -25,9 +29,25 @@ module ERBLint
         top_level_elements.size == 1 && top_level_elements.last.name == END_MARKER_NAME
       end
 
+      def get_all_nodes(nodes)
+        nodes.search('.//node()')
+      end
+
+      def get_non_text_nodes(nodes)
+        nodes.search('*')
+      end
+
+      def get_text_nodes(nodes)
+        nodes.search('.//text()')
+      end
+
+      def get_attributes(nodes)
+        nodes.search('.//@*')
+      end
+
       private
 
-      def strip_erb_tags(file_content)
+      def escape_erb_tags(file_content, seed)
         scanner = StringScanner.new(file_content)
 
         while scanner.skip_until(/<%/)
@@ -41,10 +61,18 @@ module ERBLint
 
           end_tag_index = find_end_tag_index(file: file_content, scanner: scanner)
 
-          file_content = remove_tag(file: file_content, start_index: start_tag_index, end_index: end_tag_index)
+          file_content, new_scanner_pos = escape_tag(
+            file: file_content,
+            start_index: start_tag_index,
+            end_index: end_tag_index,
+            escape_seed: seed
+          )
+
+          scanner = StringScanner.new(file_content)
+          scanner.pos = new_scanner_pos
         end
 
-        file_content = escape_erb_tag_literals(file_content)
+        file_content = encode_erb_tag_literals(file_content)
 
         file_content
       end
@@ -61,17 +89,37 @@ module ERBLint
         scanner.pos - 1
       end
 
-      def remove_tag(file:, start_index:, end_index:)
-        erb_tag = file.byteslice(start_index..end_index)
+      def escape_tag(file:, start_index:, end_index:, escape_seed:)
+        bare_erb_tag = file.byteslice(start_index..end_index)
 
-        whitespace_filler = erb_tag.gsub(/[^\n]/, ' ')
+        escaped_tag = bare_erb_tag
+          .gsub(/<%/, "_erb#{escape_seed}start_")
+          .gsub(/%>/, "_erb#{escape_seed}end_")
+        escaped_encoded_tag = HTMLEntities.new.encode(escaped_tag)
 
-        file_copy = file.dup
-        file_copy[start_index..end_index] = whitespace_filler
-        file_copy
+        file = replace_tag_in_file(
+          file: file,
+          start_index: start_index,
+          end_index: end_index,
+          content: escaped_encoded_tag
+        )
+
+        new_end_index = start_index + escaped_tag.length
+
+        return file, new_end_index
       end
 
-      def escape_erb_tag_literals(file_content)
+      def replace_tag_in_file(file:, start_index:, end_index:, content:)
+        left_boundary = [0, start_index - 1].max
+        preceding_content = left_boundary == 0 ? '' : file[0..left_boundary]
+
+        right_boundary = [end_index + 1, file.length - 1].min
+        following_content = right_boundary == file.length - 1 ? '' : file[right_boundary..-1]
+
+        preceding_content + content + following_content
+      end
+
+      def encode_erb_tag_literals(file_content)
         file_content.gsub(/(<%%|%%>)/) do |tag_literal|
           HTMLEntities.new.encode(tag_literal)
         end
@@ -84,6 +132,18 @@ module ERBLint
             This is only necessary until Text#line is fixed in Nokogiri.
           </#{END_MARKER_NAME}>
         END_MARKER
+      end
+
+      def restore_erb_tags(file_tree, seed)
+        text_containers = get_text_nodes(file_tree) + get_attributes(file_tree)
+        text_containers.each do |text_container|
+          erb_tag_restored_content = text_container.content
+            .gsub(/_erb#{seed}start_/, "<%")
+            .gsub(/_erb#{seed}end_/, "%>")
+          text_container.content = erb_tag_restored_content
+        end
+
+        # in the future we would ideally parse out the erb tags into real nodes and assign line numbers
       end
 
       def ensure_valid_tree(file_tree)
