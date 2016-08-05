@@ -29,55 +29,31 @@ module ERBLint
       def lint_file(file_tree)
         errors = []
         @prior_violations = []
-        inner_text = select_text_children(html_elements(file_tree))
-        outer_text = select_text_children(file_tree)
-        all_text = (outer_text + inner_text)
-        # Assumes the immediate parent is on the same line. Nokogiri bug
-        # prevents retrieving line number from text node:
-        # https://github.com/sparklemotion/nokogiri/issues/1493
+        all_text = Parser.get_text_nodes(file_tree)
         all_text.each do |text_node|
           # Skips nodes that contain only a newline
-          next if text_node.text == '\n'
-          line_number = calculate_line_number(text_node)
-          errors.push(*generate_errors(strip_next_lines(text_node.text), line_number))
+          next if text_node.text == '\n' # TODO: Check that the node contains content (next if the node doesn't contain content)
+          content_lines = split_lines(text_node)
+          content.lines.each do |line|
+            errors.push(*generate_errors(line.text, line.number))
+          end
         end
         errors
       end
 
       private
 
-      def calculate_line_number(text_node)
+      def split_lines(text_node)
+        lines = []
+        current_line_number = 1
         unless text_node.parent.nil?
           s = StringScanner.new(text_node.text)
-          # Scan until character that's not newline or space
-          newlines = s.scan_until(/[^\\n\s]/) || ''
-          @newline_count = newlines.scan(/\n/).size || 0
-          text_node.parent.line + @newline_count
-        end
-      end
-
-      # To avoid errors showing the wrong line number in Policial
-      def strip_next_lines(text)
-        if text =~ /\n/
-          if text[0] == '\n'
-            # Strips out content after any newlines following the
-            # newline_count number of newlines.
-            text.match(/\A.*\n{#{@newline_count}}.*/).to_s
-          else
-            # Strips out the content after any newlines.
-            text.match(/(.+?)(?=\n)/).to_s
+          while line_content = s.scan_until(/\n/)
+            lines.push({text: line_content, number: current_line_number})
+            current_line_number += 1
           end
-        else
-          text
         end
-      end
-
-      def select_text_children(source)
-        source.children.select(&:text?) || []
-      end
-
-      def html_elements(file_tree)
-        Nokogiri::XML::NodeSet.new(file_tree.document, file_tree.search('*'))
+        lines
       end
 
       def generate_errors(text, line_number)
@@ -98,21 +74,20 @@ module ERBLint
 
       def violated_rules(text)
         @content_ruleset.select do |content_rule|
-          violation = content_rule[:violating_pattern]
+          violating_pattern = content_rule[:violating_pattern]
           suggestion = content_rule[:suggestion]
-          rule_case_insensitive = content_rule[:case_insensitive] == true
+          case_insensitive = content_rule[:case_insensitive] == true
           # Next if this violation is contained within another one that has occurred earlier
           # in the list, e.g. "Store's admin" violates "store's admin" and "Store"
-          next if @prior_violations.to_s.include?(violation)
-          if rule_case_insensitive
-            # case-insensitive_match
-            match_violation(/(#{violation})\b/i, text)
-          elsif !rule_case_insensitive && suggestion_lowercase(suggestion, violation)
+          next if @prior_violations.to_s.include?(violating_pattern)
+          if case_insensitive
+            match_violation(/(#{violating_pattern})\b/i, text)
+          elsif !case_insensitive && suggestion_lowercase(suggestion, violating_pattern)
             # case-sensitive match that ignores case violations that start a sentence
-            match_violation(/\w (#{violation})\b/, text)
+            match_violation(/\w (#{violating_pattern})\b/, text)
           else
             # case-sensitive match
-            match_violation(/(#{violation})\b/, text)
+            match_violation(/(#{violating_pattern})\b/, text)
           end
         end
       end
@@ -121,11 +96,11 @@ module ERBLint
         regex.match(text) && record_prior_violation(regex, text)
       end
 
-      def suggestion_lowercase(suggestion, violation)
+      def suggestion_lowercase(suggestion, violating_pattern)
         # Check if the suggestion starts with a lowercase letter and the
         # violation starts with an uppercase letter, in which case the match
         # needs to ignore cases where the violation starts a sentence.
-        suggestion.match(/\p{Lower}/) && !violation.match(/\p{Lower}/)
+        suggestion.match(/\p{Lower}/) && !violating_pattern.match(/\p{Lower}/)
       end
 
       def record_prior_violation(regex, text)
