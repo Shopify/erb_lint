@@ -19,60 +19,60 @@ describe ERBLint::Parser do
         context 'when the erb tags are code execution tags' do
           let(:file) { '<% %>' }
 
-          it 'returns a text node consisting only of whitespace' do
+          it 'returns a text node consisting of the execution tag' do
             expect(described_class.parse(file).children.size).to eq 2
             expect(described_class.parse(file).child.text?).to be_truthy
-            expect(described_class.parse(file).child.text.strip).to eq ''
+            expect(described_class.parse(file).child.text).to eq '<% %>'
           end
         end
 
         context 'when the erb tags are code evaluation tags' do
           let(:file) { '<%= %>' }
 
-          it 'returns a text node consisting only of whitespace' do
+          it 'returns a text node consisting of the evaluation tag' do
             expect(described_class.parse(file).children.size).to eq 2
             expect(described_class.parse(file).child.text?).to be_truthy
-            expect(described_class.parse(file).child.text.strip).to eq ''
+            expect(described_class.parse(file).child.text).to eq '<%= %>'
           end
         end
 
         context 'when the erb tags trim the following line break' do
           let(:file) { '<% -%>' }
 
-          it 'returns a text node consisting only of whitespace' do
+          it 'returns a text node consisting of the trim tag' do
             expect(described_class.parse(file).children.size).to eq 2
             expect(described_class.parse(file).child.text?).to be_truthy
-            expect(described_class.parse(file).child.text.strip).to eq ''
+            expect(described_class.parse(file).child.text).to eq '<% -%>'
           end
         end
 
         context 'when the erb tags are comment tags' do
           let(:file) { '<%# %>' }
 
-          it 'returns a text node consisting only of whitespace' do
+          it 'returns a text node consisting of the comment tag' do
             expect(described_class.parse(file).children.size).to eq 2
             expect(described_class.parse(file).child.text?).to be_truthy
-            expect(described_class.parse(file).child.text.strip).to eq ''
+            expect(described_class.parse(file).child.text).to eq '<%# %>'
           end
         end
 
         context 'when the erb tags are inside double quotes' do
           let(:file) { '"<% %>"' }
 
-          it 'returns a text node consisting of double quotes containing 5 spaces' do
+          it 'returns a text node consisting of double quotes containing the erb tag' do
             expect(described_class.parse(file).children.size).to eq 2
             expect(described_class.parse(file).child.text?).to be_truthy
-            expect(described_class.parse(file).child.text.strip).to eq '"     "'
+            expect(described_class.parse(file).child.text).to eq '"<% %>"'
           end
         end
 
         context 'when the erb tags are inside single quotes' do
           let(:file) { "'<% %>'" }
 
-          it 'returns a text node consisting of single quotes containing 5 spaces' do
+          it 'returns a text node consisting of single quotes containing the erb tag' do
             expect(described_class.parse(file).children.size).to eq 2
             expect(described_class.parse(file).child.text?).to be_truthy
-            expect(described_class.parse(file).child.text.strip).to eq "'     '"
+            expect(described_class.parse(file).child.text).to eq "'<% %>'"
           end
         end
       end

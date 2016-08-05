@@ -110,11 +110,11 @@ module ERBLint
       end
 
       def replace_tag_in_file(file:, start_index:, end_index:, content:)
-        left_boundary = [0, start_index - 1].max
-        preceding_content = left_boundary == 0 ? '' : file[0..left_boundary]
+        left_boundary = start_index - 1
+        preceding_content = left_boundary < 0 ? '' : file[0..left_boundary]
 
-        right_boundary = [end_index + 1, file.length - 1].min
-        following_content = right_boundary == file.length - 1 ? '' : file[right_boundary..-1]
+        right_boundary = end_index + 1
+        following_content = right_boundary > file.length - 1 ? '' : file[right_boundary..-1]
 
         preceding_content + content + following_content
       end
