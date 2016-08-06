@@ -31,11 +31,11 @@ module ERBLint
         @prior_violations = []
         all_text = Parser.get_text_nodes(file_tree)
         all_text.each do |text_node|
-          # Skips nodes that contain only a newline
-          next if text_node.text == '\n' # TODO: Check that the node contains content (next if the node doesn't contain content)
+          # Next if node doesn't contain content
+          next if text_node.text =~ /\A(\n|\s)*\z/
           content_lines = split_lines(text_node)
-          content.lines.each do |line|
-            errors.push(*generate_errors(line.text, line.number))
+          content_lines.each do |line|
+            errors.push(*generate_errors(line[:text], line[:number]))
           end
         end
         errors
@@ -48,9 +48,13 @@ module ERBLint
         current_line_number = 1
         unless text_node.parent.nil?
           s = StringScanner.new(text_node.text)
-          while line_content = s.scan_until(/\n/)
-            lines.push({text: line_content, number: current_line_number})
-            current_line_number += 1
+          if s.check_until(/\n/)
+            while line_content = s.scan_until(/\n/)
+              lines.push(text: line_content, number: current_line_number)
+              current_line_number += 1
+            end
+          else
+            lines.push(text: text_node.text, number: current_line_number)
           end
         end
         lines

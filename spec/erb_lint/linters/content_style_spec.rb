@@ -393,7 +393,6 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context '- text node has multiple lines' do
-      # This test will only handle following lines once we build in multiline functionality
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -419,21 +418,23 @@ describe ERBLint::Linter::ContentStyle do
         </p>
       FILE
 
-      it 'strips the content after the first line and reports only 1 error' do
-        expect(linter_errors.size).to eq 1
+      it 'reports 2 errors' do
+        expect(linter_errors.size).to eq 2
       end
 
       it 'reports an error for `App` and suggests `app`' do
         expect(linter_errors[0][:message]).to include 'Don\'t use `App`'
         expect(linter_errors[0][:message]).to include 'Do use `app`'
+        expect(linter_errors[1][:message]).to include 'Don\'t use `Apps`'
+        expect(linter_errors[1][:message]).to include 'Do use `apps`'
       end
-      it 'calculates a correct first line number' do
+      it 'calculates correct line numbers' do
         expect(linter_errors[0][:line]).to eq(3)
+        expect(linter_errors[1][:line]).to eq(4)
       end
     end
 
     context '- text node starts on same line as parent but has multiple lines' do
-      # This test will only handle following lines once we build in multiline functionality
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -457,16 +458,19 @@ describe ERBLint::Linter::ContentStyle do
         </p>
       FILE
 
-      it 'strips the content after the first line and reports only 1 error' do
-        expect(linter_errors.size).to eq 1
+      it 'reports 2 errors' do
+        expect(linter_errors.size).to eq 2
       end
 
-      it 'reports an error for `App` and suggests `app`' do
+      it 'reports errors for `App` and `Apps` and suggests `app` and `apps`' do
         expect(linter_errors[0][:message]).to include 'Don\'t use `App`'
         expect(linter_errors[0][:message]).to include 'Do use `app`'
+        expect(linter_errors[1][:message]).to include 'Don\'t use `Apps`'
+        expect(linter_errors[1][:message]).to include 'Do use `apps`'
       end
-      it 'calculates a correct first line number' do
+      it 'calculates correct line numbers' do
         expect(linter_errors[0][:line]).to eq(1)
+        expect(linter_errors[1][:line]).to eq(2)
       end
     end
 
