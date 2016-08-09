@@ -92,58 +92,6 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- suggestion is prefix + violation (`Lintercorp theme store`)
-    - file contains violation (`theme store`)
-    - file contains violation (`Theme Store`)
-    - violation contains other violations (`Theme Store` contains `Theme` and `Store`)' do
-      # Note that this test will fail if the violations contained within another
-      # violation appear earlier in the rule list than the containing violation.
-      violation_set_1 = ['theme store', 'Theme Store']
-      suggestion_1 = 'Lintercorp theme store'
-      violation_set_2 = 'Theme'
-      suggestion_2 = 'theme'
-      violation_set_3 = 'Themes'
-      suggestion_3 = 'themes'
-      violation_set_4 = 'Store'
-      suggestion_4 = 'store'
-
-      let(:rule_set) do
-        [
-          {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
-          },
-          {
-            'violation' => violation_set_2,
-            'suggestion' => suggestion_2
-          },
-          {
-            'violation' => violation_set_3,
-            'suggestion' => suggestion_3
-          },
-          {
-            'violation' => violation_set_4,
-            'suggestion' => suggestion_4
-          }
-        ]
-      end
-      let(:file) { <<~FILE }
-        <p>The theme store called. They are out of themes at the Theme Store.</p>
-
-      FILE
-
-      it 'reports 2 errors' do
-        expect(linter_errors.size).to eq 2
-      end
-
-      it 'reports errors for `theme store` and `Theme Store` and suggests `Lintercorp theme store`' do
-        expect(linter_errors[0][:message]).to include 'Don\'t use `theme store`'
-        expect(linter_errors[0][:message]).to include 'Do use `Lintercorp theme store`'
-        expect(linter_errors[1][:message]).to include 'Don\'t use `Theme Store`'
-        expect(linter_errors[1][:message]).to include 'Do use `Lintercorp theme store`'
-      end
-    end
-
     context '- violation starts with uppercase character (`Apps`)
     - suggestion starts with lowercase character (`apps`)
     - file contains violation (`Big Apps`)
@@ -178,8 +126,9 @@ describe ERBLint::Linter::ContentStyle do
     - suggestion starts with lowercase character (`app`)
     - violation (`App`) contained in another violation (`Apps`)
     - file contains a violation (`Five hundred App`)
-    - file contains two potential false positives
-      (the string and a sentence within the string both start with `App`)' do
+    - file contains four potential false positives
+      (the string and a sentence within the string both start with `App`, and
+      `App` is preceded by a comma and then a space, and an em dash and no space)' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -198,7 +147,7 @@ describe ERBLint::Linter::ContentStyle do
         ]
       end
       let(:file) { <<~FILE }
-        <p>App Apply. Five hundred App. App now, time is running out.</p>
+        <p>App Apply. Five hundred App. George, App king. George—App king. App now, time is running out.</p>
       FILE
 
       it 'reports 1 errors' do
@@ -387,7 +336,7 @@ describe ERBLint::Linter::ContentStyle do
         expect(linter_errors[0][:message]).to include 'Don\'t use `Lintercorp Plus client`'
         expect(linter_errors[0][:message]).to include 'Do use `Lintercorp Plus merchant`'
       end
-      it 'calculates the correct line number' do
+      it 'calculates correct line numbers' do
         expect(linter_errors[0][:line]).to eq(2)
       end
     end
@@ -474,6 +423,34 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
+    context '- an extra line is present above parent node' do
+      violation_set_1 = 'App'
+      suggestion_1 = 'app'
+
+      let(:rule_set) do
+        [
+          {
+            'violation' => violation_set_1,
+            'suggestion' => suggestion_1
+          }
+        ]
+      end
+      let(:file) { <<~FILE }
+        <div></div>
+        <div>
+          The App
+        </div>
+      FILE
+
+      it 'reports 1 error' do
+        expect(linter_errors.size).to eq 1
+      end
+
+      it 'calculates correct line numbers' do
+        expect(linter_errors[0][:line]).to eq(3)
+      end
+    end
+
     context '- dumb single quote is violation and file has dumb single quote' do
       violation_set_1 = '\''
       suggestion_1 = '’'
@@ -503,14 +480,14 @@ describe ERBLint::Linter::ContentStyle do
     context '- violation is regex' do
       violation_set_1 = '\D+(-|–|—)\$?\d+'
       suggestion_1 = '– (minus sign) to denote negative numbers'
-      regex_description_1 = '— (em dash), – (en dash), or - (hyphen) to denote negative numbers'
+      pattern_description_1 = '— (em dash), – (en dash), or - (hyphen) to denote negative numbers'
 
       let(:rule_set) do
         [
           {
             'violation' => violation_set_1,
             'suggestion' => suggestion_1,
-            'regex_description' => regex_description_1
+            'pattern_description' => pattern_description_1
           }
         ]
       end

@@ -10,7 +10,7 @@ module ERBLint
         @content_ruleset = []
         config.fetch('rule_set', []).each do |rule|
           suggestion = rule.fetch('suggestion', '')
-          regex_description = rule.fetch('regex_description', '')
+          pattern_description = rule.fetch('pattern_description', '')
           case_insensitive = rule.fetch('case_insensitive', false)
           violation = rule.fetch('violation', [])
           (violation.is_a?(String) ? [violation] : violation).each do |violating_pattern|
@@ -18,7 +18,7 @@ module ERBLint
               violating_pattern: violating_pattern,
               suggestion: suggestion,
               case_insensitive: case_insensitive,
-              regex_description: regex_description
+              pattern_description: pattern_description
             )
           end
         end
@@ -29,10 +29,10 @@ module ERBLint
       def lint_file(file_tree)
         errors = []
         @prior_violations = []
-        all_text = Parser.get_text_nodes(file_tree)
-        all_text.each do |text_node|
+        text_nodes = Parser.get_text_nodes(file_tree)
+        text_nodes.each do |text_node|
           # Next if node doesn't contain content
-          next if text_node.text =~ /\A(\n|\s)*\z/
+          next unless text_node.text =~ /[^\n\s]/
           content_lines = split_lines(text_node)
           content_lines.each do |line|
             errors.push(*generate_errors(line[:text], line[:number]))
@@ -45,7 +45,7 @@ module ERBLint
 
       def split_lines(text_node)
         lines = []
-        current_line_number = 1
+        current_line_number = text_node.parent.line
         unless text_node.parent.nil?
           s = StringScanner.new(text_node.text)
           if s.check_until(/\n/)
@@ -63,12 +63,8 @@ module ERBLint
       def generate_errors(text, line_number)
         violated_rules(text).map do |violated_rule|
           suggestion = violated_rule[:suggestion]
-          regex_description = violated_rule[:regex_description]
-          violation = if !regex_description.empty?
-                        regex_description
-                      else
-                        violated_rule[:violating_pattern]
-                      end
+          pattern_description = violated_rule[:pattern_description]
+          violation = pattern_description.empty? ? violated_rule[:violating_pattern] : pattern_description
           {
             line: line_number,
             message: "Don't use `#{violation}`. Do use `#{suggestion}`. #{@addendum}".strip
@@ -81,34 +77,23 @@ module ERBLint
           violating_pattern = content_rule[:violating_pattern]
           suggestion = content_rule[:suggestion]
           case_insensitive = content_rule[:case_insensitive] == true
-          # Next if this violation is contained within another one that has occurred earlier
-          # in the list, e.g. "Store's admin" violates "store's admin" and "Store"
-          next if @prior_violations.to_s.include?(violating_pattern)
           if case_insensitive
-            match_violation(/(#{violating_pattern})\b/i, text)
+            /(#{violating_pattern})\b/i.match(text)
           elsif !case_insensitive && suggestion_lowercase(suggestion, violating_pattern)
             # case-sensitive match that ignores case violations that start a sentence
-            match_violation(/\w (#{violating_pattern})\b/, text)
+            /[^\.]\s(#{violating_pattern})\b/.match(text)
           else
             # case-sensitive match
-            match_violation(/(#{violating_pattern})\b/, text)
+            /(#{violating_pattern})\b/.match(text)
           end
         end
-      end
-
-      def match_violation(regex, text)
-        regex.match(text) && record_prior_violation(regex, text)
       end
 
       def suggestion_lowercase(suggestion, violating_pattern)
         # Check if the suggestion starts with a lowercase letter and the
         # violation starts with an uppercase letter, in which case the match
         # needs to ignore cases where the violation starts a sentence.
-        suggestion.match(/\p{Lower}/) && !violating_pattern.match(/\p{Lower}/)
-      end
-
-      def record_prior_violation(regex, text)
-        @prior_violations.push(regex.match(text).captures)
+        suggestion.match(/\A[a-z]/) && !violating_pattern.match(/\A[A-Z]/)
       end
     end
   end
