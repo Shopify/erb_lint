@@ -14,10 +14,10 @@ describe ERBLint::Linter::ContentStyle do
 
   subject(:linter_errors) { linter.lint_file(ERBLint::Parser.parse(file)) }
 
-  context 'when the rule set is empty' do
+  context 'when rule set is empty' do
     let(:rule_set) { [] }
 
-    context 'when the file is empty' do
+    context 'when file is empty' do
       let(:file) { '' }
 
       it 'does not report any errors' do
@@ -26,11 +26,8 @@ describe ERBLint::Linter::ContentStyle do
     end
   end
 
-  context 'when the rule set contains violations' do
-    context '- rule is case-insensitive
-    - file contains violation with different case from suggestion (`Drop down`)
-    - file contains violation with same case as suggestion (`dropdown`)
-    - file contains suggestion (`drop-down`)' do
+  context 'when rule set and file contain violations' do
+    context 'when rule is case-insensitive and file contains violations in different cases' do
       violation_set_1 = ['dropdown', 'drop down']
       suggestion_1 = 'drop-down'
       case_insensitive_1 = true
@@ -62,9 +59,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- suggestion is prefix + violation (`Lintercorp Help Center`)
-    - file contains suggestion (`Lintercorp Help Center`)
-    - file contains violation (`Help Center`)' do
+    context 'when suggestion is prefix + violation' do
       violation_set_1 = ['Help Center', 'help center']
       suggestion_1 = 'Lintercorp Help Center'
 
@@ -92,11 +87,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- violation starts with uppercase character (`Apps`)
-    - suggestion starts with lowercase character (`apps`)
-    - file contains violation (`Big Apps`)
-    - file contains two potential false positives (the string and a sentence within the string both start
-      with `Apps`)' do
+    context 'when violation starts with uppercase and suggestion starts with lowercase' do
       violation_set_1 = 'Apps'
       suggestion_1 = 'apps'
 
@@ -122,13 +113,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- violation starts with uppercase character (`App`)
-    - suggestion starts with lowercase character (`app`)
-    - violation (`App`) contained in another violation (`Apps`)
-    - file contains a violation (`Five hundred App`)
-    - file contains four potential false positives
-      (the string and a sentence within the string both start with `App`, and
-      `App` is preceded by a comma and then a space, and an em dash and no space)' do
+    context 'when violation is contained in another violation in rule list' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -160,8 +145,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- violation has multiple words starting with uppercase characters (`Payment Gateways`)
-    - suggestion contains only lowercase characters (`payment gateways`)' do
+    context 'when violation is compound word starting with uppercase and suggestion starts with lowercase' do
       violation_set_1 = 'Payment Gateways'
       suggestion_1 = 'payment gateways'
 
@@ -187,9 +171,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- violation has multiple words and first word of violation starts with uppercase character (`Lintercorp
-      partner`)
-    - suggestion has multiple words, both starting with uppercase characters (`Lintercorp Partner`)' do
+    context 'when violation and suggestion are compound words starting with uppercase' do
       violation_set_1 = 'Lintercorp partner'
       suggestion_1 = 'Lintercorp Partner'
 
@@ -215,7 +197,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- file contains violation with a dumb single quote (`Store\'s dashboard`)' do
+    context 'when violation contains single dumb quote' do
       violation_set_1 = 'store\'s dashboard'
       suggestion_1 = 'Lintercorp dashboard'
       case_insensitive_1 = true
@@ -243,8 +225,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- violation has a smart single quote (`Store’s dashboard`)
-    - violation contained in prior violation' do
+    context 'when violation contains single smart quote' do
       violation_set_1 = 'store’s dashboard'
       suggestion_1 = 'Lintercorp dashboard'
       case_insensitive_1 = true
@@ -272,7 +253,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- file has a dumb double quote (`"backend store dashboard`)' do
+    context 'when file contains double dumb quote' do
       violation_set_1 = 'backend store dashboard'
       suggestion_1 = 'Lintercorp dashboard'
       case_insensitive_1 = true
@@ -300,7 +281,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- text node starts on line after parent' do
+    context 'when text node starts on line after parent' do
       violation_set_1 = 'Lintercorp Plus client'
       suggestion_1 = 'Lintercorp Plus merchant'
       case_insensitive_1 = true
@@ -341,7 +322,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- text node has multiple lines' do
+    context 'when text node has multiple lines' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -371,19 +352,13 @@ describe ERBLint::Linter::ContentStyle do
         expect(linter_errors.size).to eq 2
       end
 
-      it 'reports an error for `App` and suggests `app`' do
-        expect(linter_errors[0][:message]).to include 'Don\'t use `App`'
-        expect(linter_errors[0][:message]).to include 'Do use `app`'
-        expect(linter_errors[1][:message]).to include 'Don\'t use `Apps`'
-        expect(linter_errors[1][:message]).to include 'Do use `apps`'
-      end
       it 'calculates correct line numbers' do
         expect(linter_errors[0][:line]).to eq(3)
         expect(linter_errors[1][:line]).to eq(4)
       end
     end
 
-    context '- text node starts on same line as parent but has multiple lines' do
+    context 'when text node starts on same line as parent and has multiple lines' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -411,19 +386,13 @@ describe ERBLint::Linter::ContentStyle do
         expect(linter_errors.size).to eq 2
       end
 
-      it 'reports errors for `App` and `Apps` and suggests `app` and `apps`' do
-        expect(linter_errors[0][:message]).to include 'Don\'t use `App`'
-        expect(linter_errors[0][:message]).to include 'Do use `app`'
-        expect(linter_errors[1][:message]).to include 'Don\'t use `Apps`'
-        expect(linter_errors[1][:message]).to include 'Do use `apps`'
-      end
       it 'calculates correct line numbers' do
         expect(linter_errors[0][:line]).to eq(1)
         expect(linter_errors[1][:line]).to eq(2)
       end
     end
 
-    context '- an extra line is present above parent node' do
+    context 'when an extra line is present above parent node' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
 
@@ -451,7 +420,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- dumb single quote is violation and file has dumb single quote' do
+    context 'when violation is dumb single quote' do
       violation_set_1 = '\''
       suggestion_1 = '’'
 
@@ -477,7 +446,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context '- violation is regex' do
+    context 'when violation is regex' do
       violation_set_1 = '\D+(-|–|—)\$?\d+'
       suggestion_1 = '– (minus sign) to denote negative numbers'
       pattern_description_1 = '— (em dash), – (en dash), or - (hyphen) to denote negative numbers'
@@ -505,7 +474,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context 'when an addendum is present' do
+    context 'when addendum is present' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -532,7 +501,7 @@ describe ERBLint::Linter::ContentStyle do
       end
       let(:addendum) { 'Addendum!' }
 
-      context 'when the file is empty' do
+      context 'when file is empty' do
         let(:file) { '' }
 
         it 'does not report any errors' do
@@ -540,7 +509,7 @@ describe ERBLint::Linter::ContentStyle do
         end
       end
 
-      context 'when the file contains a violation' do
+      context 'when file contains violation' do
         let(:file) { <<~FILE }
           <p>All about that App</p>
         FILE
@@ -555,7 +524,7 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context 'when an addendum is absent' do
+    context 'when addendum is absent' do
       violation_set_1 = 'App'
       suggestion_1 = 'app'
       violation_set_2 = 'Apps'
@@ -574,7 +543,7 @@ describe ERBLint::Linter::ContentStyle do
         ]
       end
 
-      context 'when the file is empty' do
+      context 'when file is empty' do
         violation_set_1 = 'App'
         suggestion_1 = 'app'
         violation_set_2 = 'Apps'
