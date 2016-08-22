@@ -30,8 +30,8 @@ module ERBLint
         errors = []
         text_nodes = Parser.get_text_nodes(file_tree)
         text_nodes.each do |text_node|
-          # Next if node doesn't contain content
-          next unless text_node.text =~ /[^\n\s]/
+          node_has_content = text_node.text =~ /[^\n\s]/
+          next unless node_has_content
           content_lines = split_lines(text_node)
           content_lines.each do |line|
             errors.concat(generate_errors(line[:text], line[:number]))
@@ -76,23 +76,23 @@ module ERBLint
           violating_pattern = content_rule[:violating_pattern]
           suggestion = content_rule[:suggestion]
           case_insensitive = content_rule[:case_insensitive] == true
+          match_case_insensitive = /(#{violating_pattern})\b/i.match(text)
+          match_case_sensitive = /(#{violating_pattern})\b/.match(text)
+          match_ignoring_initial_cap_violations = /[^\.]\s(#{violating_pattern})\b/.match(text)
           if case_insensitive
-            /(#{violating_pattern})\b/i.match(text)
-          elsif !case_insensitive && suggestion_lowercase(suggestion, violating_pattern)
-            # case-sensitive match that ignores case violations that start a sentence
-            /[^\.]\s(#{violating_pattern})\b/.match(text)
+            match_case_insensitive
+          elsif !case_insensitive && suggestion_lowercase_violation_uppercase(suggestion, violating_pattern)
+            match_ignoring_initial_cap_violations
           else
-            # case-sensitive match
-            /(#{violating_pattern})\b/.match(text)
+            match_case_sensitive
           end
         end
       end
 
-      def suggestion_lowercase(suggestion, violating_pattern)
-        # Check if the suggestion starts with a lowercase letter and the
-        # violation starts with an uppercase letter, in which case the match
-        # needs to ignore cases where the violation starts a sentence.
-        suggestion.match(/\A[a-z]/) && !violating_pattern.match(/\A[A-Z]/)
+      def suggestion_lowercase_violation_uppercase(suggestion, violating_pattern)
+        suggestion_first_character_lowercase = suggestion.match(/\A[a-z]/)
+        violation_first_character_uppercase = !violating_pattern.match(/\A[A-Z]/)
+        suggestion_first_character_lowercase && violation_first_character_uppercase
       end
     end
   end
