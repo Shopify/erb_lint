@@ -28,7 +28,6 @@ module ERBLint
 
       def lint_file(file_tree)
         errors = []
-        @prior_violations = []
         text_nodes = Parser.get_text_nodes(file_tree)
         text_nodes.each do |text_node|
           # Next if node doesn't contain content
