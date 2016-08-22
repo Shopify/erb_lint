@@ -34,7 +34,7 @@ module ERBLint
           next unless text_node.text =~ /[^\n\s]/
           content_lines = split_lines(text_node)
           content_lines.each do |line|
-            errors.push(*generate_errors(line[:text], line[:number]))
+            errors.concat(generate_errors(line[:text], line[:number]))
           end
         end
         errors
@@ -48,7 +48,7 @@ module ERBLint
         unless text_node.parent.nil?
           s = StringScanner.new(text_node.text)
           if s.check_until(/\n/)
-            while line_content = s.scan_until(/\n/)
+            while (line_content = s.scan_until(/\n/))
               lines.push(text: line_content, number: current_line_number)
               current_line_number += 1
             end
