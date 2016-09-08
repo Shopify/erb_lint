@@ -194,7 +194,7 @@ Please write tests!
 
 To run tests:
 
-1. run `bundle install` to install `rspec`
+1. run `bundle install` to install `rspec` and ERBLint dependencies.
 2. make sure you have ruby `2.3.0` installed.
 3. `bundle exec rspec spec` to run the test suite.
 
