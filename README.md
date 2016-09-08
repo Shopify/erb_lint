@@ -5,7 +5,7 @@
 ## Requirements
 
 * Ruby 2.2.0+ (Runtime)
-* Ruby 2.3.0+ (Development)
+* Ruby 2.3.1+ (Development)
  - This is due to the use of the tilde-heredoc `<<~` syntax in some tests.
 
 ## Installation
@@ -195,7 +195,7 @@ Please write tests!
 To run tests:
 
 1. run `bundle install` to install `rspec` and ERBLint dependencies.
-2. make sure you have ruby `2.3.0` installed.
+2. make sure you have ruby `2.3.1` installed.
 3. `bundle exec rspec spec` to run the test suite.
 
 ## License
