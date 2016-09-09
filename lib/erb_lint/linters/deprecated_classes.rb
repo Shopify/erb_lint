@@ -32,7 +32,7 @@ module ERBLint
           start_tags.each do |start_tag|
             start_tag.attributes.select(&:class?).each do |class_attr|
               class_attr.value.split(' ').each do |class_name|
-                errors.push(*generate_errors(class_name, index + 1))
+                errors.push(*generate_errors(class_name, line_number: index + 1))
               end
             end
           end
@@ -42,7 +42,7 @@ module ERBLint
 
       private
 
-      def generate_errors(class_name, line_number)
+      def generate_errors(class_name, line_number:)
         violated_rules(class_name).map do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
@@ -69,7 +69,6 @@ module ERBLint
       # https://www.w3.org/TR/html5/syntax.html#syntax-attributes
 
       # attribute names must be non empty and can't contain a certain set of special characters
-      ATTRIBUTE_NAME_PATTERN = %r{[^\s"'>\/=]+}
 
       ATTRIBUTE_VALUE_PATTERN = %r{
         "([^"]*)" |           # double-quoted value
@@ -79,20 +78,18 @@ module ERBLint
 
       # attributes can be empty or have an attribute value
       ATTRIBUTE_PATTERN = %r{
-        #{ATTRIBUTE_NAME_PATTERN}        # attribute name
+        [^\s"'>\/=]+                     # attribute name
         (
           \s*=\s*                        # any whitespace around equals sign
           (#{ATTRIBUTE_VALUE_PATTERN})   # attribute value
         )?                               # attributes can be empty or have an assignemnt.
       }x
 
-      # Start tag Patterns
+      # Start tag Pattern
       # https://www.w3.org/TR/html5/syntax.html#syntax-start-tag
 
-      TAG_NAME_PATTERN = /[A-Za-z0-9]+/ # maybe add _ < ? etc later since it gets interpreted by some browsers
-
       START_TAG_PATTERN = %r{
-        <(#{TAG_NAME_PATTERN})         # start of tag with tag name
+        <([A-Za-z0-9]+)                # tag name
         (
           (
             \s+                        # required whitespace between tag name and first attribute and between attributes
@@ -104,7 +101,7 @@ module ERBLint
 
       # Represents and provides an interface for a start tag found in the HTML.
       class StartTag
-        attr_accessor :tag_name, :attributes
+        attr_reader :tag_name, :attributes
 
         def initialize(tag_name, attributes)
           @tag_name = tag_name
@@ -115,7 +112,7 @@ module ERBLint
       # Represents and provides an interface for an attribute found in a start tag in the HTML.
       class Attribute
         ATTR_NAME_CLASS_PATTERN = /\Aclass\z/i # attribute names are case-insensitive
-        attr_accessor :attribute_name, :value
+        attr_reader :attribute_name, :value
 
         def initialize(attribute_name, value)
           @attribute_name = attribute_name
@@ -156,7 +153,9 @@ module ERBLint
 
             # The 3 captures [3..5] are the possibilities specified in ATTRIBUTE_VALUE_PATTERN
             possible_value_formats = attribute_matching_group[3..5]
-            value = possible_value_formats.reduce { |a, e| a.nil? ? e : a }
+            value = possible_value_formats.reduce do |first_val, second_val|
+              first_val.nil? ? second_val : first_val
+            end
 
             Attribute.new(name, value)
           end
