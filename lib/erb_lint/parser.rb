@@ -5,6 +5,7 @@ require 'securerandom'
 
 module ERBLint
   # Contains the logic for generating the file tree structure used by linters.
+  # rubocop:disable Metrics/ModuleLength
   module Parser
     END_MARKER_NAME = 'erb_lint_end_marker'
 
@@ -47,6 +48,7 @@ module ERBLint
 
       private
 
+      # rubocop:disable Metrics/AbcSize
       def escape_erb_tags(file_content, seed)
         scanner = StringScanner.new(file_content)
 
@@ -76,6 +78,7 @@ module ERBLint
 
         file_content
       end
+      # rubocop:enable Metrics/AbcSize
 
       def find_end_tag_index(file:, scanner:)
         end_tag_not_found = true
@@ -93,8 +96,8 @@ module ERBLint
         bare_erb_tag = file.byteslice(start_index..end_index)
 
         escaped_tag = bare_erb_tag
-          .gsub(/<%/, "_erb#{escape_seed}start_")
-          .gsub(/%>/, "_erb#{escape_seed}end_")
+                      .gsub(/<%/, "_erb#{escape_seed}start_")
+                      .gsub(/%>/, "_erb#{escape_seed}end_")
         escaped_encoded_tag = HTMLEntities.new.encode(escaped_tag)
 
         file = replace_tag_in_file(
@@ -105,13 +108,14 @@ module ERBLint
         )
 
         new_end_index = start_index + escaped_tag.length
-
+        # rubocop:disable Style/RedundantReturn
         return file, new_end_index
+        # rubocop:enable Style/RedundantReturn
       end
 
       def replace_tag_in_file(file:, start_index:, end_index:, content:)
         left_boundary = start_index - 1
-        preceding_content = left_boundary < 0 ? '' : file[0..left_boundary]
+        preceding_content = left_boundary.negative? ? '' : file[0..left_boundary]
 
         right_boundary = end_index + 1
         following_content = right_boundary > file.length - 1 ? '' : file[right_boundary..-1]
@@ -138,8 +142,8 @@ module ERBLint
         text_containers = get_text_nodes(file_tree) + get_attributes(file_tree)
         text_containers.each do |text_container|
           erb_tag_restored_content = text_container.content
-            .gsub(/_erb#{seed}start_/, "<%")
-            .gsub(/_erb#{seed}end_/, "%>")
+                                                   .gsub(/_erb#{seed}start_/, '<%')
+                                                   .gsub(/_erb#{seed}end_/, '%>')
           text_container.content = erb_tag_restored_content
         end
 
@@ -156,4 +160,5 @@ module ERBLint
     class ParseError < StandardError
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end
