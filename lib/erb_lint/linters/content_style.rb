@@ -12,8 +12,9 @@ module ERBLint
           suggestion = rule.fetch('suggestion', '')
           pattern_description = rule.fetch('pattern_description', '')
           case_insensitive = rule.fetch('case_insensitive', false)
-          violation = rule.fetch('violation', [])
-          (violation.is_a?(String) ? [violation] : violation).each do |violating_pattern|
+          violation_string_or_array = rule.fetch('violation', [])
+          violation_array = [violation_string_or_array].flatten
+          violation_array.each do |violating_pattern|
             @content_ruleset.push(
               violating_pattern: violating_pattern,
               suggestion: suggestion,

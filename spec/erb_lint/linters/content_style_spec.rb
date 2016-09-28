@@ -28,23 +28,22 @@ describe ERBLint::Linter::ContentStyle do
 
   context 'when rule set and file contain violations' do
     context 'when rule is case-insensitive and file contains violations in different cases' do
-      violation_set_1 = ['dropdown', 'drop down']
-      suggestion_1 = 'drop-down'
-      case_insensitive_1 = true
+      violation_set = ['dropdown', 'drop down']
+      suggestion = 'drop-down'
+      case_insensitive = true
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1,
-            'case_insensitive' => case_insensitive_1
+            'violation' => violation_set,
+            'suggestion' => suggestion,
+            'case_insensitive' => case_insensitive
           }
         ]
       end
 
       let(:file) { <<~FILE }
         <p>Tune in, turn on, and drop-down out! And check out the Drop down and dropdown menu too.</p>
-
       FILE
 
       it 'reports 2 errors' do
@@ -60,21 +59,20 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when suggestion is prefix + violation' do
-      violation_set_1 = ['Help Center', 'help center']
-      suggestion_1 = 'Lintercorp Help Center'
+      violation_set = ['Help Center', 'help center']
+      suggestion = 'Lintercorp Help Center'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
+            'violation' => violation_set,
+            'suggestion' => suggestion
           }
         ]
       end
 
       let(:file) { <<~FILE }
         <p>Help! I need a Lintercorp Help Center. Not just any Help Center. Help!</p>
-
       FILE
 
       it 'reports 1 errors' do
@@ -88,14 +86,14 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when violation starts with uppercase and suggestion starts with lowercase' do
-      violation_set_1 = 'Apps'
-      suggestion_1 = 'apps'
+      violation_set = 'Apps'
+      suggestion = 'apps'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
+            'violation' => violation_set,
+            'suggestion' => suggestion
           }
         ]
       end
@@ -146,14 +144,14 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when violation is compound word starting with uppercase and suggestion starts with lowercase' do
-      violation_set_1 = 'Payment Gateways'
-      suggestion_1 = 'payment gateways'
+      violation_set = 'Payment Gateways'
+      suggestion = 'payment gateways'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
+            'violation' => violation_set,
+            'suggestion' => suggestion
           }
         ]
       end
@@ -172,14 +170,14 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when violation and suggestion are compound words starting with uppercase' do
-      violation_set_1 = 'Lintercorp partner'
-      suggestion_1 = 'Lintercorp Partner'
+      violation_set = 'Lintercorp partner'
+      suggestion = 'Lintercorp Partner'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
+            'violation' => violation_set,
+            'suggestion' => suggestion
           }
         ]
       end
@@ -197,17 +195,17 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context 'when violation contains single dumb quote' do
-      violation_set_1 = 'store\'s dashboard'
-      suggestion_1 = 'Lintercorp dashboard'
-      case_insensitive_1 = true
+    context 'when violation contains single quote' do
+      violation_set = 'store\'s dashboard'
+      suggestion = 'Lintercorp dashboard'
+      case_insensitive = true
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1,
-            'case_insensitive' => case_insensitive_1
+            'violation' => violation_set,
+            'suggestion' => suggestion,
+            'case_insensitive' => case_insensitive
           }
         ]
       end
@@ -226,16 +224,16 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when violation contains single smart quote' do
-      violation_set_1 = 'store’s dashboard'
-      suggestion_1 = 'Lintercorp dashboard'
-      case_insensitive_1 = true
+      violation_set = 'store’s dashboard'
+      suggestion = 'Lintercorp dashboard'
+      case_insensitive = true
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1,
-            'case_insensitive' => case_insensitive_1
+            'violation' => violation_set,
+            'suggestion' => suggestion,
+            'case_insensitive' => case_insensitive
           }
         ]
       end
@@ -253,17 +251,17 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context 'when file contains double dumb quote' do
-      violation_set_1 = 'backend store dashboard'
-      suggestion_1 = 'Lintercorp dashboard'
-      case_insensitive_1 = true
+    context 'when file contains double quote' do
+      violation_set = 'backend store dashboard'
+      suggestion = 'Lintercorp dashboard'
+      case_insensitive = true
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1,
-            'case_insensitive' => case_insensitive_1
+            'violation' => violation_set,
+            'suggestion' => suggestion,
+            'case_insensitive' => case_insensitive
           }
         ]
       end
@@ -393,14 +391,14 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when an extra line is present above parent node' do
-      violation_set_1 = 'App'
-      suggestion_1 = 'app'
+      violation_set = 'App'
+      suggestion = 'app'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
+            'violation' => violation_set,
+            'suggestion' => suggestion
           }
         ]
       end
@@ -420,15 +418,15 @@ describe ERBLint::Linter::ContentStyle do
       end
     end
 
-    context 'when violation is dumb single quote' do
-      violation_set_1 = '\''
-      suggestion_1 = '’'
+    context 'when violation is single quote' do
+      violation_set = '\''
+      suggestion = '’'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1
+            'violation' => violation_set,
+            'suggestion' => suggestion
           }
         ]
       end
@@ -447,16 +445,16 @@ describe ERBLint::Linter::ContentStyle do
     end
 
     context 'when violation is regex' do
-      violation_set_1 = '\D+(-|–|—)\$?\d+'
-      suggestion_1 = '– (minus sign) to denote negative numbers'
-      pattern_description_1 = '— (em dash), – (en dash), or - (hyphen) to denote negative numbers'
+      violation_set = '\D+(-|–|—)\$?\d+'
+      suggestion = '– (minus sign) to denote negative numbers'
+      pattern_description = '— (em dash), – (en dash), or - (hyphen) to denote negative numbers'
 
       let(:rule_set) do
         [
           {
-            'violation' => violation_set_1,
-            'suggestion' => suggestion_1,
-            'pattern_description' => pattern_description_1
+            'violation' => violation_set,
+            'suggestion' => suggestion,
+            'pattern_description' => pattern_description
           }
         ]
       end
