@@ -5,7 +5,6 @@ require 'securerandom'
 
 module ERBLint
   # Contains the logic for generating the file tree structure used by linters.
-  # rubocop:disable Metrics/ModuleLength
   module Parser
     END_MARKER_NAME = 'erb_lint_end_marker'
 
@@ -48,7 +47,6 @@ module ERBLint
 
       private
 
-      # rubocop:disable Metrics/AbcSize
       def escape_erb_tags(file_content, seed)
         scanner = StringScanner.new(file_content)
 
@@ -73,12 +71,13 @@ module ERBLint
           scanner = StringScanner.new(file_content)
           scanner.pos = new_scanner_pos
         end
+        file_content_encoded_erb_tag_literals(file_content)
+      end
 
+      def file_content_encoded_erb_tag_literals(file_content)
         file_content = encode_erb_tag_literals(file_content)
-
         file_content
       end
-      # rubocop:enable Metrics/AbcSize
 
       def find_end_tag_index(file:, scanner:)
         end_tag_not_found = true
@@ -108,9 +107,8 @@ module ERBLint
         )
 
         new_end_index = start_index + escaped_tag.length
-        # rubocop:disable Style/RedundantReturn
-        return file, new_end_index
-        # rubocop:enable Style/RedundantReturn
+
+        [file, new_end_index]
       end
 
       def replace_tag_in_file(file:, start_index:, end_index:, content:)
@@ -160,5 +158,4 @@ module ERBLint
     class ParseError < StandardError
     end
   end
-  # rubocop:enable Metrics/ModuleLength
 end

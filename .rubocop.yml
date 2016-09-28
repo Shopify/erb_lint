@@ -16,3 +16,6 @@ Style/IndentHash:
 Style/RegexpLiteral:
   EnforcedStyle: mixed
 
+Metrics/ModuleLength:
+  CountComments: false
+  Max: 120
