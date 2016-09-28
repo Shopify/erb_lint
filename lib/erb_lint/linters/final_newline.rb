@@ -10,26 +10,33 @@ module ERBLint
         @new_lines_should_be_present = config['present'].nil? ? true : config['present']
       end
 
-      protected
+      def lint_file(file_tree)
+        return [] if Parser.file_is_empty?(file_tree)
 
-      def lint_lines(lines)
-        errors = []
-        return errors if lines.empty?
+        end_marker = file_tree.search(Parser::END_MARKER_NAME).first
+        last_child = end_marker.previous_sibling
 
-        ends_with_newline = lines.last.chars[-1] == "\n"
+        generate_errors(last_element: last_child, end_marker_line_number: end_marker.line)
+      end
 
-        if @new_lines_should_be_present && !ends_with_newline
-          errors.push(
-            line: lines.length,
-            message: 'Missing a trailing newline at the end of the file.'
-          )
-        elsif !@new_lines_should_be_present && ends_with_newline
-          errors.push(
-            line: lines.length,
-            message: 'Remove the trailing newline at the end of the file.'
-          )
+      private
+
+      def generate_errors(last_element:, end_marker_line_number:)
+        if ends_with_newline?(last_element) && !@new_lines_should_be_present
+          message = 'Remove the trailing newline at the end of the file.'
+          last_line = end_marker_line_number - 1
+        elsif !ends_with_newline?(last_element) && @new_lines_should_be_present
+          message = 'Missing a trailing newline at the end of the file.'
+          last_line = end_marker_line_number
+        else
+          return []
         end
-        errors
+
+        [{ message: message, line: last_line }]
+      end
+
+      def ends_with_newline?(node)
+        node.text? && node.text.chars[-1] == "\n"
       end
     end
   end
