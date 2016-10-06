@@ -16,7 +16,6 @@ module ERBLint
 
     def run(filename, file_content)
       file_tree = begin
-
         Parser.parse(file_content)
       rescue Parser::ParseError
         return [
@@ -27,7 +26,6 @@ module ERBLint
           ] }
         ]
       end
-      return unless file_tree
 
       linters_for_file = @linters.select { |linter| !linter_excludes_file?(linter, filename) }
       linters_for_file.map do |linter|
