@@ -108,7 +108,7 @@ default_config = {
 
 ## Linters
 
-`erb-lint` comes with 2 linters on-board: `DeprecatedClasses` and `FinalNewline`, each with their own linter-specific options.
+`erb-lint` comes with 3 linters on-board: `DeprecatedClasses`, `ContentStyle`, and `FinalNewline`, each with their own linter-specific options.
 
 ### DeprecatedClasses
 
@@ -137,6 +137,48 @@ Linter-Specific Option | Description
 `rule_set`             | A list of rules, each with a `deprecated` and `suggestion` option.
 `deprecated`           | A list of **regular expressions** which specify the classes deprecated by this rule.
 `suggestion`           | A string to be included in the rule's error message. Make this informative and specific to the rule that it is contained in.
+`addendum`             | A string to be included at the end of every error message of the rule set. (Optional)
+
+### ContentStyle
+
+ContentStyle will find any words or phrases that
+violate the rule set that you provide.
+
+This `rule_set` is specified as a list of rules, each with a `violation` set and
+a corresponding `suggestion`. Optionally, you can also add a `case_insensitive:
+true` value to make ContentStyle ignore case when searching for violations.
+If your `violation` is a regex pattern, you can add a `pattern_description` string
+to replace the pattern in the error message.
+
+```ruby
+'rule_set' => [
+  {
+    'violation' => ['application', 'program'],
+    'suggestion' => 'app'
+    'case_insensitive' => true
+  },
+  {
+    'violation' => 'support page',
+    'suggestion' => 'Lintercorp Help Center'
+  },
+    'violation' => '\d+ ?(—|-) ?\d+'
+    'suggestion' => '— (en dash) in number ranges'
+    'pattern_description' => '- (hyphen) or — (em dash) in number ranges'
+  }
+]
+```
+
+You can also specify an addendum to be added to the end of each error message
+using the `addendum` option. The error message format is: `"Don't use #{violation}. Do use #{suggestion}"` 
+or `"Don't use #{violation}. Do use #{suggestion}. #{addendum}"` if an `addendum` is present.
+
+Linter-Specific Option | Description
+-----------------------|-----------------------------------------------------------------------------------
+`rule_set`             | A list of rules, each with a `violation` and `suggestion` option.
+`violation`            | A list of strings or regex patterns that specify unwanted text content.
+`suggestion`           | A suggested replacement for the unwanted text content defined in `violation`.
+`case_insensitive`     | A Boolean value that determines whether the rule is case sensitive. (Optional, defaults to false if not included)
+`pattern_description`    | A string that appears in place of the regex pattern as the violation in the error message. (Optional) 
 `addendum`             | A string to be included at the end of every error message of the rule set. (Optional)
 
 ### FinalNewline
