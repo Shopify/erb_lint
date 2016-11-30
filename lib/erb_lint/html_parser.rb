@@ -5,7 +5,7 @@ require 'securerandom'
 
 module ERBLint
   # Contains the logic for generating the file tree structure used by linters.
-  module HtmlParser
+  module HTMLParser
     END_MARKER_NAME = 'erb_lint_end_marker'
 
     class << self

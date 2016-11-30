@@ -3,6 +3,7 @@
 require 'erb_lint/linter_registry'
 require 'erb_lint/linter'
 require 'erb_lint/html_parser'
+require 'erb_lint/erb_parser'
 require 'erb_lint/runner'
 
 # Load linters

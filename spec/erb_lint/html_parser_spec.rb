@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ERBLint::HtmlParser do
+describe ERBLint::HTMLParser do
   describe '#parse' do
     context 'when the file is empty' do
       let(:file) { '' }
@@ -10,7 +10,7 @@ describe ERBLint::HtmlParser do
       it 'returns a document fragment with only the end marker as a child' do
         expect(described_class.parse(file).class).to eq Nokogiri::HTML::DocumentFragment
         expect(described_class.parse(file).children.size).to eq 1
-        expect(described_class.parse(file).child.name).to eq ERBLint::HtmlParser::END_MARKER_NAME
+        expect(described_class.parse(file).child.name).to eq ERBLint::HTMLParser::END_MARKER_NAME
       end
     end
 

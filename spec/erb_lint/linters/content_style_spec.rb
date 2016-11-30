@@ -12,7 +12,7 @@ describe ERBLint::Linter::ContentStyle do
 
   let(:linter) { described_class.new(linter_config) }
 
-  subject(:linter_errors) { linter.lint_file(ERBLint::HtmlParser.parse(file)) }
+  subject(:linter_errors) { linter.lint_file(ERBLint::HTMLParser.parse(file)) }
 
   context 'when rule set is empty' do
     let(:rule_set) { [] }

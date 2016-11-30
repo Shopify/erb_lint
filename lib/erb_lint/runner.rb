@@ -16,8 +16,8 @@ module ERBLint
 
     def run(filename, file_content)
       file_tree = begin
-        HtmlParser.parse(file_content)
-      rescue HtmlParser::ParseError
+        HTMLParser.parse(file_content)
+      rescue HTMLParser::ParseError
         return [
           { linter_name: 'HTMLValidity', errors: [
             { line: 1,
@@ -27,11 +27,13 @@ module ERBLint
         ]
       end
 
+      ruby_ast = ERBParser.parse(file_content)
+
       linters_for_file = @linters.select { |linter| !linter_excludes_file?(linter, filename) }
       linters_for_file.map do |linter|
         {
           linter_name: linter.class.simple_name,
-          errors: linter.lint_file(file_tree)
+          errors: linter.lint_file(file_tree, ruby_ast)
         }
       end
     end

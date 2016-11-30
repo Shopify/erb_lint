@@ -11,9 +11,9 @@ module ERBLint
       end
 
       def lint_file(file_tree)
-        return [] if HtmlParser.file_is_empty?(file_tree)
+        return [] if HTMLParser.file_is_empty?(file_tree)
 
-        end_marker = file_tree.search(HtmlParser::END_MARKER_NAME).first
+        end_marker = file_tree.search(HTMLParser::END_MARKER_NAME).first
         last_child = end_marker.previous_sibling
 
         generate_errors(last_element: last_child, end_marker_line_number: end_marker.line)
