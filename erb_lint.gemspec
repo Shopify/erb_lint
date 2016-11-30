@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'nokogiri'
   s.add_dependency 'htmlentities'
+  s.add_dependency 'parser'
+  s.add_dependency 'ast'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
 end
