@@ -11,7 +11,7 @@ describe ERBLint::Linter::DeprecatedClasses do
 
   let(:linter) { described_class.new(linter_config) }
 
-  subject(:linter_errors) { linter.lint_file(ERBLint::Parser.parse(file)) }
+  subject(:linter_errors) { linter.lint_file(ERBLint::HtmlParser.parse(file)) }
 
   context 'when the rule set is empty' do
     let(:rule_set) { [] }

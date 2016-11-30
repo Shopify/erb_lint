@@ -34,7 +34,7 @@ describe ERBLint::Runner do
     fake_final_newline_errors = ['FakeFinalNewlineDummyErrors']
 
     before do
-      allow(ERBLint::Parser).to receive(:parse)
+      allow(ERBLint::HtmlParser).to receive(:parse)
         .with(file).and_return file_tree
       allow_any_instance_of(ERBLint::Linter::FakeLinter1).to receive(:lint_file)
         .with(file_tree).and_return fake_linter_1_errors

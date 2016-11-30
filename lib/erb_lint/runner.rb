@@ -16,8 +16,8 @@ module ERBLint
 
     def run(filename, file_content)
       file_tree = begin
-        Parser.parse(file_content)
-      rescue Parser::ParseError
+        HtmlParser.parse(file_content)
+      rescue HtmlParser::ParseError
         return [
           { linter_name: 'HTMLValidity', errors: [
             { line: 1,

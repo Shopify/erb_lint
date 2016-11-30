@@ -29,7 +29,7 @@ module ERBLint
 
       def lint_file(file_tree)
         errors = []
-        text_nodes = Parser.get_text_nodes(file_tree)
+        text_nodes = HtmlParser.get_text_nodes(file_tree)
         text_nodes.each do |text_node|
           node_has_content = text_node.text =~ /[^\n\s]/
           next unless node_has_content
