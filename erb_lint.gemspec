@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'htmlentities'
   s.add_dependency 'parser'
   s.add_dependency 'ast'
-  s.add_dependency 'erubis'
+  s.add_dependency 'erubi'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'pry'
