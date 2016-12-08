@@ -27,7 +27,14 @@ module ERBLint
         ]
       end
 
-      ruby_ast = ERBParser.parse(file_content)
+      ruby_ast = begin
+        ERBParser.parse(file_content)
+      rescue ERBParser::ParseError => e
+        return [{
+          linter_name: 'ERBValidity',
+          errors: [{ line: 1, message: e.message }]
+        }]
+      end
 
       linters_for_file = @linters.select { |linter| !linter_excludes_file?(linter, filename) }
       linters_for_file.map do |linter|

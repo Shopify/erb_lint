@@ -27,7 +27,7 @@ module ERBLint
         @addendum = config.fetch('addendum', '')
       end
 
-      def lint_file(file_tree)
+      def lint_file(file_tree, ruby_ast)
         errors = []
         text_nodes = HTMLParser.get_text_nodes(file_tree)
         text_nodes.each do |text_node|

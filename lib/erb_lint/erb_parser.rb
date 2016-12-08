@@ -1,19 +1,16 @@
 require 'erubis'
 require 'parser/current'
 
-RubyParser = Parser
-
 module ERBLint
   module ERBParser
+    def parse(file_content)
+      eruby = Erubis::Eruby.new(file_content)
+      Parser::CurrentRuby.parse(eruby.src)
+    rescue Erubis::ErubisError, Parser::SyntaxError
+      raise ParseError, 'File is not valid ERB and could not be parsed.'
+    end
 
-    class << self
-      def parse(file_content)
-        eruby = Erubis::Eruby.new(file_content)
-
-        ast = RubyParser::CurrentRuby.parse(eruby.src)
-
-        ast
-      end
+    class ParseError < StandardError
     end
   end
 end
