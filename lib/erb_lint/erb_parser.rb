@@ -13,15 +13,15 @@ module ERBLint
         raise ParseError, 'File is not valid ERB and could not be parsed.'
       end
 
-      class ParseError < StandardError
-      end
-
       private
 
       def transform_capture_blocks(src)
         regexp = /<%(={1,2})([^%>]*?\sdo\s(?!\|.*\|\s)?%>)/
         src.gsub(regexp) { "<%|#{$1}#{$2}" }
       end
+    end
+
+    class ParseError < StandardError
     end
   end
 end
