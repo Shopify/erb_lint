@@ -1,0 +1,45 @@
+<%
+  view.config do |v|
+    v.defaults wrapper_tag: :header,
+               lowlight: true,
+               signup_options: {},
+               video_options: {},
+               picture_options: { lazyload: false },
+               image_options: { lazyload: false },
+               heading_tag: :h1
+    v.classes heading: ('lowlight__heading' if view.lowlight),
+      subhead: ('lowlight__heading' if view.lowlight),
+      wrapper: %w(page-header) << ('page-header--video' if view.video_options[:path].present?) << ('marketing-block--lowlight' if view.lowlight),
+      video: 'background-video'
+  end
+%>
+
+<%= content_tag view.wrapper_tag, class: view.classes(:wrapper) do %>
+  <% if view.video_options[:path].present? %>
+    <%= ui_module 'video', view.video_options.merge({
+      classes: {
+        wrapper: view.classes(:video)
+      }
+    }) %>
+  <% end %>
+
+  <div class="page-width">
+    <%= ui_section_heading class: view.classes(:section_heading) do |section_heading| %>
+      <%= section_heading.heading view.heading, tag: view.heading_tag, class: view.classes(:heading) %>
+      <%= section_heading.subhead view.subhead, class: view.classes(:subhead) if view.subhead?  %>
+    <% end %>
+
+    <%= ui_module 'picture', view.picture_options if view.picture_options[:path].present? %>
+    <%= ui_module 'image', view.image_options if view.image_options[:path].present? %>
+
+    <%= capture(&view.block) if view.block %>
+  </div>
+
+  <% if view.signup? %>
+    <%= ui_module 'inline_signup', view.signup_options.merge(
+      classes: {
+        heading: ('lowlight__heading' if view.lowlight),
+        form_wrapper: ('page-header__cta' if view.lowlight)
+      }) %>
+  <% end %>
+<% end %>

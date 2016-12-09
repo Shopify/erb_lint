@@ -16,7 +16,7 @@ module ERBLint
       private
 
       def transform_capture_blocks(src)
-        regexp = /<%(={1,2})([^%>]*?\sdo\s(?!\|.*\|\s)?%>)/
+        regexp = /<%(={1,2})([^%>]*?\sdo\s(?:\|.*\|\s)?%>)/
         src.gsub(regexp) { "<%|#{$1}#{$2}" }
       end
     end
