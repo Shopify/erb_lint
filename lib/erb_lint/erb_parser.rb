@@ -7,7 +7,6 @@ module ERBLint
       def parse(file_content)
         file_content = transform_capture_blocks(file_content)
         eruby = Erubi::CaptureEngine.new(file_content)
-        STDOUT.puts eruby.src
         Parser::CurrentRuby.parse(eruby.src)
       rescue Parser::SyntaxError
         raise ParseError, 'File is not valid ERB and could not be parsed.'
