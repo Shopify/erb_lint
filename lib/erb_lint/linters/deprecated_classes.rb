@@ -22,7 +22,7 @@ module ERBLint
         @addendum = config.fetch('addendum', '')
       end
 
-      def lint_file(file_tree)
+      def lint_file(file_tree, _ruby_ast)
         errors = []
 
         elements_with_class_attr = file_tree.search('[class]')

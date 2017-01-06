@@ -10,7 +10,7 @@ module ERBLint
         @new_lines_should_be_present = config['present'].nil? ? true : config['present']
       end
 
-      def lint_file(file_tree)
+      def lint_file(file_tree, _ruby_ast)
         return [] if HTMLParser.file_is_empty?(file_tree)
 
         end_marker = file_tree.search(HTMLParser::END_MARKER_NAME).first
