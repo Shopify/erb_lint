@@ -1,0 +1,14 @@
+<div class="grid-container">
+  <div class="grid-item grid-10 grid-push-3">
+    <h2 id="ModalTitle" class="visuallyhidden"><%= view.heading %></h2>
+
+    <%= form_tag plus_contact_path, id: 'PlusContactForm', class: 'plus-form', method: :post, 'novalidate' => '' do %>
+      <%= ui_module 'plus/contact_form/partials/hidden_fields', token: view.token %>
+      <%= ui_module 'plus/contact_form/partials/business_fields',
+        render_current_ecommerce_platform: true,
+        classes: { wrapper: 'gutter-bottom' } %>
+      <%= ui_module 'plus/contact_form/partials/contact_fields' %>
+      <%= ui_module 'plus/modules/forms/submit_button', text: t('.form.cta') %>
+    <% end %>
+  </div>
+</div>

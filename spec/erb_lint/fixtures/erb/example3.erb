@@ -1,10 +1,10 @@
 <%= content_for :application_stylesheets do %>
-  <%= stylesheet_link_tag 'marketing_assets/styleguide/styleguide' %>
+  <%= stylesheet_link_tag 'assets/application' %>
 <% end %>
 
 <%= content_for :page_script_tags do %>
   <script>
-    var styleguideSearchData = <%= styleguide_autocomplete_data.to_json.html_safe %>
+    var applicationData = <%= application_data.to_json.html_safe %>
   </script>
-  <%= javascript_include_tag 'marketing_assets/styleguide/styleguide' %>
+  <%= javascript_include_tag 'assets/application' %>
 <% end %>
