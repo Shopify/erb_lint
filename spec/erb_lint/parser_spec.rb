@@ -216,6 +216,19 @@ describe ERBLint::Parser do
         end
       end
     end
+
+    context 'when tags are not properly closed' do
+      let(:file) { <<~FILE.chomp }
+        <div>
+      FILE
+
+      it 'raises a general parsing error' do
+        expect { described_class.parse(file) }.to raise_error(
+          described_class::ParseError,
+          'File could not be successfully parsed. Ensure all tags are properly closed.'
+        )
+      end
+    end
   end
 
   describe '#file_is_empty?' do

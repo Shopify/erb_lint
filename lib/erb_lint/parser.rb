@@ -148,9 +148,10 @@ module ERBLint
         # in the future we would ideally parse out the erb tags into real nodes and assign line numbers
       end
 
-      # Temporarily suppressing invalid HTML errors because nokogiri is raising lots of false positives
-      def ensure_valid_tree(_file_tree)
-        true
+      def ensure_valid_tree(file_tree)
+        if file_tree.children.empty? || file_tree.children.last.name != END_MARKER_NAME
+          raise ParseError, 'File could not be successfully parsed. Ensure all tags are properly closed.'
+        end
       end
     end
 
