@@ -15,20 +15,7 @@ module ERBLint
     end
 
     def run(filename, file_content)
-      file_tree = begin
-
-        Parser.parse(file_content)
-      rescue Parser::ParseError
-        return [
-          { linter_name: 'HTMLValidity', errors: [
-            { line: 1,
-              message: 'File is not HTML valid and could not be successfully parsed.
-              Ensure all tags are properly closed.' }
-          ] }
-        ]
-      end
-      return unless file_tree
-
+      file_tree = Parser.parse(file_content)
       linters_for_file = @linters.select { |linter| !linter_excludes_file?(linter, filename) }
       linters_for_file.map do |linter|
         {
