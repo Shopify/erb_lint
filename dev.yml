@@ -1,0 +1,15 @@
+name: erb-lint
+
+up:
+  - homebrew:
+    - openssl
+    # - another_package
+  - ruby: 2.3.3
+  - bundler
+
+commands:
+  test:
+    syntax:
+      argument: file
+      optional: args...
+    run: bundle exec rspec "$@"
