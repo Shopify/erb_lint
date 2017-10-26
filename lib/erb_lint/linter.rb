@@ -24,9 +24,16 @@ module ERBLint
       raise NotImplementedError, "must implement ##{__method__}"
     end
 
-    # The lint_file method that contains the logic for the linter and returns a list of errors.
+    def lint_file(file_content)
+      lines = file_content.scan(/[^\n]*\n|[^\n]+/)
+      lint_lines(lines)
+    end
+
+    protected
+
+    # The lint_lines method that contains the logic for the linter and returns a list of errors.
     # Must be implemented by the concrete inheriting class.
-    def lint_file(_file_tree)
+    def lint_lines(_lines)
       raise NotImplementedError, "must implement ##{__method__}"
     end
   end

@@ -13,8 +13,56 @@ describe ERBLint::Linter do
           def initialize(_config)
           end
 
-          def lint_file(_file_tree)
+          protected
+
+          def lint_lines(_lines)
           end
+        end
+      end
+    end
+
+    describe '#lint_file' do
+      after do
+        subject.lint_file(file)
+      end
+
+      context 'when the file is empty' do
+        let(:file) { '' }
+
+        it 'calls lint_lines with an empty list' do
+          expect(subject).to receive(:lint_lines).with([])
+        end
+      end
+
+      context 'when the file does not end with a newline' do
+        let(:file) { <<~FILE.chomp }
+          Line1
+          Line2
+          Line3
+        FILE
+
+        it 'calls lint_lines with the list of lines' do
+          expect(subject).to receive(:lint_lines).with(%W(
+            Line1\n
+            Line2\n
+            Line3
+          ))
+        end
+      end
+
+      context 'when the file ends with a newline' do
+        let(:file) { <<~FILE }
+          Line1
+          Line2
+          Line3
+        FILE
+
+        it 'calls lint_lines with the list of lines' do
+          expect(subject).to receive(:lint_lines).with(%W(
+            Line1\n
+            Line2\n
+            Line3\n
+          ))
         end
       end
     end

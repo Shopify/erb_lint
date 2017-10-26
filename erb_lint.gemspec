@@ -12,8 +12,6 @@ Gem::Specification.new do |s|
 
   s.files = Dir['lib/**/*.rb']
 
-  s.add_dependency 'nokogiri'
-  s.add_dependency 'htmlentities'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
 end

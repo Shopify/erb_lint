@@ -11,7 +11,7 @@ describe ERBLint::Linter::DeprecatedClasses do
 
   let(:linter) { described_class.new(linter_config) }
 
-  subject(:linter_errors) { linter.lint_file(ERBLint::Parser.parse(file)) }
+  subject(:linter_errors) { linter.lint_file(file) }
 
   context 'when the rule set is empty' do
     let(:rule_set) { [] }
@@ -66,7 +66,7 @@ describe ERBLint::Linter::DeprecatedClasses do
 
     context 'when the file contains no classes from either set' do
       let(:file) { <<~FILE }
-        <div class="unknown">
+        <div class="unkown">
           Content
         </div>
       FILE
@@ -213,60 +213,11 @@ describe ERBLint::Linter::DeprecatedClasses do
 
     context 'when invalid attributes have really long names' do
       let(:file) { <<~FILE }
-        <div superlongpotentialattributename"small"></div>
+        <div superlongpotentialattributename"small">
       FILE
 
       it 'does not report any errors' do
         expect(linter_errors).to eq []
-      end
-    end
-
-    context 'when the file contains a multiline start tag' do
-      let(:linter_config) do
-        {
-          'rule_set' => rule_set
-        }
-      end
-
-      context 'when the file contains a class from a deprecated set' do
-        let(:file) { <<~FILE }
-          <div class="#{deprecated_set_1.first}"
-               name="second-line">
-            Content
-          </div>
-        FILE
-
-        it 'reports 1 error' do
-          expect(linter_errors.size).to eq 1
-        end
-
-        it 'reports an error on the last line of the start tag' do
-          expect(linter_errors.first[:line]).to eq 2
-        end
-      end
-    end
-
-    context 'when the file does not use a fully lowercase class attribute' do
-      let(:linter_config) do
-        {
-          'rule_set' => rule_set
-        }
-      end
-
-      context 'when the file contains a class from a deprecated set' do
-        let(:file) { <<~FILE }
-          <div ClAsS="#{deprecated_set_1.first}">
-            Content
-          </div>
-        FILE
-
-        it 'reports 1 error' do
-          expect(linter_errors.size).to eq 1
-        end
-
-        it 'reports an error with its message ending with the suggestion' do
-          expect(linter_errors.first[:message]).to end_with suggestion_1
-        end
       end
     end
   end
