@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ERBLint
-  class Linter
+  module Linters
     # Checks for final newlines at the end of a file.
     class FinalNewline < Linter
       include LinterRegistry

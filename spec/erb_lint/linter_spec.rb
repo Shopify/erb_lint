@@ -5,10 +5,10 @@ require 'spec_helper'
 describe ERBLint::Linter do
   context 'when inheriting from the Linter class' do
     let(:linter_config) { {} }
-    subject             { ERBLint::Linter::Fake.new(linter_config) }
+    subject             { ERBLint::Linters::Fake.new(linter_config) }
 
     module ERBLint
-      class Linter
+      module Linters
         class Fake < ERBLint::Linter
           def initialize(_config)
           end

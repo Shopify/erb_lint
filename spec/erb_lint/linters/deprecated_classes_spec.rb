@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ERBLint::Linter::DeprecatedClasses do
+describe ERBLint::Linters::DeprecatedClasses do
   let(:linter_config) do
     {
       'rule_set' => rule_set

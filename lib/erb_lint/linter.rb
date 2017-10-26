@@ -8,10 +8,10 @@ module ERBLint
 
       # When defining a Linter class, define its simple name as well. This
       # assumes that the module hierarchy of every linter starts with
-      # `ERBLint::Linter::`, and removes this part of the class name.
+      # `ERBLint::Linters::`, and removes this part of the class name.
       #
-      # `ERBLint::Linter::Foo.simple_name`          #=> "Foo"
-      # `ERBLint::Linter::Compass::Bar.simple_name` #=> "Compass::Bar"
+      # `ERBLint::Linters::Foo.simple_name`          #=> "Foo"
+      # `ERBLint::Linters::Compass::Bar.simple_name` #=> "Compass::Bar"
       def inherited(linter)
         name_parts = linter.name.split('::')
         name = name_parts.length < 3 ? '' : name_parts[2..-1].join('::')
