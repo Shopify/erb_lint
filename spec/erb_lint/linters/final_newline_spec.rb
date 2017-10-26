@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ERBLint::Linter::FinalNewline do
+describe ERBLint::Linters::FinalNewline do
   let(:linter_config) { { 'present' => present } }
 
   let(:linter) { described_class.new(linter_config) }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ERBLint
-  class Linter
+  module Linters
     class CustomLinter < Linter
       include LinterRegistry
     end

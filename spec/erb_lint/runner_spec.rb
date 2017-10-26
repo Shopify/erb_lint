@@ -7,13 +7,13 @@ describe ERBLint::Runner do
 
   before do
     allow(ERBLint::LinterRegistry).to receive(:linters)
-      .and_return([ERBLint::Linter::FakeLinter1,
-                   ERBLint::Linter::FakeLinter2,
-                   ERBLint::Linter::FinalNewline])
+      .and_return([ERBLint::Linters::FakeLinter1,
+                   ERBLint::Linters::FakeLinter2,
+                   ERBLint::Linters::FinalNewline])
   end
 
   module ERBLint
-    class Linter
+    module Linters
       class FakeLinter1 < Linter
         def initialize(_config) end
       end
@@ -33,11 +33,11 @@ describe ERBLint::Runner do
     fake_final_newline_errors = ['FakeFinalNewlineDummyErrors']
 
     before do
-      allow_any_instance_of(ERBLint::Linter::FakeLinter1).to receive(:lint_file)
+      allow_any_instance_of(ERBLint::Linters::FakeLinter1).to receive(:lint_file)
         .with(file).and_return fake_linter_1_errors
-      allow_any_instance_of(ERBLint::Linter::FakeLinter2).to receive(:lint_file)
+      allow_any_instance_of(ERBLint::Linters::FakeLinter2).to receive(:lint_file)
         .with(file).and_return fake_linter_2_errors
-      allow_any_instance_of(ERBLint::Linter::FinalNewline).to receive(:lint_file)
+      allow_any_instance_of(ERBLint::Linters::FinalNewline).to receive(:lint_file)
         .with(file).and_return fake_final_newline_errors
     end
 
