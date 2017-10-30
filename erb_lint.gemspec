@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'html_tokenizer'
   s.add_dependency 'better_html'
+  s.add_dependency 'activesupport', '~> 5.1'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
-  s.add_development_dependency 'activesupport', '~> 5.1'
 end
