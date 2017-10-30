@@ -28,17 +28,24 @@ module ERBLint
 
       def lint_file(file_content)
         errors = []
-        iterator = BetterHtml::NodeIterator.new(file_content, template_language: :html)
-        each_class_name(iterator) do |class_name, line|
+        iterator = build_iterator(file_content)
+        each_class_name_with_line(iterator) do |class_name, line|
           errors.push(*generate_errors(class_name, line))
+        end
+        each_texthtml_script(iterator) do |text_node|
+          errors.push(*lint_file(text_node.content))
         end
         errors
       end
 
       private
 
-      def each_class_name(iterator)
-        each_element(iterator) do |element|
+      def build_iterator(file_content)
+        BetterHtml::NodeIterator.new(file_content, template_language: :html)
+      end
+
+      def each_class_name_with_line(iterator)
+        each_element_with_index(iterator) do |element, index|
           klass = element.find_attr('class')
           next unless klass
           klass.value_without_quotes.split(' ').each do |class_name|
@@ -47,9 +54,21 @@ module ERBLint
         end
       end
 
-      def each_element(iterator)
-        iterator.nodes.each do |node|
-          yield node if node.element?
+      def each_element_with_index(iterator)
+        iterator.nodes.each_with_index do |node, index|
+          yield node, index if node.element?
+        end
+      end
+
+      def each_texthtml_script(iterator)
+        each_element_with_index(iterator) do |element, index|
+          type = element.find_attr('type')
+          next unless type
+          next unless 'text/html' == type.value_without_quotes
+          next_node = iterator.nodes[index + 1]
+          if next_node&.text?
+            yield next_node
+          end
         end
       end
 
