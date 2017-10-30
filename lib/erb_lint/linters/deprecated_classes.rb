@@ -46,7 +46,7 @@ module ERBLint
       end
 
       def each_class_name_with_line(iterator)
-        each_element_with_index(iterator) do |element, index|
+        each_element_with_index(iterator) do |element, _index|
           klass = element.find_attr('class')
           next unless klass
           klass.value_without_quotes.split(' ').each do |class_name|
@@ -67,9 +67,8 @@ module ERBLint
           next unless type
           next unless 'text/html' == type.value_without_quotes
           next_node = iterator.nodes[index + 1]
-          if next_node&.text?
-            yield next_node
-          end
+
+          yield next_node if next_node&.text?
         end
       end
 
