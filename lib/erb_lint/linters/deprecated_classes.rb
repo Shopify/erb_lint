@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'better_html'
+
 module ERBLint
   module Linters
     # Checks for deprecated classes in the start tags of HTML elements.
@@ -22,25 +24,50 @@ module ERBLint
         @addendum = config.fetch('addendum', '')
       end
 
-      protected
-
-      def lint_lines(lines)
+      def lint_file(file_content)
         errors = []
-
-        lines.each_with_index do |line, index|
-          start_tags = StartTagHelper.start_tags(line)
-          start_tags.each do |start_tag|
-            start_tag.attributes.select(&:class?).each do |class_attr|
-              class_attr.value.split(' ').each do |class_name|
-                errors.push(*generate_errors(class_name, index + 1))
-              end
-            end
-          end
+        iterator = build_iterator(file_content)
+        each_class_name_with_line(iterator) do |class_name, line|
+          errors.push(*generate_errors(class_name, line))
+        end
+        each_texthtml_script(iterator) do |text_node|
+          errors.push(*lint_file(text_node.content))
         end
         errors
       end
 
       private
+
+      def build_iterator(file_content)
+        BetterHtml::NodeIterator.new(file_content, template_language: :html)
+      end
+
+      def each_class_name_with_line(iterator)
+        each_element_with_index(iterator) do |element, _index|
+          klass = element.find_attr('class')
+          next unless klass
+          klass.value_without_quotes.split(' ').each do |class_name|
+            yield class_name, klass.name_parts.first.location.line
+          end
+        end
+      end
+
+      def each_element_with_index(iterator)
+        iterator.nodes.each_with_index do |node, index|
+          yield node, index if node.element?
+        end
+      end
+
+      def each_texthtml_script(iterator)
+        each_element_with_index(iterator) do |element, index|
+          type = element.find_attr('type')
+          next unless type
+          next unless 'text/html' == type.value_without_quotes
+          next_node = iterator.nodes[index + 1]
+
+          yield next_node if next_node&.text?
+        end
+      end
 
       def generate_errors(class_name, line_number)
         violated_rules(class_name).map do |violated_rule|
@@ -56,110 +83,6 @@ module ERBLint
       def violated_rules(class_name)
         @deprecated_ruleset.select do |deprecated_rule|
           /\A#{deprecated_rule[:class_expr]}\z/.match(class_name)
-        end
-      end
-    end
-
-    # Provides methods and classes for finding HTML start tags and their attributes.
-    module StartTagHelper
-      # These patterns cover a superset of the W3 HTML5 specification.
-      # Additional cases not included in the spec include those that are still rendered by some browsers.
-
-      # Attribute Patterns
-      # https://www.w3.org/TR/html5/syntax.html#syntax-attributes
-
-      # attribute names must be non empty and can't contain a certain set of special characters
-      ATTRIBUTE_NAME_PATTERN = %r{[^\s"'>\/=]+}
-
-      ATTRIBUTE_VALUE_PATTERN = %r{
-        "([^"]*)" |           # double-quoted value
-        '([^']*)' |           # single-quoted value
-        ([^\s"'=<>`]+)        # unquoted non-empty value without special characters
-      }x
-
-      # attributes can be empty or have an attribute value
-      ATTRIBUTE_PATTERN = %r{
-        #{ATTRIBUTE_NAME_PATTERN}        # attribute name
-        (
-          \s*=\s*                        # any whitespace around equals sign
-          (#{ATTRIBUTE_VALUE_PATTERN})   # attribute value
-        )?                               # attributes can be empty or have an assignemnt.
-      }x
-
-      # Start tag Patterns
-      # https://www.w3.org/TR/html5/syntax.html#syntax-start-tag
-
-      TAG_NAME_PATTERN = /[A-Za-z0-9]+/ # maybe add _ < ? etc later since it gets interpreted by some browsers
-
-      START_TAG_PATTERN = %r{
-        <(#{TAG_NAME_PATTERN})         # start of tag with tag name
-        (
-          (
-            \s+                        # required whitespace between tag name and first attribute and between attributes
-            #{ATTRIBUTE_PATTERN}       # attributes
-          )*
-        )?                             # having an attribute block is optional
-        \/?>                           # void or foreign elements can have a slash before tag close
-      }x
-
-      # Represents and provides an interface for a start tag found in the HTML.
-      class StartTag
-        attr_accessor :tag_name, :attributes
-
-        def initialize(tag_name, attributes)
-          @tag_name = tag_name
-          @attributes = attributes
-        end
-      end
-
-      # Represents and provides an interface for an attribute found in a start tag in the HTML.
-      class Attribute
-        ATTR_NAME_CLASS_PATTERN = /\Aclass\z/i # attribute names are case-insensitive
-        attr_accessor :attribute_name, :value
-
-        def initialize(attribute_name, value)
-          @attribute_name = attribute_name
-          @value = value
-        end
-
-        def class?
-          ATTR_NAME_CLASS_PATTERN.match(@attribute_name)
-        end
-      end
-
-      class << self
-        def start_tags(line)
-          # TODO: Implement String Scanner to track quotes before the start tag begins to ensure that it is
-          #       not enclosed inside of a string. Alternatively this problem would be solved by using
-          #       a 3rd party parser like Nokogiri::XML
-
-          start_tag_matching_groups = line.scan(/(#{START_TAG_PATTERN})/)
-          start_tag_matching_groups.map do |start_tag_matching_group|
-            tag_name = start_tag_matching_group[1]
-
-            # attributes_string can be nil if there is no space after the tag name (and therefore no attributes).
-            attributes_string = start_tag_matching_group[2] || ''
-
-            attribute_list = attributes(attributes_string)
-
-            StartTag.new(tag_name, attribute_list)
-          end
-        end
-
-        private
-
-        def attributes(attributes_string)
-          attributes_string.scan(/(#{ATTRIBUTE_PATTERN})/).map do |attribute_matching_group|
-            entire_string = attribute_matching_group[0]
-            value_with_equal_sign = attribute_matching_group[1] || '' # This can be nil if attribute is empty
-            name = entire_string.sub(value_with_equal_sign, '')
-
-            # The 3 captures [3..5] are the possibilities specified in ATTRIBUTE_VALUE_PATTERN
-            possible_value_formats = attribute_matching_group[3..5]
-            value = possible_value_formats.reduce { |a, e| a.nil? ? e : a }
-
-            Attribute.new(name, value)
-          end
         end
       end
     end

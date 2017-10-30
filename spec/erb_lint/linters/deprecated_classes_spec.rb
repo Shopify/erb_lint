@@ -92,6 +92,24 @@ describe ERBLint::Linters::DeprecatedClasses do
       end
     end
 
+    context 'when the file contains nested html content' do
+      let(:file) { <<~FILE }
+        <script type="text/html">
+          <div class="#{deprecated_set_1.first}">
+            Content
+          </div>
+        </script>
+      FILE
+
+      it 'reports 1 error' do
+        expect(linter_errors.size).to eq 1
+      end
+
+      it 'reports an error with message containing suggestion 1' do
+        expect(linter_errors.first[:message]).to include suggestion_1
+      end
+    end
+
     context 'when the file contains both classes from set 1' do
       context 'when both classes are on the same tag' do
         let(:file) { <<~FILE }
