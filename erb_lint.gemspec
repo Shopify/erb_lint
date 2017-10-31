@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = 'erb_lint'
-  s.version = '0.0.4'
+  s.version = '0.0.5'
   s.authors = ['Justin Chan']
   s.email = ['justin.the.c@gmail.com']
   s.summary = 'ERB lint tool'
