@@ -2,6 +2,7 @@
 
 require 'better_html'
 require 'rubocop'
+require 'tempfile'
 
 module ERBLint
   module Linters
@@ -62,7 +63,7 @@ module ERBLint
       def team
         selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@enabled_cops) }
         cop_classes = RuboCop::Cop::Registry.new(selected_cops)
-        RuboCop::Cop::Team.new(cop_classes, @config, extra_details: true)
+        RuboCop::Cop::Team.new(cop_classes, @config, extra_details: true, display_cop_names: true)
       end
 
       def format_error(token, offense)
