@@ -60,6 +60,20 @@ describe ERBLint::Linters::Rubocop do
     it { expect(linter_errors).to eq [arbitrary_error_message] }
   end
 
+  context 'line numbers take into account both html and erb newlines' do
+    let(:file) { <<~FILE }
+      <div>
+        <%
+          if foo?
+            banned_method
+          end
+        %>
+      </div>
+    FILE
+
+    it { expect(linter_errors).to eq [arbitrary_error_message(line: 4)] }
+  end
+
   private
 
   def arbitrary_error_message(line: 1)

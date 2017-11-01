@@ -25,7 +25,7 @@ module ERBLint
         erb = BetterHtml::NodeIterator::HtmlErb.new(file_content)
         erb.tokens.each do |token|
           next unless [:stmt, :expr_literal, :expr_escaped].include?(token.type)
-          ruby_code = token.code.strip.sub(BLOCK_EXPR, '')
+          ruby_code = token.code.sub(BLOCK_EXPR, '')
           offenses = inspect_content(ruby_code)
           offenses&.each do |offense|
             errors << format_error(token, offense)
