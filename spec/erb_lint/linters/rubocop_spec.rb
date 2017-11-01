@@ -2,13 +2,12 @@
 
 require 'spec_helper'
 require 'better_html'
-require_relative '../fixtures/example_cop'
 
 describe ERBLint::Linters::Rubocop do
   let(:linter_config) do
     {
       only: ['ErbLint/ArbitraryRule'],
-      require: [File.expand_path('../../fixtures/example_cop', __FILE__)],
+      require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
       AllCops: {
         TargetRubyVersion: '2.3',
       },

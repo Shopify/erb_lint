@@ -18,7 +18,7 @@ describe ERBLint::LinterRegistry do
   end
 
   describe '.load_custom_linters' do
-    let(:custom_directory) { File.expand_path('../fixtures', __FILE__) }
+    let(:custom_directory) { File.expand_path('../fixtures/linters', __FILE__) }
 
     it 'adds the custom linter to the set of registered linters' do
       expect(described_class).to receive(:require)
