@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
 
   s.files = Dir['lib/**/*.rb']
 
-  s.add_dependency 'html_tokenizer'
   s.add_dependency 'better_html', '~> 0.0.5'
+  s.add_dependency 'html_tokenizer'
   s.add_dependency 'rubocop'
 
   s.add_development_dependency 'rspec'

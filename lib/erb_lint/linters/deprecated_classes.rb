@@ -62,7 +62,7 @@ module ERBLint
         each_element_with_index(iterator) do |element, index|
           type = element.find_attr('type')
           next unless type
-          next unless 'text/html' == type.value_without_quotes
+          next unless type.value_without_quotes == 'text/html'
           next_node = iterator.nodes[index + 1]
 
           yield next_node if next_node&.text?

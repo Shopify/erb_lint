@@ -7,11 +7,35 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 20
 
-Style/IndentArray:
+Layout/IndentArray:
   EnforcedStyle: consistent
 
-Style/IndentHash:
+Layout/IndentHash:
   EnforcedStyle: consistent
 
 Style/RegexpLiteral:
   EnforcedStyle: mixed
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/EmptyMethod:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false

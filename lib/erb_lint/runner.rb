@@ -15,7 +15,7 @@ module ERBLint
     end
 
     def run(filename, file_content)
-      linters_for_file = @linters.select { |linter| !linter_excludes_file?(linter, filename) }
+      linters_for_file = @linters.reject { |linter| linter_excludes_file?(linter, filename) }
       linters_for_file.map do |linter|
         {
           linter_name: linter.class.simple_name,
