@@ -10,6 +10,7 @@ module ERBLint
     class Rubocop < Linter
       include LinterRegistry
 
+      # copied from Rails: action_view/template/handlers/erb/erubi.rb
       BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
       def initialize(config_hash)
