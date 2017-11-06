@@ -4,8 +4,5 @@
 # DS_Store
 .DS_Store
 
-# Gemfile.lock
-Gemfile.lock
-
 # Bundle configs
 .bundle
