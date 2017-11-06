@@ -26,7 +26,7 @@ module ERBLint
 
       def format_error(error)
         {
-          line: error.token.location.line,
+          line: error.location.line,
           message: error.message
         }
       end
