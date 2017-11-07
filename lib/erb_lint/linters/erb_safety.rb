@@ -24,6 +24,12 @@ module ERBLint
 
       private
 
+      def config
+        BetterHtml::Config.new(
+          **YAML.load(File.read(Rails.root.join('config/better-html.yml'))).symbolize_keys
+        )
+      end
+
       def format_error(error)
         {
           line: error.location.line,

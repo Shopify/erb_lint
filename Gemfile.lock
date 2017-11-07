@@ -21,11 +21,13 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     ast (2.3.0)
-    better_html (0.0.9)
+    better_html (0.0.10)
       actionview (>= 4.0)
       activesupport (>= 4.0)
       erubi (~> 1.4)
+      html_tokenizer
       parser (>= 2.4)
+      smart_properties
     builder (3.2.3)
     concurrent-ruby (1.0.5)
     crass (1.0.2)
@@ -74,6 +76,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.9.0)
+    smart_properties (1.13.0)
     thread_safe (0.3.6)
     tzinfo (1.2.4)
       thread_safe (~> 0.1)
@@ -90,4 +93,4 @@ DEPENDENCIES
   rubocop (~> 0.50.0)
 
 BUNDLED WITH
-   1.16.0.pre.3
+   1.16.0
