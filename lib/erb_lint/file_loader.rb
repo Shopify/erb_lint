@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ERBLint
+  # Loads file from disk
   class FileLoader
     attr_reader :base_path
 
@@ -21,7 +22,7 @@ module ERBLint
     end
 
     def read_content(filename)
-      File.read(join(base_path, filename))
+      File.read(join(filename))
     end
   end
 end

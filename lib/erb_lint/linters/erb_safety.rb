@@ -28,10 +28,10 @@ module ERBLint
 
       def better_html_config
         @better_html_config ||= begin
-          if @config_filename.nil?
-            config_hash = {}
+          config_hash = if @config_filename.nil?
+            {}
           else
-            config_hash = @file_loader.yaml(@config_filename)
+            @file_loader.yaml(@config_filename)
           end
           BetterHtml::Config.new(**config_hash)
         end
