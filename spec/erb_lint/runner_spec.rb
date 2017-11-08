@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe ERBLint::Runner do
-  let(:runner) { described_class.new(config) }
+  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:runner) { described_class.new(file_loader, config) }
 
   before do
     allow(ERBLint::LinterRegistry).to receive(:linters)
@@ -15,10 +16,8 @@ describe ERBLint::Runner do
   module ERBLint
     module Linters
       class FakeLinter1 < Linter
-        def initialize(_config) end
       end
       class FakeLinter2 < Linter
-        def initialize(_config) end
       end
     end
   end

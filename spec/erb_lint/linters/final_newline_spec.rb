@@ -5,7 +5,8 @@ require 'spec_helper'
 describe ERBLint::Linters::FinalNewline do
   let(:linter_config) { { 'present' => present } }
 
-  let(:linter) { described_class.new(linter_config) }
+  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:linter) { described_class.new(file_loader, linter_config) }
 
   subject(:linter_errors) { linter.lint_file(file) }
 

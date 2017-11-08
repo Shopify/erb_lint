@@ -8,7 +8,9 @@ module ERBLint
     class DeprecatedClasses < Linter
       include LinterRegistry
 
-      def initialize(config)
+      def initialize(file_loader, config)
+        super
+
         @deprecated_ruleset = []
         config.fetch('rule_set', []).each do |rule|
           suggestion = rule.fetch('suggestion', '')

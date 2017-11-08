@@ -13,7 +13,8 @@ describe ERBLint::Linters::Rubocop do
       },
     }.deep_stringify_keys
   end
-  let(:linter) { described_class.new(linter_config) }
+  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:linter) { described_class.new(file_loader, linter_config) }
   subject(:linter_errors) { linter.lint_file(file) }
 
   context 'when rubocop finds no offenses' do

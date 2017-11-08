@@ -10,12 +10,14 @@ module ERBLint
       include LinterRegistry
       include BetterHtml::TestHelper::SafeErbTester
 
-      def initialize(config)
+      def initialize(file_loader, config)
+        super
+        @config_filename = config['better-html-config']
       end
 
       def lint_file(file_content)
         errors = []
-        tester = Tester.new(file_content)
+        tester = Tester.new(file_content, config: config)
         tester.errors.each do |error|
           errors << format_error(error)
         end
@@ -25,9 +27,14 @@ module ERBLint
       private
 
       def config
-        BetterHtml::Config.new(
-          **YAML.load(File.read(Rails.root.join('config/better-html.yml'))).symbolize_keys
-        )
+        @config ||= begin
+          if @config_filename.nil?
+            config_hash = {}
+          else
+            config_hash = @file_loader.yaml(@config_filename).symbolize_keys
+          end
+          BetterHtml::Config.new(**config_hash)
+        end
       end
 
       def format_error(error)
