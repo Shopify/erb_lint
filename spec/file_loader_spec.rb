@@ -15,7 +15,7 @@ describe ERBLint::FileLoader do
 
   describe '.yaml' do
     context "it reads the file from disk" do
-      it { expect(subject).to eq({ 'my_yaml_config' => 123 }) }
+      it { expect(subject).to eq('my_yaml_config' => 123) }
     end
 
     context "it allows regexp to be loaded" do
@@ -24,7 +24,7 @@ describe ERBLint::FileLoader do
         some_config:
           - !ruby/regexp /\\Afoo/i
       YAML
-      it { expect(subject).to eq({ 'some_config' => [/\Afoo/i] }) }
+      it { expect(subject).to eq('some_config' => [/\Afoo/i]) }
     end
 
     context "it does not allow other objects to be loaded" do
@@ -34,7 +34,7 @@ describe ERBLint::FileLoader do
           - !ruby/array:Array
             - fooo
       YAML
-      it { expect{ subject }.to raise_exception(Psych::DisallowedClass) }
+      it { expect { subject }.to raise_exception(Psych::DisallowedClass) }
     end
 
     context "gracefully falls back when syntax is wrong" do

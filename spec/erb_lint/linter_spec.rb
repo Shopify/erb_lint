@@ -11,7 +11,6 @@ describe ERBLint::Linter do
     module ERBLint
       module Linters
         class Fake < ERBLint::Linter
-
           protected
 
           def lint_lines(_lines)
