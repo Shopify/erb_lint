@@ -17,7 +17,7 @@ module ERBLint
 
       def lint_file(file_content)
         errors = []
-        tester = Tester.new(file_content, config: config)
+        tester = Tester.new(file_content, config: better_html_config)
         tester.errors.each do |error|
           errors << format_error(error)
         end
@@ -26,12 +26,12 @@ module ERBLint
 
       private
 
-      def config
-        @config ||= begin
+      def better_html_config
+        @better_html_config ||= begin
           if @config_filename.nil?
             config_hash = {}
           else
-            config_hash = @file_loader.yaml(@config_filename).symbolize_keys
+            config_hash = @file_loader.yaml(@config_filename)
           end
           BetterHtml::Config.new(**config_hash)
         end

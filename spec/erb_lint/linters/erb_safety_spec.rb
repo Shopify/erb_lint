@@ -5,12 +5,23 @@ require 'better_html'
 
 describe ERBLint::Linters::ErbSafety do
   let(:linter_config) { {} }
-  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:better_html_config) do
+    {
+      javascript_safe_methods: ['to_json']
+    }
+  end
+  let(:file_loader) { MockFileLoader.new(better_html_config) }
   let(:linter) { described_class.new(file_loader, linter_config) }
   subject(:linter_errors) { linter.lint_file(file) }
 
-  before do
-    allow(BetterHtml::Config).to receive(:javascript_safe_methods).and_return(['to_json'])
+  class MockFileLoader
+    def initialize(config)
+      @config = config
+    end
+
+    def yaml(_filename)
+      @config
+    end
   end
 
   context 'interpolate a variable in js attribute' do
@@ -115,6 +126,23 @@ describe ERBLint::Linters::ErbSafety do
     FILE
 
     it { expect(linter_errors).to eq [erb_statements_not_allowed] }
+  end
+
+  context 'changing better-html config file works' do
+    let(:linter_config) { { 'better-html-config' => '.better-html.yml' } }
+    let(:file) { <<~FILE }
+      <script><%= foobar %></script>
+    FILE
+
+    context 'with default config' do
+      let(:better_html_config) { {} }
+      it { expect(linter_errors).to eq [unsafe_javascript_tag_interpolate] }
+    end
+
+    context 'with non-default config' do
+      let(:better_html_config) { { javascript_safe_methods: ['foobar'] } }
+      it { expect(linter_errors).to eq [] }
+    end
   end
 
   private
