@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    erb_lint (0.0.8)
+    erb_lint (0.0.9)
       better_html (~> 0.0.10)
       html_tokenizer
       rubocop
