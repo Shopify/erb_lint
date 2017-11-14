@@ -143,6 +143,11 @@ describe ERBLint::Linters::ErbSafety do
       let(:better_html_config) { { javascript_safe_methods: ['foobar'] } }
       it { expect(linter_errors).to eq [] }
     end
+
+    context 'with string keys in config' do
+      let(:better_html_config) { { 'javascript_safe_methods' => ['foobar'] } }
+      it { expect(linter_errors).to eq [] }
+    end
   end
 
   private

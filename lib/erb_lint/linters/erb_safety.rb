@@ -32,7 +32,7 @@ module ERBLint
             if @config_filename.nil?
               {}
             else
-              @file_loader.yaml(@config_filename)
+              @file_loader.yaml(@config_filename).symbolize_keys
             end
           BetterHtml::Config.new(**config_hash)
         end
