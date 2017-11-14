@@ -13,7 +13,8 @@ module ERBLint
       # copied from Rails: action_view/template/handlers/erb/erubi.rb
       BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
-      def initialize(config_hash)
+      def initialize(file_loader, config_hash)
+        super
         @enabled_cops = config_hash.delete('only')
         tempfile_from('.erblint-rubocop', config_hash.except('enabled').to_yaml) do |tempfile|
           custom_config = RuboCop::ConfigLoader.load_file(tempfile.path)

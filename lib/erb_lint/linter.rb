@@ -20,8 +20,8 @@ module ERBLint
     end
 
     # Must be implemented by the concrete inheriting class.
-    def initialize(_config)
-      raise NotImplementedError, "must implement ##{__method__}"
+    def initialize(file_loader, _config)
+      @file_loader = file_loader
     end
 
     def lint_file(file_content)

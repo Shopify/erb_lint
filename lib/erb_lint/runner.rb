@@ -3,14 +3,15 @@
 module ERBLint
   # Runs all enabled linters against an html.erb file.
   class Runner
-    def initialize(config = {})
+    def initialize(file_loader, config = {})
+      @file_loader = file_loader
       @config = default_config.merge(config || {})
 
       LinterRegistry.load_custom_linters
       @linters = LinterRegistry.linters.select { |linter_class| linter_enabled?(linter_class) }
       @linters.map! do |linter_class|
         linter_config = @config.dig('linters', linter_class.simple_name)
-        linter_class.new(linter_config)
+        linter_class.new(@file_loader, linter_config)
       end
     end
 

@@ -5,14 +5,12 @@ require 'spec_helper'
 describe ERBLint::Linter do
   context 'when inheriting from the Linter class' do
     let(:linter_config) { {} }
-    subject             { ERBLint::Linters::Fake.new(linter_config) }
+    let(:file_loader)   { ERBLint::FileLoader.new('.') }
+    subject             { ERBLint::Linters::Fake.new(file_loader, linter_config) }
 
     module ERBLint
       module Linters
         class Fake < ERBLint::Linter
-          def initialize(_config)
-          end
-
           protected
 
           def lint_lines(_lines)

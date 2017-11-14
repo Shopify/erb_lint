@@ -6,7 +6,8 @@ module ERBLint
     class FinalNewline < Linter
       include LinterRegistry
 
-      def initialize(config)
+      def initialize(file_loader, config)
+        super
         @new_lines_should_be_present = config['present'].nil? ? true : config['present']
       end
 
