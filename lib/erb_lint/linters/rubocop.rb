@@ -28,6 +28,8 @@ module ERBLint
         erb.tokens.each do |token|
           next unless [:stmt, :expr_literal, :expr_escaped].include?(token.type)
           ruby_code = token.code.sub(BLOCK_EXPR, '')
+          ruby_code = ruby_code.sub(/\A[[:blank:]]*/, '')
+          ruby_code = "#{' ' * token.location.column}#{ruby_code}"
           offenses = inspect_content(ruby_code)
           offenses&.each do |offense|
             errors << format_error(token, offense)
