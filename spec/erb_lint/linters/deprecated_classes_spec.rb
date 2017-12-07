@@ -4,9 +4,9 @@ require 'spec_helper'
 
 describe ERBLint::Linters::DeprecatedClasses do
   let(:linter_config) do
-    {
-      'rule_set' => rule_set
-    }
+    ERBLint::LinterConfig.new(
+      rule_set: rule_set
+    )
   end
 
   let(:file_loader) { ERBLint::FileLoader.new('.') }
@@ -166,10 +166,10 @@ describe ERBLint::Linters::DeprecatedClasses do
 
     context 'when an addendum is present' do
       let(:linter_config) do
-        {
-          'rule_set' => rule_set,
-          'addendum' => addendum
-        }
+        ERBLint::LinterConfig.new(
+          rule_set: rule_set,
+          addendum: addendum,
+        )
       end
       let(:addendum) { 'Addendum badoo ba!' }
 
@@ -200,9 +200,9 @@ describe ERBLint::Linters::DeprecatedClasses do
 
     context 'when an addendum is absent' do
       let(:linter_config) do
-        {
-          'rule_set' => rule_set
-        }
+        ERBLint::LinterConfig.new(
+          rule_set: rule_set
+        )
       end
 
       context 'when the file is empty' do
