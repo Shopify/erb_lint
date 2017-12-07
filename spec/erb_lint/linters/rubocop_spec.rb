@@ -75,6 +75,38 @@ describe ERBLint::Linters::Rubocop do
     it { expect(linter_errors).to eq [arbitrary_error_message(line: 4)] }
   end
 
+  context 'supports loading nested config' do
+    let(:linter_config) do
+      {
+        only: ['ErbLint/ArbitraryRule'],
+        inherit_from: 'custom_rubocop.yml',
+        AllCops: {
+          TargetRubyVersion: '2.3',
+        },
+      }.deep_stringify_keys
+    end
+
+    let(:nested_config) do
+      {
+        'ErbLint/ArbitraryRule': {
+          'Enabled': false
+        }
+      }.deep_stringify_keys
+    end
+
+    before do
+      expect(file_loader).to receive(:yaml).with('custom_rubocop.yml').and_return(nested_config)
+    end
+
+    context 'rules from nested config are merged' do
+      let(:file) { <<~FILE }
+        <% banned_method %>
+      FILE
+
+      it { expect(linter_errors).to eq [] }
+    end
+  end
+
   context 'code is aligned to the column matching start of erb tag' do
     let(:linter_config) do
       {

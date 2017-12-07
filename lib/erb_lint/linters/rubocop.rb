@@ -16,10 +16,8 @@ module ERBLint
       def initialize(file_loader, config_hash)
         super
         @only_cops = config_hash.delete('only')
-        tempfile_from('.erblint-rubocop', config_hash.except('enabled').to_yaml) do |tempfile|
-          custom_config = RuboCop::ConfigLoader.load_file(tempfile.path)
-          @config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
-        end
+        custom_config = config_from_hash(config_hash.except('enabled'))
+        @config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
 
       def lint_file(file_content)
@@ -82,6 +80,37 @@ module ERBLint
           line: token.location.line + offense.line - 1,
           message: offense.message.strip
         }
+      end
+
+      def config_from_hash(hash)
+        inherit_from = hash.delete('inherit_from')
+        resolve_inheritance(hash, inherit_from)
+
+        tempfile_from('.erblint-rubocop', hash.to_yaml) do |tempfile|
+          RuboCop::ConfigLoader.load_file(tempfile.path)
+        end
+      end
+
+      def resolve_inheritance(hash, inherit_from)
+        base_configs(inherit_from)
+          .reverse_each do |base_config|
+          base_config.each do |k, v|
+            hash[k] = hash.key?(k) ? RuboCop::ConfigLoader.merge(v, hash[k]) : v if v.is_a?(Hash)
+          end
+        end
+      end
+
+      def base_configs(inherit_from)
+        regex = URI::DEFAULT_PARSER.make_regexp(%w[http https])
+        configs = Array(inherit_from).compact.map do |base_name|
+          if base_name =~ /\A#{regex}\z/
+            RuboCop::ConfigLoader.load_file(RuboCop::RemoteConfig.new(base_name, Dir.pwd))
+          else
+            config_from_hash(@file_loader.yaml(base_name))
+          end
+        end
+
+        configs.compact
       end
     end
   end
