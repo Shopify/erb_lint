@@ -9,7 +9,7 @@ describe ERBLint::Linters::Rubocop do
       only: ['ErbLint/ArbitraryRule'],
       require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
       AllCops: {
-        TargetRubyVersion: '2.3',
+        TargetRubyVersion: '2.4',
       },
     }.deep_stringify_keys
   end
@@ -80,7 +80,7 @@ describe ERBLint::Linters::Rubocop do
       {
         only: ['Layout/AlignParameters'],
         AllCops: {
-          TargetRubyVersion: '2.3',
+          TargetRubyVersion: '2.4',
         },
         'Layout/AlignParameters': {
           Enabled: true,
