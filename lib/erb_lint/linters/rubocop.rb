@@ -15,7 +15,7 @@ module ERBLint
 
       def initialize(file_loader, config_hash)
         super
-        @enabled_cops = config_hash.delete('only')
+        @only_cops = config_hash.delete('only')
         custom_config = config_from_hash(config_hash.except('enabled'))
         @config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
@@ -63,8 +63,15 @@ module ERBLint
       end
 
       def team
-        selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@enabled_cops) }
-        cop_classes = RuboCop::Cop::Registry.new(selected_cops)
+        cop_classes =
+          if @only_cops.present?
+            selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
+            RuboCop::Cop::Registry.new(selected_cops)
+          elsif @config['Rails']['Enabled']
+            RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
+          else
+            RuboCop::Cop::Cop.non_rails
+          end
         RuboCop::Cop::Team.new(cop_classes, @config, extra_details: true, display_cop_names: true)
       end
 
