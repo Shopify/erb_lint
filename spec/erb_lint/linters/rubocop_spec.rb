@@ -9,7 +9,7 @@ describe ERBLint::Linters::Rubocop do
       only: ['ErbLint/ArbitraryRule'],
       require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
       AllCops: {
-        TargetRubyVersion: '2.3',
+        TargetRubyVersion: '2.4',
       },
     }.deep_stringify_keys
   end
@@ -73,6 +73,59 @@ describe ERBLint::Linters::Rubocop do
     FILE
 
     it { expect(linter_errors).to eq [arbitrary_error_message(line: 4)] }
+  end
+
+  context 'code is aligned to the column matching start of erb tag' do
+    let(:linter_config) do
+      {
+        only: ['Layout/AlignParameters'],
+        AllCops: {
+          TargetRubyVersion: '2.4',
+        },
+        'Layout/AlignParameters': {
+          Enabled: true,
+          EnforcedStyle: 'with_fixed_indentation',
+          SupportedStyles: %w[with_first_parameter with_fixed_indentation],
+          IndentationWidth: nil,
+        }
+      }.deep_stringify_keys
+    end
+
+    context 'when alignment is correct' do
+      let(:file) { <<~FILE }
+        <% ui_helper :foo,
+          checked: true %>
+      FILE
+
+      it { expect(linter_errors).to eq [] }
+    end
+
+    context 'when alignment is incorrect' do
+      let(:file) { <<~FILE }
+        <% ui_helper :foo,
+              checked: true %>
+      FILE
+
+      it do
+        expect(linter_errors).to eq [
+          {
+            line: 2,
+            message:
+              "Layout/AlignParameters: Use one level of indentation for "\
+              "parameters following the first line of a multi-line method call."
+          }
+        ]
+      end
+    end
+
+    context 'correct alignment with html preceeding erb' do
+      let(:file) { <<~FILE }
+        <div><a><br><% ui_helper :foo,
+                      checked: true %>
+      FILE
+
+      it { expect(linter_errors).to eq [] }
+    end
   end
 
   private

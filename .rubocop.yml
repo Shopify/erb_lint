@@ -39,3 +39,6 @@ Naming/VariableNumber:
 
 Style/SymbolArray:
   Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
