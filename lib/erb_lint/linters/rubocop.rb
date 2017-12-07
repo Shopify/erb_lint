@@ -101,7 +101,7 @@ module ERBLint
       end
 
       def base_configs(inherit_from)
-        regex = URI::DEFAULT_PARSER.make_regexp(%w[http https])
+        regex = URI::DEFAULT_PARSER.make_regexp(%w(http https))
         configs = Array(inherit_from).compact.map do |base_name|
           if base_name =~ /\A#{regex}\z/
             RuboCop::ConfigLoader.load_file(RuboCop::RemoteConfig.new(base_name, Dir.pwd))

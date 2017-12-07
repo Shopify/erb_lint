@@ -117,7 +117,7 @@ describe ERBLint::Linters::Rubocop do
         'Layout/AlignParameters': {
           Enabled: true,
           EnforcedStyle: 'with_fixed_indentation',
-          SupportedStyles: %w[with_first_parameter with_fixed_indentation],
+          SupportedStyles: %w(with_first_parameter with_fixed_indentation),
           IndentationWidth: nil,
         }
       }.deep_stringify_keys

@@ -6,3 +6,5 @@
 
 # Bundle configs
 .bundle
+
+.rubocop-https---shopify-github-io-ruby-style-guide-rubocop-yml

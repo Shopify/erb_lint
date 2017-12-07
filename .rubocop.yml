@@ -1,44 +1,8 @@
+inherit_from:
+  - https://shopify.github.io/ruby-style-guide/rubocop.yml
+
 AllCops:
-  TargetRubyVersion: 2.3
-
-Metrics/LineLength:
-  Max: 120
-
-Metrics/MethodLength:
-  Max: 20
-
-Layout/IndentArray:
-  EnforcedStyle: consistent
-
-Layout/IndentHash:
-  EnforcedStyle: consistent
-
-Style/RegexpLiteral:
-  EnforcedStyle: mixed
-
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
-Style/EmptyMethod:
-  Enabled: false
-
-Metrics/ModuleLength:
-  Enabled: false
-
-Style/TrailingCommaInLiteral:
-  Enabled: false
-
-Style/StringLiterals:
-  Enabled: false
-
-Metrics/BlockLength:
-  Enabled: false
-
-Naming/VariableNumber:
-  Enabled: false
-
-Style/SymbolArray:
-  Enabled: false
-
-Metrics/AbcSize:
-  Enabled: false
+  TargetRubyVersion: 2.4
+  Exclude:
+    - 'vendor/**/*'
+  DisplayCopNames: true
