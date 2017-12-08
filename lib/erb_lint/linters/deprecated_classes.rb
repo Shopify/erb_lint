@@ -8,22 +8,24 @@ module ERBLint
     class DeprecatedClasses < Linter
       include LinterRegistry
 
+      class RuleSet
+        include SmartProperties
+        property :suggestion, accepts: String, default: ''
+        property :deprecated, accepts: LinterConfig.array_of?(String), default: []
+      end
+
+      class ConfigSchema < LinterConfig
+        property :rule_set,
+          default: [],
+          accepts: array_of?(RuleSet),
+          converts: to_array_of(RuleSet)
+        property :addendum, accepts: String
+      end
+      self.config_schema = ConfigSchema
+
       def initialize(file_loader, config)
         super
-
-        @deprecated_ruleset = []
-        config.fetch('rule_set', []).each do |rule|
-          suggestion = rule.fetch('suggestion', '')
-          rule.fetch('deprecated', []).each do |class_expr|
-            @deprecated_ruleset.push(
-              class_expr: class_expr,
-              suggestion: suggestion
-            )
-          end
-        end
-        @deprecated_ruleset.freeze
-
-        @addendum = config.fetch('addendum', '')
+        @addendum = @config.addendum
       end
 
       def lint_file(file_content)
@@ -93,8 +95,17 @@ module ERBLint
       end
 
       def violated_rules(class_name)
-        @deprecated_ruleset.select do |deprecated_rule|
-          /\A#{deprecated_rule[:class_expr]}\z/.match(class_name)
+        [].tap do |result|
+          @config.rule_set.each do |rule|
+            rule.deprecated.each do |deprecated|
+              next unless /\A#{deprecated}\z/ =~ class_name
+
+              result << {
+                suggestion: rule.suggestion,
+                class_expr: deprecated,
+              }
+            end
+          end
         end
       end
     end

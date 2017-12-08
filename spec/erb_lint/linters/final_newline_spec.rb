@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe ERBLint::Linters::FinalNewline do
-  let(:linter_config) { ERBLint::LinterConfig.new(present: present) }
+  let(:linter_config) { described_class.config_schema.new(present: present) }
 
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
@@ -75,7 +75,7 @@ describe ERBLint::Linters::FinalNewline do
   end
 
   context 'when trailing newline preference is not stated' do
-    let(:linter_config) { ERBLint::LinterConfig.new }
+    let(:linter_config) { described_class.config_schema.new }
 
     context 'when the file is empty' do
       let(:file) { '' }

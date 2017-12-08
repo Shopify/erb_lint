@@ -5,11 +5,13 @@ require 'better_html'
 
 describe ERBLint::Linters::Rubocop do
   let(:linter_config) do
-    ERBLint::LinterConfig.new(
+    described_class.config_schema.new(
       only: ['ErbLint/ArbitraryRule'],
-      require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
-      AllCops: {
-        TargetRubyVersion: '2.4',
+      rubocop_config: {
+        require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
+        AllCops: {
+          TargetRubyVersion: '2.4',
+        },
       },
     )
   end
@@ -77,11 +79,13 @@ describe ERBLint::Linters::Rubocop do
 
   context 'supports loading nested config' do
     let(:linter_config) do
-      ERBLint::LinterConfig.new(
+      described_class.config_schema.new(
         only: ['ErbLint/ArbitraryRule'],
-        inherit_from: 'custom_rubocop.yml',
-        AllCops: {
-          TargetRubyVersion: '2.3',
+        rubocop_config: {
+          inherit_from: 'custom_rubocop.yml',
+          AllCops: {
+            TargetRubyVersion: '2.3',
+          },
         },
       )
     end
@@ -109,17 +113,19 @@ describe ERBLint::Linters::Rubocop do
 
   context 'code is aligned to the column matching start of erb tag' do
     let(:linter_config) do
-      ERBLint::LinterConfig.new(
+      described_class.config_schema.new(
         only: ['Layout/AlignParameters'],
-        AllCops: {
-          TargetRubyVersion: '2.4',
+        rubocop_config: {
+          AllCops: {
+            TargetRubyVersion: '2.4',
+          },
+          'Layout/AlignParameters': {
+            Enabled: true,
+            EnforcedStyle: 'with_fixed_indentation',
+            SupportedStyles: %w(with_first_parameter with_fixed_indentation),
+            IndentationWidth: nil,
+          }
         },
-        'Layout/AlignParameters': {
-          Enabled: true,
-          EnforcedStyle: 'with_fixed_indentation',
-          SupportedStyles: %w(with_first_parameter with_fixed_indentation),
-          IndentationWidth: nil,
-        }
       )
     end
 

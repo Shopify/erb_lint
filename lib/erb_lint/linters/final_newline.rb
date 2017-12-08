@@ -6,9 +6,14 @@ module ERBLint
     class FinalNewline < Linter
       include LinterRegistry
 
+      class ConfigSchema < LinterConfig
+        property :present, accepts: [true, false], default: true, reader: :present?
+      end
+      self.config_schema = ConfigSchema
+
       def initialize(file_loader, config)
         super
-        @new_lines_should_be_present = config.fetch(:present, true)
+        @new_lines_should_be_present = @config.present?
       end
 
       protected

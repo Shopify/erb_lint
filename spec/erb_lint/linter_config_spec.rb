@@ -12,18 +12,25 @@ describe ERBLint::LinterConfig do
       context 'with empty hash' do
         let(:config_hash) { {} }
 
-        it { expect(subject).to eq({}) }
+        it 'returns default config' do
+          expect(subject).to eq("enabled" => false, "exclude" => [])
+        end
       end
 
       context 'with custom data' do
         let(:config_hash) { { foo: true } }
 
-        it { expect(subject).to eq('foo' => true) }
+        it { expect { subject }.to raise_error(described_class::Error, "Given key is not allowed: foo") }
       end
     end
 
     describe '#[]' do
       subject { linter_config[key] }
+
+      class CustomConfig < described_class
+        property :foo
+      end
+      let(:linter_config) { CustomConfig.new(config_hash) }
 
       context 'with empty hash' do
         let(:config_hash) { {} }
@@ -45,24 +52,12 @@ describe ERBLint::LinterConfig do
 
         it { expect(subject).to eq('custom value') }
       end
-    end
 
-    describe '#fetch' do
-      let(:config_hash) { { foo: 'custom value' } }
+      context 'with unknown key' do
+        let(:config_hash) { {} }
+        let(:key) { 'bogus' }
 
-      context 'with existing key and no default' do
-        subject { linter_config.fetch('foo') }
-        it { expect(subject).to eq('custom value') }
-      end
-
-      context 'with missing key and no default' do
-        subject { linter_config.fetch('no such key') }
-        it { expect { subject }.to raise_error(KeyError) }
-      end
-
-      context 'with missing key and a default' do
-        subject { linter_config.fetch('no such key', 'fallback') }
-        it { expect(subject).to eq('fallback') }
+        it { expect { subject }.to raise_error(described_class::Error, "No such property: bogus") }
       end
     end
 
@@ -84,14 +79,20 @@ describe ERBLint::LinterConfig do
         it { expect(subject).to eq(false) }
       end
 
-      context 'when enabled key is truthy' do
+      context 'when enabled key is not true or false' do
         let(:config_hash) { { enabled: 42 } }
-        it { expect(subject).to eq(true) }
+        it do
+          expect { subject }.to \
+            raise_error(
+              described_class::Error,
+              "ERBLint::LinterConfig does not accept 42 as value for the property enabled. Only accepts: [true, false]"
+            )
+        end
       end
 
-      context 'when enabled key is falsy' do
+      context 'when enabled key is nil' do
         let(:config_hash) { { enabled: nil } }
-        it { expect(subject).to eq(false) }
+        it { expect(subject).to eq(nil) }
       end
     end
 

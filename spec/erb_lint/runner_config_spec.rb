@@ -38,6 +38,10 @@ describe ERBLint::RunnerConfig do
       subject { runner_config.for_linter(linter) }
 
       class MyCustomLinter < ERBLint::Linter
+        class MySchema < ERBLint::LinterConfig
+          property :my_option
+        end
+        self.config_schema = MySchema
       end
 
       before do
@@ -49,7 +53,7 @@ describe ERBLint::RunnerConfig do
         let(:linter) { 'MyCustomLinter' }
         let(:config_hash) { { linters: { 'MyCustomLinter' => { 'my_option' => 'custom value' } } } }
 
-        it { expect(subject.class).to eq(ERBLint::LinterConfig) }
+        it { expect(subject.class).to eq(MyCustomLinter::MySchema) }
         it { expect(subject['my_option']).to eq('custom value') }
       end
 
@@ -57,23 +61,23 @@ describe ERBLint::RunnerConfig do
         let(:linter) { MyCustomLinter }
         let(:config_hash) { { linters: { 'MyCustomLinter' => { my_option: 'custom value' } } } }
 
-        it { expect(subject.class).to eq(ERBLint::LinterConfig) }
+        it { expect(subject.class).to eq(MyCustomLinter::MySchema) }
       end
 
       context 'with argument that isnt a string and does not inherit from Linter' do
         let(:linter) { Object }
         let(:config_hash) { { linters: { 'MyCustomLinter' => { my_option: 'custom value' } } } }
 
-        it { expect { subject }.to raise_error(ArgumentError) }
+        it { expect { subject }.to raise_error(ArgumentError, "expected String or linter class") }
       end
 
       context 'for linter not present in config hash' do
         let(:linter) { 'FinalNewline' }
         let(:config_hash) {}
 
-        it { expect(subject.class).to eq(ERBLint::LinterConfig) }
-        it 'returns empty config' do
-          expect(subject.to_hash).to eq({})
+        it { expect(subject.class).to eq(ERBLint::Linters::FinalNewline::ConfigSchema) }
+        it 'fills linter config with defaults from schema' do
+          expect(subject.to_hash).to eq("enabled" => false, "exclude" => [], "present" => true)
         end
         it 'is disabled by default' do
           expect(subject.enabled?).to eq(false)

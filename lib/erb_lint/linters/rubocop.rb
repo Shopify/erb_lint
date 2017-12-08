@@ -10,13 +10,20 @@ module ERBLint
     class Rubocop < Linter
       include LinterRegistry
 
+      class ConfigSchema < LinterConfig
+        property :only, accepts: array_of?(String)
+        property :rubocop_config, accepts: Hash
+      end
+
+      self.config_schema = ConfigSchema
+
       # copied from Rails: action_view/template/handlers/erb/erubi.rb
       BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
       def initialize(file_loader, config)
         super
-        @only_cops = config['only']
-        custom_config = config_from_hash(config.to_hash.except('only', 'enabled'))
+        @only_cops = @config.only
+        custom_config = config_from_hash(@config.rubocop_config)
         @rubocop_config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
 

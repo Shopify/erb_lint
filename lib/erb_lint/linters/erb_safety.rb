@@ -10,9 +10,15 @@ module ERBLint
       include LinterRegistry
       include BetterHtml::TestHelper::SafeErbTester
 
+      class ConfigSchema < LinterConfig
+        property :better_html_config, accepts: String
+      end
+
+      self.config_schema = ConfigSchema
+
       def initialize(file_loader, config)
         super
-        @config_filename = config['better-html-config']
+        @config_filename = @config.better_html_config
       end
 
       def lint_file(file_content)
