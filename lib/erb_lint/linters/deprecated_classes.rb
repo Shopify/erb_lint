@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'better_html'
+require 'better_html/node_iterator'
 
 module ERBLint
   module Linters
