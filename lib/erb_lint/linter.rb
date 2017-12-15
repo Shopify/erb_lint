@@ -20,8 +20,19 @@ module ERBLint
     end
 
     # Must be implemented by the concrete inheriting class.
-    def initialize(file_loader, _config)
+    def initialize(file_loader, config)
       @file_loader = file_loader
+      @config = config
+      raise ArgumentError, "expect `config` to be LinterConfig instance, "\
+        "not #{config.class}" unless config.is_a?(LinterConfig)
+    end
+
+    def enabled?
+      @config.enabled?
+    end
+
+    def excludes_file?(filename)
+      @config.excludes_file?(filename)
     end
 
     def lint_file(file_content)

@@ -42,12 +42,12 @@ describe ERBLint::Runner do
 
     context 'when all linters are enabled' do
       let(:config) do
-        {
-          'linters' => {
+        ERBLint::RunnerConfig.new(
+          linters: {
             'FakeLinter1' => { 'enabled' => true },
             'FakeLinter2' => { 'enabled' => true }
           }
-        }
+        )
       end
 
       it 'returns each linter with their errors' do
@@ -66,12 +66,12 @@ describe ERBLint::Runner do
 
     context 'when only some linters are enabled' do
       let(:config) do
-        {
-          'linters' => {
+        ERBLint::RunnerConfig.new(
+          linters: {
             'FakeLinter1' => { 'enabled' => true },
             'FakeLinter2' => { 'enabled' => false }
           }
-        }
+        )
       end
 
       it 'returns only enabled linters with their errors' do
@@ -86,12 +86,12 @@ describe ERBLint::Runner do
 
     context 'when all linters are disabled' do
       let(:config) do
-        {
-          'linters' => {
+        ERBLint::RunnerConfig.new(
+          linters: {
             'FakeLinter1' => { 'enabled' => false },
             'FakeLinter2' => { 'enabled' => false }
           }
-        }
+        )
       end
 
       it 'returns no linters' do
@@ -101,12 +101,12 @@ describe ERBLint::Runner do
 
     context 'when all linters exclude the file' do
       let(:config) do
-        {
-          'linters' => {
+        ERBLint::RunnerConfig.new(
+          linters: {
             'FakeLinter1' => { 'enabled' => true, 'exclude' => ['**/otherfolder/**'] },
             'FakeLinter2' => { 'enabled' => true, 'exclude' => ['somefolder/**.html.erb'] }
           }
-        }
+        )
       end
 
       it 'returns no linters' do
@@ -115,15 +115,10 @@ describe ERBLint::Runner do
     end
 
     context 'when the config has no linters' do
-      let(:config) { {} }
+      let(:config) { ERBLint::RunnerConfig.new }
 
-      it 'returns default linters with their errors' do
-        expect(subject).to eq [
-          {
-            linter_name: 'FinalNewline',
-            errors: fake_final_newline_errors
-          }
-        ]
+      it 'has all linters disabled' do
+        expect(subject).to eq []
       end
     end
 

@@ -13,11 +13,11 @@ module ERBLint
       # copied from Rails: action_view/template/handlers/erb/erubi.rb
       BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
-      def initialize(file_loader, config_hash)
+      def initialize(file_loader, config)
         super
-        @only_cops = config_hash.delete('only')
-        custom_config = config_from_hash(config_hash.except('enabled'))
-        @config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
+        @only_cops = config['only']
+        custom_config = config_from_hash(config.to_hash.except('only', 'enabled'))
+        @rubocop_config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
 
       def lint_file(file_content)
@@ -57,7 +57,7 @@ module ERBLint
       def processed_source(content)
         RuboCop::ProcessedSource.new(
           content,
-          @config.target_ruby_version,
+          @rubocop_config.target_ruby_version,
           '(erb)'
         )
       end
@@ -67,12 +67,12 @@ module ERBLint
           if @only_cops.present?
             selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
             RuboCop::Cop::Registry.new(selected_cops)
-          elsif @config['Rails']['Enabled']
+          elsif @rubocop_config['Rails']['Enabled']
             RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
           else
             RuboCop::Cop::Cop.non_rails
           end
-        RuboCop::Cop::Team.new(cop_classes, @config, extra_details: true, display_cop_names: true)
+        RuboCop::Cop::Team.new(cop_classes, @rubocop_config, extra_details: true, display_cop_names: true)
       end
 
       def format_error(code_node, offense)

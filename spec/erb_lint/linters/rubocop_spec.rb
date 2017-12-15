@@ -5,13 +5,13 @@ require 'better_html'
 
 describe ERBLint::Linters::Rubocop do
   let(:linter_config) do
-    {
+    ERBLint::LinterConfig.new(
       only: ['ErbLint/ArbitraryRule'],
       require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
       AllCops: {
         TargetRubyVersion: '2.4',
       },
-    }.deep_stringify_keys
+    )
   end
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
@@ -77,13 +77,13 @@ describe ERBLint::Linters::Rubocop do
 
   context 'supports loading nested config' do
     let(:linter_config) do
-      {
+      ERBLint::LinterConfig.new(
         only: ['ErbLint/ArbitraryRule'],
         inherit_from: 'custom_rubocop.yml',
         AllCops: {
           TargetRubyVersion: '2.3',
         },
-      }.deep_stringify_keys
+      )
     end
 
     let(:nested_config) do
@@ -109,7 +109,7 @@ describe ERBLint::Linters::Rubocop do
 
   context 'code is aligned to the column matching start of erb tag' do
     let(:linter_config) do
-      {
+      ERBLint::LinterConfig.new(
         only: ['Layout/AlignParameters'],
         AllCops: {
           TargetRubyVersion: '2.4',
@@ -120,7 +120,7 @@ describe ERBLint::Linters::Rubocop do
           SupportedStyles: %w(with_first_parameter with_fixed_indentation),
           IndentationWidth: nil,
         }
-      }.deep_stringify_keys
+      )
     end
 
     context 'when alignment is correct' do

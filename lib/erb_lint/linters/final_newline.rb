@@ -8,7 +8,7 @@ module ERBLint
 
       def initialize(file_loader, config)
         super
-        @new_lines_should_be_present = config['present'].nil? ? true : config['present']
+        @new_lines_should_be_present = config.fetch(:present, true)
       end
 
       protected
