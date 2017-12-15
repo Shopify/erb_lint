@@ -22,15 +22,15 @@ module ERBLint
 
       def lint_file(file_content)
         errors = []
-        erb = BetterHtml::NodeIterator::HtmlErb.new(file_content)
-        erb.tokens.each do |token|
-          next unless [:stmt, :expr_literal, :expr_escaped].include?(token.type)
-          ruby_code = token.code.sub(BLOCK_EXPR, '')
-          ruby_code = ruby_code.sub(/\A[[:blank:]]*/, '')
-          ruby_code = "#{' ' * token.location.column}#{ruby_code}"
-          offenses = inspect_content(ruby_code)
+        parser = BetterHtml::Parser.new(file_content, template_language: :html)
+        parser.ast.descendants(:erb).each do |erb_node|
+          _, _, code_node, = *erb_node
+          code = code_node.loc.source.sub(/\A[[:blank:]]*/, '')
+          code = "#{' ' * erb_node.loc.column}#{code}"
+          code = code.sub(BLOCK_EXPR, '')
+          offenses = inspect_content(code)
           offenses&.each do |offense|
-            errors << format_error(token, offense)
+            errors << format_error(code_node, offense)
           end
         end
         errors
@@ -75,9 +75,9 @@ module ERBLint
         RuboCop::Cop::Team.new(cop_classes, @config, extra_details: true, display_cop_names: true)
       end
 
-      def format_error(token, offense)
+      def format_error(code_node, offense)
         {
-          line: token.location.line + offense.line - 1,
+          line: code_node.loc.line + offense.line - 1,
           message: offense.message.strip
         }
       end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'better_html/node_iterator'
+require 'better_html/parser'
 
 module ERBLint
   module Linters
@@ -29,47 +28,57 @@ module ERBLint
 
       def lint_file(file_content)
         errors = []
-        iterator = build_iterator(file_content)
-        each_class_name_with_line(iterator) do |class_name, line|
-          errors.push(*generate_errors(class_name, line))
+        parser = build_parser(file_content)
+        class_name_with_loc(parser).each do |class_name, loc|
+          errors.push(*generate_errors(class_name, loc.line))
         end
-        each_texthtml_script(iterator) do |text_node|
-          errors.push(*lint_file(text_node.content))
+        text_tags_content(parser).each do |content|
+          errors.push(*lint_file(content))
         end
         errors
       end
 
       private
 
-      def build_iterator(file_content)
-        BetterHtml::NodeIterator.new(file_content, template_language: :html)
+      def build_parser(file_content)
+        BetterHtml::Parser.new(file_content, template_language: :html)
       end
 
-      def each_class_name_with_line(iterator)
-        each_element_with_index(iterator) do |element, _index|
-          klass = element.find_attr('class')
-          next unless klass
-          klass.value_without_quotes.split(' ').each do |class_name|
-            yield class_name, klass.name_parts.first.location.line
+      def class_name_with_loc(parser)
+        Enumerator.new do |yielder|
+          tags(parser).each do |tag|
+            class_value = tag.attributes['class']&.value
+            next unless class_value
+            class_value.split(' ').each do |class_name|
+              yielder.yield(class_name, tag.loc)
+            end
           end
         end
       end
 
-      def each_element_with_index(iterator)
-        iterator.nodes.each_with_index do |node, index|
-          yield node, index if node.element?
+      def text_tags_content(parser)
+        Enumerator.new do |yielder|
+          script_tags(parser)
+            .select { |tag| tag.attributes['type']&.value == 'text/html' }
+            .each do |tag|
+              index = parser.ast.to_a.find_index(tag.node)
+              next_node = parser.ast.to_a[index + 1]
+
+              yielder.yield(next_node.loc.source) if next_node.type == :text
+            end
         end
       end
 
-      def each_texthtml_script(iterator)
-        each_element_with_index(iterator) do |element, index|
-          type = element.find_attr('type')
-          next unless type
-          next unless type.value_without_quotes == 'text/html'
-          next_node = iterator.nodes[index + 1]
+      def script_tags(parser)
+        tags(parser).select { |tag| tag.name == 'script' }
+      end
 
-          yield next_node if next_node&.text?
-        end
+      def tags(parser)
+        tag_nodes(parser).map { |tag_node| BetterHtml::Tree::Tag.from_node(tag_node) }
+      end
+
+      def tag_nodes(parser)
+        parser.nodes_with_type(:tag)
       end
 
       def generate_errors(class_name, line_number)
