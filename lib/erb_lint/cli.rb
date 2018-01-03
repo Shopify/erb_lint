@@ -129,7 +129,7 @@ module ERBLint
     def enabled_linter_names
       @enabled_linter_names ||=
         @options[:enabled_linters] ||
-        known_linter_names.select { |klass| @config.for_linter(klass).enabled? }
+        known_linter_names.select { |name| @config.for_linter(name.camelize).enabled? }
     end
 
     def enabled_linter_classes
