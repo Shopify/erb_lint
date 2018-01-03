@@ -6,6 +6,7 @@ PATH
       better_html (~> 1.0.0)
       html_tokenizer
       rubocop (~> 0.51)
+      smart_properties
 
 GEM
   remote: https://rubygems.org/

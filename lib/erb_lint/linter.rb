@@ -5,6 +5,7 @@ module ERBLint
   class Linter
     class << self
       attr_accessor :simple_name
+      attr_accessor :config_schema
 
       # When defining a Linter class, define its simple name as well. This
       # assumes that the module hierarchy of every linter starts with
@@ -13,9 +14,14 @@ module ERBLint
       # `ERBLint::Linters::Foo.simple_name`          #=> "Foo"
       # `ERBLint::Linters::Compass::Bar.simple_name` #=> "Compass::Bar"
       def inherited(linter)
-        name_parts = linter.name.split('::')
-        name = name_parts.length < 3 ? '' : name_parts[2..-1].join('::')
-        linter.simple_name = name
+        linter.simple_name = if linter.name.start_with?('ERBLint::Linters::')
+          name_parts = linter.name.split('::')
+          name_parts[2..-1].join('::')
+        else
+          linter.name
+        end
+
+        linter.config_schema = LinterConfig
       end
     end
 
@@ -23,8 +29,8 @@ module ERBLint
     def initialize(file_loader, config)
       @file_loader = file_loader
       @config = config
-      raise ArgumentError, "expect `config` to be LinterConfig instance, "\
-        "not #{config.class}" unless config.is_a?(LinterConfig)
+      raise ArgumentError, "expect `config` to be #{self.class.config_schema} instance, "\
+        "not #{config.class}" unless config.is_a?(self.class.config_schema)
     end
 
     def enabled?

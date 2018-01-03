@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'better_html'
 
 describe ERBLint::Linters::ErbSafety do
-  let(:linter_config) { ERBLint::LinterConfig.new }
+  let(:linter_config) { described_class.config_schema.new }
   let(:better_html_config) do
     {
       javascript_safe_methods: ['to_json']
@@ -129,7 +129,11 @@ describe ERBLint::Linters::ErbSafety do
   end
 
   context 'changing better-html config file works' do
-    let(:linter_config) { ERBLint::LinterConfig.new('better-html-config' => '.better-html.yml') }
+    let(:linter_config) do
+      described_class.config_schema.new(
+        'better_html_config' => '.better-html.yml'
+      )
+    end
     let(:file) { <<~FILE }
       <script><%= foobar %></script>
     FILE

@@ -2,6 +2,8 @@
 
 module ERBLint
   class RunnerConfig
+    class Error < StandardError; end
+
     def initialize(config = nil)
       @config = (config || {}).dup.deep_stringify_keys
     end
@@ -18,7 +20,9 @@ module ERBLint
       else
         raise ArgumentError, 'expected String or linter class'
       end
-      LinterConfig.new(linters_config[klass_name] || {})
+      linter_klass = LinterRegistry.find_by_name(klass_name)
+      raise Error, "#{klass_name}: linter not found (is it loaded?)" unless linter_klass
+      linter_klass.config_schema.new(linters_config[klass_name] || {})
     end
 
     def merge(other_config)
