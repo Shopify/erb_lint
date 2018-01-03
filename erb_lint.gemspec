@@ -14,8 +14,9 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/justinthec/erb-lint'
   s.license = 'MIT'
 
-  s.files = Dir['lib/**/*.rb', 'bin/*']
-  s.executables = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.files = Dir['lib/**/*.rb', 'exe/*']
+  s.bindir = 'exe'
+  s.executables = s.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
   s.add_dependency 'better_html', '~> 1.0.0'
   s.add_dependency 'html_tokenizer'
