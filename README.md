@@ -108,7 +108,7 @@ default_config = {
 
 ## Linters
 
-`erb-lint` comes with 2 linters on-board: `DeprecatedClasses` and `FinalNewline`, each with their own linter-specific options.
+`erb-lint` comes with 2 linters on-board: `DeprecatedClasses` and `FinalNewline` with their own linter-specific options, and 1 linter `ErbSafety` without any linter-specific options.
 
 ### DeprecatedClasses
 
@@ -151,6 +151,12 @@ option.
 Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `present`              | Whether a final newline should be present (default **true**)
+
+### ErbSafety
+
+ErbSafety ensures that Ruby data evaluated in ERB tags translate into JavaScript data only, never becoming JavaScript code. There are certain safety methods that ErbSafety permits to prevent this from occuring such as `.to_json`; more detailed documentation can be found at [Shopify/better-html](https://github.com/Shopify/better-html#testing-for-valid-html-and-erb).
+
+This linter has no customization options.
 
 ## Custom Linters
 
