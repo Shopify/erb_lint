@@ -30,7 +30,7 @@ module ERBLint
 
       def offenses(processed_source)
         offenses = []
-        processed_source.ast.descendants(:erb).each do |erb_node|
+        descendant_nodes(processed_source).each do |erb_node|
           offenses.push(*inspect_content(processed_source, erb_node))
         end
         offenses
@@ -50,6 +50,10 @@ module ERBLint
       end
 
       private
+
+      def descendant_nodes(processed_source)
+        processed_source.ast.descendants(:erb)
+      end
 
       class OffenseWithCorrection < Offense
         attr_reader :correction, :offset, :bound_range
