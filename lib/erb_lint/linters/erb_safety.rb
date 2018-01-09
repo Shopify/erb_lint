@@ -25,7 +25,7 @@ module ERBLint
         errors = []
         tester = Tester.new(file_content, config: better_html_config)
         tester.errors.each do |error|
-          errors << format_error(error)
+          errors << format_offense(error)
         end
         errors
       end
@@ -44,11 +44,12 @@ module ERBLint
         end
       end
 
-      def format_error(error)
-        {
-          line: error.location.line,
-          message: error.message
-        }
+      def format_offense(error)
+        Offense.new(
+          self,
+          error.location.line_range,
+          error.message
+        )
       end
     end
   end

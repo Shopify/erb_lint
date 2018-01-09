@@ -37,7 +37,7 @@ describe ERBLint::Linters::FinalNewline do
       end
 
       it 'reports an error on the last line' do
-        expect(linter_errors.first[:line]).to eq 3
+        expect(linter_errors.first.line_range).to eq 3..3
       end
     end
   end
@@ -61,7 +61,7 @@ describe ERBLint::Linters::FinalNewline do
       end
 
       it 'reports an error on the last line' do
-        expect(linter_errors.first[:line]).to eq 3
+        expect(linter_errors.first.line_range).to eq 3..3
       end
     end
 
@@ -101,7 +101,7 @@ describe ERBLint::Linters::FinalNewline do
       end
 
       it 'reports an error on the last line' do
-        expect(linter_errors.first[:line]).to eq 3
+        expect(linter_errors.first.line_range).to eq 3..3
       end
     end
   end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'erb_lint/version'
+require 'erb_lint/offense'
 require 'erb_lint/linter_config'
 require 'erb_lint/linter_registry'
 require 'erb_lint/linter'

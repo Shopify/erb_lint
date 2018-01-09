@@ -32,7 +32,7 @@ module ERBLint
         errors = []
         parser = build_parser(file_content)
         class_name_with_loc(parser).each do |class_name, loc|
-          errors.push(*generate_errors(class_name, loc.line))
+          errors.push(*generate_errors(class_name, loc.line_range))
         end
         text_tags_content(parser).each do |content|
           errors.push(*lint_file(content))
@@ -83,14 +83,16 @@ module ERBLint
         parser.nodes_with_type(:tag)
       end
 
-      def generate_errors(class_name, line_number)
+      def generate_errors(class_name, line_range)
         violated_rules(class_name).map do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
-          {
-            line: line_number,
-            message: format(message, class_name, violated_rule[:class_expr], suggestion)
-          }
+
+          Offense.new(
+            self,
+            line_range,
+            format(message, class_name, violated_rule[:class_expr], suggestion)
+          )
         end
       end
 

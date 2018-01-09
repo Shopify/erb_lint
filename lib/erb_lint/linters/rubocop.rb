@@ -37,7 +37,7 @@ module ERBLint
           code = code.sub(BLOCK_EXPR, '')
           offenses = inspect_content(code)
           offenses&.each do |offense|
-            errors << format_error(code_node, offense)
+            errors << format_offense(file_content, code_node, offense)
           end
         end
         errors
@@ -82,11 +82,17 @@ module ERBLint
         RuboCop::Cop::Team.new(cop_classes, @rubocop_config, extra_details: true, display_cop_names: true)
       end
 
-      def format_error(code_node, offense)
-        {
-          line: code_node.loc.line + offense.line - 1,
-          message: offense.message.strip
-        }
+      def format_offense(file_content, code_node, offense)
+        loc = BetterHtml::Tokenizer::Location.new(
+          file_content,
+          code_node.loc.start + offense.location.begin_pos,
+          code_node.loc.start + offense.location.end_pos - 1,
+        )
+        Offense.new(
+          self,
+          loc.line_range,
+          offense.message.strip
+        )
       end
 
       def config_from_hash(hash)

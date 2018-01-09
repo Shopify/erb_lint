@@ -40,12 +40,11 @@ module ERBLint
       runner_config = @config.merge(runner_config_override)
       runner = ERBLint::Runner.new(file_loader, runner_config)
       lint_files.each do |filename|
-        lint_result = runner.run(filename, File.read(filename))
-        errors = lint_result.map { |r| r[:errors] }.flatten
-        errors.each do |lint_error|
+        offenses = runner.run(filename, File.read(filename))
+        offenses.each do |offense|
           puts <<~EOF
-            #{lint_error[:message]}
-            In file: #{relative_filename(filename)}:#{lint_error[:line]}
+            #{offense.message}
+            In file: #{relative_filename(filename)}:#{offense.line_range.begin}
 
           EOF
           errors_found = true
