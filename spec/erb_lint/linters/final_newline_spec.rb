@@ -7,7 +7,7 @@ describe ERBLint::Linters::FinalNewline do
 
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
-  let(:processed_source) { ERBLint::ProcessedSource.new(file) }
+  let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
   subject(:offenses) { linter.offenses(processed_source) }
 
   context 'when trailing newline is preferred' do
@@ -39,6 +39,12 @@ describe ERBLint::Linters::FinalNewline do
       it 'reports an offense on the last line' do
         expect(subject.first.line_range).to eq 3..3
       end
+
+      it 'the offense range is set to an empty range after the last character of the file' do
+        expect(subject.first.source_range.begin_pos).to eq 27
+        expect(subject.first.source_range.end_pos).to eq 27
+        expect(subject.first.source_range.source).to eq ""
+      end
     end
   end
 
@@ -60,8 +66,28 @@ describe ERBLint::Linters::FinalNewline do
         expect(subject.size).to eq 1
       end
 
+      it 'reports meaningful message' do
+        expect(subject.first.message).to eq 'Remove 1 trailing newline at the end of the file.'
+      end
+
       it 'reports an offense on the last line' do
-        expect(subject.first.line_range).to eq 3..3
+        expect(subject.first.line_range).to eq 3..4
+      end
+
+      it 'the offense range is set to the newline character' do
+        expect(subject.first.source_range.begin_pos).to eq 27
+        expect(subject.first.source_range.end_pos).to eq 28
+        expect(subject.first.source_range.source).to eq "\n"
+      end
+    end
+
+    context 'when the file ends with multiple newlines' do
+      let(:file) { "foo\n\n" }
+
+      it 'the offense range includes all newline characters' do
+        expect(subject.first.source_range.begin_pos).to eq 3
+        expect(subject.first.source_range.end_pos).to eq 5
+        expect(subject.first.source_range.source).to eq "\n\n"
       end
     end
 

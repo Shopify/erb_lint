@@ -31,10 +31,11 @@ module ERBLint
       def offenses(processed_source)
         results = []
         class_name_with_loc(processed_source).each do |class_name, loc|
-          results.push(*generate_errors(class_name, loc.line_range))
+          range = processed_source.to_source_range(loc.start, loc.stop)
+          results.push(*generate_errors(class_name, range))
         end
         text_tags_content(processed_source).each do |content|
-          sub_source = ProcessedSource.new(content)
+          sub_source = ProcessedSource.new(processed_source.filename, content)
           results.push(*offenses(sub_source))
         end
         results
@@ -79,14 +80,14 @@ module ERBLint
         processed_source.parser.nodes_with_type(:tag)
       end
 
-      def generate_errors(class_name, line_range)
+      def generate_errors(class_name, range)
         violated_rules(class_name).map do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
 
           Offense.new(
             self,
-            line_range,
+            range,
             format(message, class_name, violated_rule[:class_expr], suggestion)
           )
         end

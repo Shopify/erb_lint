@@ -17,15 +17,15 @@ describe ERBLint::Linters::Rubocop do
   end
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
-  let(:processed_source) { ERBLint::ProcessedSource.new(file) }
-  subject(:linter_errors) { linter.offenses(processed_source) }
+  let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
+  subject(:offenses) { linter.offenses(processed_source) }
 
   context 'when rubocop finds no offenses' do
     let(:file) { <<~FILE }
       <% not_banned_method %>
     FILE
 
-    it { expect(linter_errors).to eq [] }
+    it { expect(subject).to eq [] }
   end
 
   context 'when rubocop finds offenses in ruby statements' do
@@ -33,7 +33,7 @@ describe ERBLint::Linters::Rubocop do
       <% banned_method %>
     FILE
 
-    it { expect(linter_errors).to eq [arbitrary_error_message] }
+    it { expect(subject).to eq [arbitrary_error_message(3..15)] }
   end
 
   context 'when rubocop finds offenses in ruby expressions' do
@@ -41,7 +41,7 @@ describe ERBLint::Linters::Rubocop do
       <%= banned_method %>
     FILE
 
-    it { expect(linter_errors).to eq [arbitrary_error_message] }
+    it { expect(subject).to eq [arbitrary_error_message(4..16)] }
   end
 
   context 'partial ruby statements are ignored' do
@@ -51,7 +51,7 @@ describe ERBLint::Linters::Rubocop do
       <% end %>
     FILE
 
-    it { expect(linter_errors).to eq [] }
+    it { expect(subject).to eq [] }
   end
 
   context 'statements with partial block expression is processed' do
@@ -61,7 +61,7 @@ describe ERBLint::Linters::Rubocop do
       <% end %>
     FILE
 
-    it { expect(linter_errors).to eq [arbitrary_error_message] }
+    it { expect(subject).to eq [arbitrary_error_message(3..15)] }
   end
 
   context 'line numbers take into account both html and erb newlines' do
@@ -75,7 +75,7 @@ describe ERBLint::Linters::Rubocop do
       </div>
     FILE
 
-    it { expect(linter_errors).to eq [arbitrary_error_message(line_range: 4..5)] }
+    it { expect(subject).to eq [arbitrary_error_message(29..41)] }
   end
 
   context 'supports loading nested config' do
@@ -108,7 +108,7 @@ describe ERBLint::Linters::Rubocop do
         <% banned_method %>
       FILE
 
-      it { expect(linter_errors).to eq [] }
+      it { expect(subject).to eq [] }
     end
   end
 
@@ -136,7 +136,7 @@ describe ERBLint::Linters::Rubocop do
           checked: true %>
       FILE
 
-      it { expect(linter_errors).to eq [] }
+      it { expect(subject).to eq [] }
     end
 
     context 'when alignment is incorrect' do
@@ -146,9 +146,9 @@ describe ERBLint::Linters::Rubocop do
       FILE
 
       it do
-        expect(linter_errors.size).to eq(1)
-        expect(linter_errors[0].line_range).to eq 2..2
-        expect(linter_errors[0].message).to \
+        expect(subject.size).to eq(1)
+        expect(subject[0].line_range).to eq 2..2
+        expect(subject[0].message).to \
           eq "Layout/AlignParameters: Use one level of indentation for "\
              "parameters following the first line of a multi-line method call."
       end
@@ -160,16 +160,16 @@ describe ERBLint::Linters::Rubocop do
                       checked: true %>
       FILE
 
-      it { expect(linter_errors).to eq [] }
+      it { expect(subject).to eq [] }
     end
   end
 
   private
 
-  def arbitrary_error_message(line_range: 1..1)
+  def arbitrary_error_message(range)
     ERBLint::Offense.new(
       linter,
-      line_range,
+      processed_source.to_source_range(range.min, range.max),
       "ErbLint/ArbitraryRule: An arbitrary rule has been violated."
     )
   end

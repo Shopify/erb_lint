@@ -17,24 +17,25 @@ module ERBLint
       end
 
       def offenses(processed_source)
-        lines = processed_source.file_content.scan(/[^\n]*\n|[^\n]+/)
+        file_content = processed_source.file_content
 
         offenses = []
-        return offenses if lines.empty?
+        return offenses if file_content.empty?
 
-        ends_with_newline = lines.last.chars[-1] == "\n"
+        match = file_content.match(/(\n+)\z/)
+        ends_with_newline = match.present?
 
         if @new_lines_should_be_present && !ends_with_newline
           offenses << Offense.new(
             self,
-            Range.new(lines.length, lines.length),
+            processed_source.to_source_range(file_content.size, file_content.size - 1),
             'Missing a trailing newline at the end of the file.'
           )
         elsif !@new_lines_should_be_present && ends_with_newline
           offenses << Offense.new(
             self,
-            Range.new(lines.length, lines.length),
-            'Remove the trailing newline at the end of the file.'
+            processed_source.to_source_range(match.begin(0), match.end(0) - 1),
+            "Remove #{match[0].size} trailing newline at the end of the file."
           )
         end
         offenses

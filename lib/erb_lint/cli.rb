@@ -40,7 +40,8 @@ module ERBLint
       runner_config = @config.merge(runner_config_override)
       runner = ERBLint::Runner.new(file_loader, runner_config)
       lint_files.each do |filename|
-        offenses = runner.run(filename, File.read(filename))
+        processed_source = ERBLint::ProcessedSource.new(filename, File.read(filename))
+        offenses = runner.run(processed_source)
         offenses.each do |offense|
           puts <<~EOF
             #{offense.message}
