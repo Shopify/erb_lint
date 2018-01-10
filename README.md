@@ -213,9 +213,10 @@ module ERBLint
     def lint_lines(lines)
       errors = []
       unless lines.include?('this file is fine')
-        errors.push(
-          line: 1,
-          message: "This file isn't fine. #{@config.custom_message}"
+        errors << Offense.new(
+          self,
+          1..1,
+          "This file isn't fine. #{@config.custom_message}"
         )
       end
       errors
