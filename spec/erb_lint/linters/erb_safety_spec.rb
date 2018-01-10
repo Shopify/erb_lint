@@ -12,7 +12,8 @@ describe ERBLint::Linters::ErbSafety do
   end
   let(:file_loader) { MockFileLoader.new(better_html_config) }
   let(:linter) { described_class.new(file_loader, linter_config) }
-  subject(:linter_errors) { linter.lint_file(file) }
+  let(:processed_source) { ERBLint::ProcessedSource.new(file) }
+  subject(:offenses) { linter.offenses(processed_source) }
 
   class MockFileLoader
     def initialize(config)
@@ -29,7 +30,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="alert('<%= foo %>')">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_interpolate_error] }
+    it { expect(subject).to eq [unsafe_interpolate] }
   end
 
   context 'interpolate a variable in js attribute calling safe method' do
@@ -37,7 +38,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="alert(<%= foo.to_json %>)">
     FILE
 
-    it { expect(linter_errors).to eq [] }
+    it { expect(subject).to eq [] }
   end
 
   context 'interpolate a variable in js attribute calling safe method inside string interpolation' do
@@ -45,7 +46,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="alert(<%= "hello \#{foo.to_json}" %>)">
     FILE
 
-    it { expect(linter_errors).to eq [] }
+    it { expect(subject).to eq [] }
   end
 
   context 'html_safe in any attribute is unsafe' do
@@ -53,7 +54,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%= foo.html_safe %>">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_html_safe] }
+    it { expect(subject).to eq [unsafe_html_safe] }
   end
 
   context 'html_safe in any attribute is unsafe despite having to_json' do
@@ -61,7 +62,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="<%= foo.to_json.html_safe %>">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_html_safe] }
+    it { expect(subject).to eq [unsafe_html_safe] }
   end
 
   context '<== in any attribute is unsafe' do
@@ -69,7 +70,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%== foo %>">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_erb_interpolate] }
+    it { expect(subject).to eq [unsafe_erb_interpolate] }
   end
 
   context '<== in any attribute is unsafe despite having to_json' do
@@ -77,7 +78,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%== foo.to_json %>">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_erb_interpolate] }
+    it { expect(subject).to eq [unsafe_erb_interpolate] }
   end
 
   context 'raw in any attribute is unsafe' do
@@ -85,7 +86,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%= raw foo %>">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_raw] }
+    it { expect(subject).to eq [unsafe_raw] }
   end
 
   context 'raw in any attribute is unsafe despite having to_json' do
@@ -93,7 +94,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%= raw foo.to_json %>">
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_raw] }
+    it { expect(subject).to eq [unsafe_raw] }
   end
 
   context 'unsafe erb in <script>' do
@@ -101,7 +102,7 @@ describe ERBLint::Linters::ErbSafety do
       <script>var foo = <%= unsafe %>;</script>
     FILE
 
-    it { expect(linter_errors).to eq [unsafe_javascript_tag_interpolate] }
+    it { expect(subject).to eq [unsafe_javascript_tag_interpolate] }
   end
 
   context 'safe erb in <script>' do
@@ -109,7 +110,7 @@ describe ERBLint::Linters::ErbSafety do
       <script>var foo = <%= unsafe.to_json %>;</script>
     FILE
 
-    it { expect(linter_errors).to eq [] }
+    it { expect(subject).to eq [] }
   end
 
   context 'safe erb in <script> when raw is present' do
@@ -117,7 +118,7 @@ describe ERBLint::Linters::ErbSafety do
       <script>var foo = <%= raw unsafe.to_json %>;</script>
     FILE
 
-    it { expect(linter_errors).to eq [] }
+    it { expect(subject).to eq [] }
   end
 
   context 'statements not allowed in <script> tags' do
@@ -125,7 +126,7 @@ describe ERBLint::Linters::ErbSafety do
       <script><% if foo? %>var foo = 1;<% end %></script>
     FILE
 
-    it { expect(linter_errors).to eq [erb_statements_not_allowed] }
+    it { expect(subject).to eq [erb_statements_not_allowed] }
   end
 
   context 'changing better-html config file works' do
@@ -140,23 +141,23 @@ describe ERBLint::Linters::ErbSafety do
 
     context 'with default config' do
       let(:better_html_config) { {} }
-      it { expect(linter_errors).to eq [unsafe_javascript_tag_interpolate] }
+      it { expect(subject).to eq [unsafe_javascript_tag_interpolate] }
     end
 
     context 'with non-default config' do
       let(:better_html_config) { { javascript_safe_methods: ['foobar'] } }
-      it { expect(linter_errors).to eq [] }
+      it { expect(subject).to eq [] }
     end
 
     context 'with string keys in config' do
       let(:better_html_config) { { 'javascript_safe_methods' => ['foobar'] } }
-      it { expect(linter_errors).to eq [] }
+      it { expect(subject).to eq [] }
     end
   end
 
   private
 
-  def unsafe_interpolate_error(line_range: 1..1)
+  def unsafe_interpolate(line_range: 1..1)
     build_offense(line_range, "erb interpolation in javascript attribute must call '(...).to_json'")
   end
 

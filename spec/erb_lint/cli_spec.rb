@@ -28,7 +28,7 @@ describe ERBLint::CLI do
   module ERBLint
     module Linters
       class LinterWithErrors < Linter
-        def lint_lines(_lines)
+        def offenses(_processed_source)
           [
             Offense.new(
               self,
@@ -40,7 +40,7 @@ describe ERBLint::CLI do
       end
 
       class LinterWithoutErrors < Linter
-        def lint_lines(_lines)
+        def offenses(_processed_source)
           []
         end
       end

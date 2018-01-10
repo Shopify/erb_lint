@@ -21,13 +21,13 @@ module ERBLint
         @config_filename = @config.better_html_config
       end
 
-      def lint_file(file_content)
-        errors = []
-        tester = Tester.new(file_content, config: better_html_config)
+      def offenses(processed_source)
+        offenses = []
+        tester = Tester.new(processed_source.file_content, config: better_html_config)
         tester.errors.each do |error|
-          errors << format_offense(error)
+          offenses << format_offense(error)
         end
-        errors
+        offenses
       end
 
       private

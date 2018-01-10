@@ -28,27 +28,23 @@ module ERBLint
         @addendum = @config.addendum
       end
 
-      def lint_file(file_content)
-        errors = []
-        parser = build_parser(file_content)
-        class_name_with_loc(parser).each do |class_name, loc|
-          errors.push(*generate_errors(class_name, loc.line_range))
+      def offenses(processed_source)
+        results = []
+        class_name_with_loc(processed_source).each do |class_name, loc|
+          results.push(*generate_errors(class_name, loc.line_range))
         end
-        text_tags_content(parser).each do |content|
-          errors.push(*lint_file(content))
+        text_tags_content(processed_source).each do |content|
+          sub_source = ProcessedSource.new(content)
+          results.push(*offenses(sub_source))
         end
-        errors
+        results
       end
 
       private
 
-      def build_parser(file_content)
-        BetterHtml::Parser.new(file_content, template_language: :html)
-      end
-
-      def class_name_with_loc(parser)
+      def class_name_with_loc(processed_source)
         Enumerator.new do |yielder|
-          tags(parser).each do |tag|
+          tags(processed_source).each do |tag|
             class_value = tag.attributes['class']&.value
             next unless class_value
             class_value.split(' ').each do |class_name|
@@ -58,29 +54,29 @@ module ERBLint
         end
       end
 
-      def text_tags_content(parser)
+      def text_tags_content(processed_source)
         Enumerator.new do |yielder|
-          script_tags(parser)
+          script_tags(processed_source)
             .select { |tag| tag.attributes['type']&.value == 'text/html' }
             .each do |tag|
-              index = parser.ast.to_a.find_index(tag.node)
-              next_node = parser.ast.to_a[index + 1]
+              index = processed_source.ast.to_a.find_index(tag.node)
+              next_node = processed_source.ast.to_a[index + 1]
 
               yielder.yield(next_node.loc.source) if next_node.type == :text
             end
         end
       end
 
-      def script_tags(parser)
-        tags(parser).select { |tag| tag.name == 'script' }
+      def script_tags(processed_source)
+        tags(processed_source).select { |tag| tag.name == 'script' }
       end
 
-      def tags(parser)
-        tag_nodes(parser).map { |tag_node| BetterHtml::Tree::Tag.from_node(tag_node) }
+      def tags(processed_source)
+        tag_nodes(processed_source).map { |tag_node| BetterHtml::Tree::Tag.from_node(tag_node) }
       end
 
-      def tag_nodes(parser)
-        parser.nodes_with_type(:tag)
+      def tag_nodes(processed_source)
+        processed_source.parser.nodes_with_type(:tag)
       end
 
       def generate_errors(class_name, line_range)

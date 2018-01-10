@@ -27,20 +27,19 @@ module ERBLint
         @rubocop_config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
 
-      def lint_file(file_content)
-        errors = []
-        parser = BetterHtml::Parser.new(file_content, template_language: :html)
-        parser.ast.descendants(:erb).each do |erb_node|
+      def offenses(processed_source)
+        offenses = []
+        processed_source.ast.descendants(:erb).each do |erb_node|
           _, _, code_node, = *erb_node
           code = code_node.loc.source.sub(/\A[[:blank:]]*/, '')
           code = "#{' ' * erb_node.loc.column}#{code}"
           code = code.sub(BLOCK_EXPR, '')
-          offenses = inspect_content(code)
-          offenses&.each do |offense|
-            errors << format_offense(file_content, code_node, offense)
+          rubocop_offenses = inspect_content(code)
+          rubocop_offenses&.each do |rubocop_offense|
+            offenses << format_offense(processed_source, code_node, rubocop_offense)
           end
         end
-        errors
+        offenses
       end
 
       private
@@ -55,13 +54,13 @@ module ERBLint
       end
 
       def inspect_content(content)
-        source = processed_source(content)
+        source = rubocop_processed_source(content)
         return unless source.valid_syntax?
         offenses = team.inspect_file(source)
         offenses.reject(&:disabled?)
       end
 
-      def processed_source(content)
+      def rubocop_processed_source(content)
         RuboCop::ProcessedSource.new(
           content,
           @rubocop_config.target_ruby_version,
@@ -82,9 +81,9 @@ module ERBLint
         RuboCop::Cop::Team.new(cop_classes, @rubocop_config, extra_details: true, display_cop_names: true)
       end
 
-      def format_offense(file_content, code_node, offense)
+      def format_offense(processed_source, code_node, offense)
         loc = BetterHtml::Tokenizer::Location.new(
-          file_content,
+          processed_source.file_content,
           code_node.loc.start + offense.location.begin_pos,
           code_node.loc.start + offense.location.end_pos - 1,
         )

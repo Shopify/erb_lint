@@ -11,8 +11,8 @@ describe ERBLint::Linters::DeprecatedClasses do
 
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
-
-  subject(:linter_errors) { linter.lint_file(file) }
+  let(:processed_source) { ERBLint::ProcessedSource.new(file) }
+  subject(:offenses) { linter.offenses(processed_source) }
 
   context 'when the rule set is empty' do
     let(:rule_set) { [] }
@@ -20,8 +20,8 @@ describe ERBLint::Linters::DeprecatedClasses do
     context 'when the file is empty' do
       let(:file) { '' }
 
-      it 'does not report any errors' do
-        expect(linter_errors).to eq []
+      it 'does not report any offense' do
+        expect(subject).to eq []
       end
     end
 
@@ -32,8 +32,8 @@ describe ERBLint::Linters::DeprecatedClasses do
         </div>
       FILE
 
-      it 'does not report any errors' do
-        expect(linter_errors).to eq []
+      it 'does not report any offenses' do
+        expect(subject).to eq []
       end
     end
   end
@@ -60,8 +60,8 @@ describe ERBLint::Linters::DeprecatedClasses do
     context 'when the file is empty' do
       let(:file) { '' }
 
-      it 'does not report any errors' do
-        expect(linter_errors).to eq []
+      it 'does not report any offenses' do
+        expect(subject).to eq []
       end
     end
 
@@ -72,8 +72,8 @@ describe ERBLint::Linters::DeprecatedClasses do
         </div>
       FILE
 
-      it 'does not report any errors' do
-        expect(linter_errors).to eq []
+      it 'does not report any offenses' do
+        expect(subject).to eq []
       end
     end
 
@@ -84,12 +84,12 @@ describe ERBLint::Linters::DeprecatedClasses do
         </div>
       FILE
 
-      it 'reports 1 error' do
-        expect(linter_errors.size).to eq 1
+      it 'reports 1 offense' do
+        expect(subject.size).to eq 1
       end
 
-      it 'reports an error with message containing suggestion 1' do
-        expect(linter_errors.first.message).to include suggestion_1
+      it 'reports an offense with message containing suggestion 1' do
+        expect(subject.first.message).to include suggestion_1
       end
     end
 
@@ -102,12 +102,12 @@ describe ERBLint::Linters::DeprecatedClasses do
         </script>
       FILE
 
-      it 'reports 1 error' do
-        expect(linter_errors.size).to eq 1
+      it 'reports 1 offense' do
+        expect(subject.size).to eq 1
       end
 
-      it 'reports an error with message containing suggestion 1' do
-        expect(linter_errors.first.message).to include suggestion_1
+      it 'reports an offense with message containing suggestion 1' do
+        expect(subject.first.message).to include suggestion_1
       end
     end
 
@@ -119,13 +119,13 @@ describe ERBLint::Linters::DeprecatedClasses do
           </div>
         FILE
 
-        it 'reports 2 errors' do
-          expect(linter_errors.size).to eq 2
+        it 'reports 2 offenses' do
+          expect(subject.size).to eq 2
         end
 
-        it 'reports errors with messages containing suggestion 1' do
-          expect(linter_errors[0].message).to include suggestion_1
-          expect(linter_errors[1].message).to include suggestion_1
+        it 'reports offenses with messages containing suggestion 1' do
+          expect(subject[0].message).to include suggestion_1
+          expect(subject[1].message).to include suggestion_1
         end
       end
 
@@ -136,13 +136,13 @@ describe ERBLint::Linters::DeprecatedClasses do
           </div>
         FILE
 
-        it 'reports 2 errors' do
-          expect(linter_errors.size).to eq 2
+        it 'reports 2 offenses' do
+          expect(subject.size).to eq 2
         end
 
-        it 'reports errors with messages containing suggestion 1' do
-          expect(linter_errors[0].message).to include suggestion_1
-          expect(linter_errors[1].message).to include suggestion_1
+        it 'reports offenses with messages containing suggestion 1' do
+          expect(subject[0].message).to include suggestion_1
+          expect(subject[1].message).to include suggestion_1
         end
       end
     end
@@ -154,13 +154,13 @@ describe ERBLint::Linters::DeprecatedClasses do
         </div>
       FILE
 
-      it 'reports 2 errors' do
-        expect(linter_errors.size).to eq 2
+      it 'reports 2 offenses' do
+        expect(subject.size).to eq 2
       end
 
-      it 'reports errors with messages containing suggestion 2' do
-        expect(linter_errors[0].message).to include suggestion_2
-        expect(linter_errors[1].message).to include suggestion_2
+      it 'reports offenses with messages containing suggestion 2' do
+        expect(subject[0].message).to include suggestion_2
+        expect(subject[1].message).to include suggestion_2
       end
     end
 
@@ -176,8 +176,8 @@ describe ERBLint::Linters::DeprecatedClasses do
       context 'when the file is empty' do
         let(:file) { '' }
 
-        it 'does not report any errors' do
-          expect(linter_errors).to eq []
+        it 'does not report any offenses' do
+          expect(subject).to eq []
         end
       end
 
@@ -188,12 +188,12 @@ describe ERBLint::Linters::DeprecatedClasses do
           </div>
         FILE
 
-        it 'reports 1 error' do
-          expect(linter_errors.size).to eq 1
+        it 'reports 1 offense' do
+          expect(subject.size).to eq 1
         end
 
-        it 'reports an error with its message ending with the addendum' do
-          expect(linter_errors.first.message).to end_with addendum
+        it 'reports an offense with its message ending with the addendum' do
+          expect(subject.first.message).to end_with addendum
         end
       end
     end
@@ -208,8 +208,8 @@ describe ERBLint::Linters::DeprecatedClasses do
       context 'when the file is empty' do
         let(:file) { '' }
 
-        it 'does not report any errors' do
-          expect(linter_errors).to eq []
+        it 'does not report any offenses' do
+          expect(subject).to eq []
         end
       end
 
@@ -220,12 +220,12 @@ describe ERBLint::Linters::DeprecatedClasses do
           </div>
         FILE
 
-        it 'reports 1 error' do
-          expect(linter_errors.size).to eq 1
+        it 'reports 1 offense' do
+          expect(subject.size).to eq 1
         end
 
-        it 'reports an error with its message ending with the suggestion' do
-          expect(linter_errors.first.message).to end_with suggestion_1
+        it 'reports an offense with its message ending with the suggestion' do
+          expect(subject.first.message).to end_with suggestion_1
         end
       end
     end
@@ -235,8 +235,8 @@ describe ERBLint::Linters::DeprecatedClasses do
         <div superlongpotentialattributename"small">
       FILE
 
-      it 'does not report any errors' do
-        expect(linter_errors).to eq []
+      it 'does not report any offenses' do
+        expect(subject).to eq []
       end
     end
   end

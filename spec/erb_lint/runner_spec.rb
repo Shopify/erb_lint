@@ -16,7 +16,7 @@ describe ERBLint::Runner do
   module ERBLint
     module Linters
       class FakeLinter1 < Linter
-        def lint_file(_file_content)
+        def offenses(_processed_source)
           [Offense.new(self, 1..1, "#{self.class.name} error")]
         end
       end
