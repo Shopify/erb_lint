@@ -41,16 +41,7 @@ module ERBLint
       @config.excludes_file?(filename)
     end
 
-    def lint_file(file_content)
-      lines = file_content.scan(/[^\n]*\n|[^\n]+/)
-      lint_lines(lines)
-    end
-
-    protected
-
-    # The lint_lines method that contains the logic for the linter and returns a list of errors.
-    # Must be implemented by the concrete inheriting class.
-    def lint_lines(_lines)
+    def offenses(_processed_source)
       raise NotImplementedError, "must implement ##{__method__}"
     end
   end

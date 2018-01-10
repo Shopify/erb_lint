@@ -208,11 +208,9 @@ module ERBLint
     end
     self.config_schema = ConfigSchema
 
-    protected
-
-    def lint_lines(lines)
+    def offenses(processed_source)
       errors = []
-      unless lines.include?('this file is fine')
+      unless processed_source.file_content.include?('this file is fine')
         errors << Offense.new(
           self,
           1..1,

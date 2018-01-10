@@ -17,7 +17,8 @@ describe ERBLint::Linters::Rubocop do
   end
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
-  subject(:linter_errors) { linter.lint_file(file) }
+  let(:processed_source) { ERBLint::ProcessedSource.new(file) }
+  subject(:linter_errors) { linter.offenses(processed_source) }
 
   context 'when rubocop finds no offenses' do
     let(:file) { <<~FILE }
