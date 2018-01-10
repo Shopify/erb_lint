@@ -16,9 +16,11 @@ describe ERBLint::Runner do
   module ERBLint
     module Linters
       class FakeLinter1 < Linter
+        def lint_file(_file_content)
+          [Offense.new(self, 1..1, "#{self.class.name} error")]
+        end
       end
-      class FakeLinter2 < Linter
-      end
+      class FakeLinter2 < FakeLinter1; end
     end
   end
 
@@ -26,19 +28,6 @@ describe ERBLint::Runner do
     let(:file) { 'DummyFileContent' }
     let(:filename) { 'somefolder/otherfolder/dummyfile.html.erb' }
     subject { runner.run(filename, file) }
-
-    fake_linter_1_errors = ['FakeLinter1DummyErrors']
-    fake_linter_2_errors = ['FakeLinter2DummyErrors']
-    fake_final_newline_errors = ['FakeFinalNewlineDummyErrors']
-
-    before do
-      allow_any_instance_of(ERBLint::Linters::FakeLinter1).to receive(:lint_file)
-        .with(file).and_return fake_linter_1_errors
-      allow_any_instance_of(ERBLint::Linters::FakeLinter2).to receive(:lint_file)
-        .with(file).and_return fake_linter_2_errors
-      allow_any_instance_of(ERBLint::Linters::FinalNewline).to receive(:lint_file)
-        .with(file).and_return fake_final_newline_errors
-    end
 
     context 'when all linters are enabled' do
       let(:config) do
@@ -51,16 +40,11 @@ describe ERBLint::Runner do
       end
 
       it 'returns each linter with their errors' do
-        expect(subject).to eq [
-          {
-            linter_name: 'FakeLinter1',
-            errors: fake_linter_1_errors
-          },
-          {
-            linter_name: 'FakeLinter2',
-            errors: fake_linter_2_errors
-          }
-        ]
+        expect(subject.size).to eq(2)
+        expect(subject[0].linter.class).to eq(ERBLint::Linters::FakeLinter1)
+        expect(subject[0].message).to eq("ERBLint::Linters::FakeLinter1 error")
+        expect(subject[1].linter.class).to eq(ERBLint::Linters::FakeLinter2)
+        expect(subject[1].message).to eq("ERBLint::Linters::FakeLinter2 error")
       end
     end
 
@@ -75,12 +59,9 @@ describe ERBLint::Runner do
       end
 
       it 'returns only enabled linters with their errors' do
-        expect(subject).to eq [
-          {
-            linter_name: 'FakeLinter1',
-            errors: fake_linter_1_errors
-          }
-        ]
+        expect(subject.size).to eq(1)
+        expect(subject[0].linter.class).to eq(ERBLint::Linters::FakeLinter1)
+        expect(subject[0].message).to eq("ERBLint::Linters::FakeLinter1 error")
       end
     end
 
@@ -126,12 +107,9 @@ describe ERBLint::Runner do
       let(:config) { nil }
 
       it 'returns default linters with their errors' do
-        expect(subject).to eq [
-          {
-            linter_name: 'FinalNewline',
-            errors: fake_final_newline_errors
-          }
-        ]
+        expect(subject.size).to eq(1)
+        expect(subject[0].linter.class).to eq(ERBLint::Linters::FinalNewline)
+        expect(subject[0].message).to eq("Missing a trailing newline at the end of the file.")
       end
     end
   end

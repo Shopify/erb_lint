@@ -74,7 +74,7 @@ describe ERBLint::Linters::Rubocop do
       </div>
     FILE
 
-    it { expect(linter_errors).to eq [arbitrary_error_message(line: 4)] }
+    it { expect(linter_errors).to eq [arbitrary_error_message(line_range: 4..5)] }
   end
 
   context 'supports loading nested config' do
@@ -145,14 +145,11 @@ describe ERBLint::Linters::Rubocop do
       FILE
 
       it do
-        expect(linter_errors).to eq [
-          {
-            line: 2,
-            message:
-              "Layout/AlignParameters: Use one level of indentation for "\
-              "parameters following the first line of a multi-line method call."
-          }
-        ]
+        expect(linter_errors.size).to eq(1)
+        expect(linter_errors[0].line_range).to eq 2..2
+        expect(linter_errors[0].message).to \
+          eq "Layout/AlignParameters: Use one level of indentation for "\
+             "parameters following the first line of a multi-line method call."
       end
     end
 
@@ -168,10 +165,11 @@ describe ERBLint::Linters::Rubocop do
 
   private
 
-  def arbitrary_error_message(line: 1)
-    {
-      message: "ErbLint/ArbitraryRule: An arbitrary rule has been violated.",
-      line: line
-    }
+  def arbitrary_error_message(line_range: 1..1)
+    ERBLint::Offense.new(
+      linter,
+      line_range,
+      "ErbLint/ArbitraryRule: An arbitrary rule has been violated."
+    )
   end
 end

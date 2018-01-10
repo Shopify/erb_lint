@@ -16,13 +16,13 @@ module ERBLint
     end
 
     def run(filename, file_content)
-      linters_for_file = @linters.reject { |linter| linter.excludes_file?(filename) }
-      linters_for_file.map do |linter|
-        {
-          linter_name: linter.class.simple_name,
-          errors: linter.lint_file(file_content)
-        }
+      offenses = []
+      @linters
+        .reject { |linter| linter.excludes_file?(filename) }
+        .each do |linter|
+        offenses += linter.lint_file(file_content)
       end
+      offenses
     end
   end
 end

@@ -156,45 +156,31 @@ describe ERBLint::Linters::ErbSafety do
 
   private
 
-  def unsafe_interpolate_error(line: 1)
-    {
-      message: "erb interpolation in javascript attribute must call '(...).to_json'",
-      line: line
-    }
+  def unsafe_interpolate_error(line_range: 1..1)
+    build_offense(line_range, "erb interpolation in javascript attribute must call '(...).to_json'")
   end
 
-  def unsafe_html_safe(line: 1)
-    {
-      message: "erb interpolation with '<%= (...).html_safe %>' inside html attribute is never safe",
-      line: line
-    }
+  def unsafe_html_safe(line_range: 1..1)
+    build_offense(line_range, "erb interpolation with '<%= (...).html_safe %>' inside html attribute is never safe")
   end
 
-  def unsafe_erb_interpolate(line: 1)
-    {
-      message: "erb interpolation with '<%==' inside html attribute is never safe",
-      line: line
-    }
+  def unsafe_erb_interpolate(line_range: 1..1)
+    build_offense(line_range, "erb interpolation with '<%==' inside html attribute is never safe")
   end
 
-  def unsafe_raw(line: 1)
-    {
-      message: "erb interpolation with '<%= raw(...) %>' inside html attribute is never safe",
-      line: line
-    }
+  def unsafe_raw(line_range: 1..1)
+    build_offense(line_range, "erb interpolation with '<%= raw(...) %>' inside html attribute is never safe")
   end
 
-  def unsafe_javascript_tag_interpolate(line: 1)
-    {
-      message: "erb interpolation in javascript tag must call '(...).to_json'",
-      line: line
-    }
+  def unsafe_javascript_tag_interpolate(line_range: 1..1)
+    build_offense(line_range, "erb interpolation in javascript tag must call '(...).to_json'")
   end
 
-  def erb_statements_not_allowed(line: 1)
-    {
-      message: "erb statement not allowed here; did you mean '<%=' ?",
-      line: line
-    }
+  def erb_statements_not_allowed(line_range: 1..1)
+    build_offense(line_range, "erb statement not allowed here; did you mean '<%=' ?")
+  end
+
+  def build_offense(line_range, message)
+    ERBLint::Offense.new(linter, line_range, message)
   end
 end

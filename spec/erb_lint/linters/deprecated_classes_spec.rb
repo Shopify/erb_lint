@@ -89,7 +89,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       end
 
       it 'reports an error with message containing suggestion 1' do
-        expect(linter_errors.first[:message]).to include suggestion_1
+        expect(linter_errors.first.message).to include suggestion_1
       end
     end
 
@@ -107,7 +107,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       end
 
       it 'reports an error with message containing suggestion 1' do
-        expect(linter_errors.first[:message]).to include suggestion_1
+        expect(linter_errors.first.message).to include suggestion_1
       end
     end
 
@@ -124,8 +124,8 @@ describe ERBLint::Linters::DeprecatedClasses do
         end
 
         it 'reports errors with messages containing suggestion 1' do
-          expect(linter_errors[0][:message]).to include suggestion_1
-          expect(linter_errors[1][:message]).to include suggestion_1
+          expect(linter_errors[0].message).to include suggestion_1
+          expect(linter_errors[1].message).to include suggestion_1
         end
       end
 
@@ -141,8 +141,8 @@ describe ERBLint::Linters::DeprecatedClasses do
         end
 
         it 'reports errors with messages containing suggestion 1' do
-          expect(linter_errors[0][:message]).to include suggestion_1
-          expect(linter_errors[1][:message]).to include suggestion_1
+          expect(linter_errors[0].message).to include suggestion_1
+          expect(linter_errors[1].message).to include suggestion_1
         end
       end
     end
@@ -159,8 +159,8 @@ describe ERBLint::Linters::DeprecatedClasses do
       end
 
       it 'reports errors with messages containing suggestion 2' do
-        expect(linter_errors[0][:message]).to include suggestion_2
-        expect(linter_errors[1][:message]).to include suggestion_2
+        expect(linter_errors[0].message).to include suggestion_2
+        expect(linter_errors[1].message).to include suggestion_2
       end
     end
 
@@ -193,7 +193,7 @@ describe ERBLint::Linters::DeprecatedClasses do
         end
 
         it 'reports an error with its message ending with the addendum' do
-          expect(linter_errors.first[:message]).to end_with addendum
+          expect(linter_errors.first.message).to end_with addendum
         end
       end
     end
@@ -225,7 +225,7 @@ describe ERBLint::Linters::DeprecatedClasses do
         end
 
         it 'reports an error with its message ending with the suggestion' do
-          expect(linter_errors.first[:message]).to end_with suggestion_1
+          expect(linter_errors.first.message).to end_with suggestion_1
         end
       end
     end

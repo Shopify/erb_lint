@@ -28,16 +28,19 @@ describe ERBLint::CLI do
   module ERBLint
     module Linters
       class LinterWithErrors < Linter
-        def lint_lines(_file_content)
-          [{
-            message: 'fake message from a fake linter',
-            line: 1
-          }]
+        def lint_lines(_lines)
+          [
+            Offense.new(
+              self,
+              1..1,
+              'fake message from a fake linter'
+            )
+          ]
         end
       end
 
       class LinterWithoutErrors < Linter
-        def lint_lines(_file_content)
+        def lint_lines(_lines)
           []
         end
       end
