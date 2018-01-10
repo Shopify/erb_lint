@@ -134,7 +134,7 @@ describe ERBLint::CLI do
           end
 
           it 'prints that errors were found to stdout' do
-            expect { subject }.to output(/Errors were found in ERB files/).to_stderr
+            expect { subject }.to output(/2 error\(s\) were found in ERB files/).to_stderr
           end
 
           it 'is not successful' do

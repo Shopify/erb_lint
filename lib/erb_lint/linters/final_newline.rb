@@ -40,6 +40,16 @@ module ERBLint
         end
         offenses
       end
+
+      def autocorrect(_processed_source, offense)
+        lambda do |corrector|
+          if @new_lines_should_be_present
+            corrector.insert_after(offense.source_range, "\n")
+          else
+            corrector.remove_trailing(offense.source_range, offense.source_range.size)
+          end
+        end
+      end
     end
   end
 end

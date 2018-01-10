@@ -8,7 +8,10 @@ describe ERBLint::Linters::FinalNewline do
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  subject(:offenses) { linter.offenses(processed_source) }
+  let(:offenses) { linter.offenses(processed_source) }
+  let(:corrector) { ERBLint::Corrector.new(processed_source, offenses) }
+  let(:corrected_content) { corrector.corrected_content }
+  subject { offenses }
 
   context 'when trailing newline is preferred' do
     let(:present) { true }
@@ -45,6 +48,10 @@ describe ERBLint::Linters::FinalNewline do
         expect(subject.first.source_range.end_pos).to eq 27
         expect(subject.first.source_range.source).to eq ""
       end
+
+      it 'autocorrects' do
+        expect(corrected_content).to eq "<div id=\"a\">\nContent\n</div>\n"
+      end
     end
   end
 
@@ -79,6 +86,10 @@ describe ERBLint::Linters::FinalNewline do
         expect(subject.first.source_range.end_pos).to eq 28
         expect(subject.first.source_range.source).to eq "\n"
       end
+
+      it 'autocorrects' do
+        expect(corrected_content).to eq "<div id=\"a\">\nContent\n</div>"
+      end
     end
 
     context 'when the file ends with multiple newlines' do
@@ -92,6 +103,10 @@ describe ERBLint::Linters::FinalNewline do
 
       it 'reports meaningful message' do
         expect(subject.first.message).to eq 'Remove 4 trailing newline at the end of the file.'
+      end
+
+      it 'autocorrects' do
+        expect(corrected_content).to eq "foo"
       end
     end
 

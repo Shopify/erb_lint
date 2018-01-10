@@ -16,10 +16,19 @@ module ERBLint
     class ExitWithFailure < RuntimeError; end
     class ExitWithSuccess < RuntimeError; end
 
+    class Stats
+      attr_accessor :found, :corrected
+      def initialize
+        @found = 0
+        @corrected = 0
+      end
+    end
+
     def initialize
       @options = {}
       @config = nil
       @files = []
+      @stats = Stats.new
     end
 
     def run(args = ARGV)
@@ -33,32 +42,33 @@ module ERBLint
       load_config
       ensure_files_exist(lint_files)
 
-      puts "Linting #{lint_files.size} files with #{enabled_linter_classes.size} linters..."
+      if enabled_linter_classes.empty?
+        failure!('no linter available with current configuration')
+      end
+
+      puts "Linting #{lint_files.size} files with "\
+        "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect?}linters..."
       puts
 
-      errors_found = false
       runner_config = @config.merge(runner_config_override)
       runner = ERBLint::Runner.new(file_loader, runner_config)
       lint_files.each do |filename|
-        processed_source = ERBLint::ProcessedSource.new(filename, File.read(filename))
-        offenses = runner.run(processed_source)
-        offenses.each do |offense|
-          puts <<~EOF
-            #{offense.message}
-            In file: #{relative_filename(filename)}:#{offense.line_range.begin}
-
-          EOF
-          errors_found = true
-        end
+        run_with_corrections(runner, filename)
       end
 
-      if errors_found
-        warn "Errors were found in ERB files".red
+      if @stats.corrected > 0
+        if @stats.found > 0
+          warn "#{@stats.corrected} error(s) corrected and #{@stats.found} error(s) remaining in ERB files".red
+        else
+          puts "#{@stats.corrected} error(s) corrected in ERB files".green
+        end
+      elsif @stats.found > 0
+        warn "#{@stats.found} error(s) were found in ERB files".red
       else
         puts "No errors were found in ERB files".green
       end
 
-      !errors_found
+      @stats.found == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
       warn e.message.red
       false
@@ -71,6 +81,59 @@ module ERBLint
     end
 
     private
+
+    def autocorrect?
+      @options[:autocorrect]
+    end
+
+    def run_with_corrections(runner, filename)
+      file_content = File.read(filename)
+      processed_source = ERBLint::ProcessedSource.new(filename, file_content)
+      offenses = runner.run(processed_source)
+
+      if offenses.any? && autocorrect?
+        corrector = correct(processed_source, offenses)
+        processed_source = ERBLint::ProcessedSource.new(filename, corrector.corrected_content)
+        offenses = runner.run(processed_source)
+
+        @stats.corrected += corrector.corrections.size
+
+        if file_content != corrector.corrected_content
+          File.open(filename, "wb") do |file|
+            file.write(corrector.corrected_content)
+          end
+
+          if corrector.corrections.any?
+            puts <<~EOF
+              #{corrector.corrections.size} offense(s) corrected
+              In file: #{relative_filename(filename)}
+
+            EOF
+          end
+        else
+          puts <<~EOF.red
+            Attempted autocorrect but file remains unchanged: #{relative_filename(filename)}
+
+          EOF
+        end
+      end
+
+      offenses.each do |offense|
+        puts <<~EOF
+          #{offense.message}#{' (not autocorrected)'.red if autocorrect?}
+          In file: #{relative_filename(filename)}:#{offense.line_range.begin}
+
+        EOF
+
+        @stats.found += 1
+      end
+    end
+
+    def correct(processed_source, offenses)
+      corrector = ERBLint::Corrector.new(processed_source, offenses)
+      failure!(corrector.diagnostics.join(', ')) if corrector.diagnostics.any?
+      corrector
+    end
 
     def config_filename
       @config_filename ||= @options[:config] || DEFAULT_CONFIG_FILENAME
@@ -129,12 +192,17 @@ module ERBLint
     def enabled_linter_names
       @enabled_linter_names ||=
         @options[:enabled_linters] ||
-        known_linter_names.select { |name| @config.for_linter(name.camelize).enabled? }
+        known_linter_names
+          .select { |name| @config.for_linter(name.camelize).enabled? }
     end
 
     def enabled_linter_classes
       @enabled_linter_classes ||= ERBLint::LinterRegistry.linters
-        .select { |klass| enabled_linter_names.include?(klass.simple_name.underscore) }
+        .select { |klass| linter_can_run?(klass) && enabled_linter_names.include?(klass.simple_name.underscore) }
+    end
+
+    def linter_can_run?(klass)
+      !autocorrect? || klass.support_autocorrect?
     end
 
     def relative_filename(filename)
@@ -142,17 +210,13 @@ module ERBLint
     end
 
     def runner_config_override
-      if @options[:enabled_linters].present?
-        RunnerConfig.new(
-          linters: {}.tap do |linters|
-            ERBLint::LinterRegistry.linters.map do |klass|
-              linters[klass.simple_name] = { 'enabled' => enabled_linter_classes.include?(klass) }
-            end
+      RunnerConfig.new(
+        linters: {}.tap do |linters|
+          ERBLint::LinterRegistry.linters.map do |klass|
+            linters[klass.simple_name] = { 'enabled' => enabled_linter_classes.include?(klass) }
           end
-        )
-      else
-        RunnerConfig.new
-      end
+        end
+      )
     end
 
     def option_parser
@@ -183,6 +247,10 @@ module ERBLint
             end
           end
           @options[:enabled_linters] = linters
+        end
+
+        opts.on("--autocorrect", "Correct offenses that can be corrected automatically (default: false)") do |config|
+          @options[:autocorrect] = config
         end
 
         opts.on_tail("-h", "--help", "Show this message") do
