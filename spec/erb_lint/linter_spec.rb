@@ -7,7 +7,7 @@ describe ERBLint::Linter do
     let(:linter_config) { ERBLint::LinterConfig.new }
     let(:file_loader)   { ERBLint::FileLoader.new('.') }
     let(:linter) { ERBLint::Linters::Fake.new(file_loader, linter_config) }
-    let(:processed_source) { ERBLint::ProcessedSource.new(file) }
+    let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
     subject { linter }
 
     module ERBLint

@@ -31,12 +31,14 @@ module ERBLint
         offenses = []
         processed_source.ast.descendants(:erb).each do |erb_node|
           _, _, code_node, = *erb_node
-          code = code_node.loc.source.sub(/\A[[:blank:]]*/, '')
+          original_source = code_node.loc.source
+          code = original_source.sub(/\A[[:blank:]]*/, '')
           code = "#{' ' * erb_node.loc.column}#{code}"
+          offset = original_source.size - code.size
           code = code.sub(BLOCK_EXPR, '')
           rubocop_offenses = inspect_content(code)
           rubocop_offenses&.each do |rubocop_offense|
-            offenses << format_offense(processed_source, code_node, rubocop_offense)
+            offenses << format_offense(processed_source, offset, code_node, rubocop_offense)
           end
         end
         offenses
@@ -81,17 +83,12 @@ module ERBLint
         RuboCop::Cop::Team.new(cop_classes, @rubocop_config, extra_details: true, display_cop_names: true)
       end
 
-      def format_offense(processed_source, code_node, offense)
-        loc = BetterHtml::Tokenizer::Location.new(
-          processed_source.file_content,
-          code_node.loc.start + offense.location.begin_pos,
-          code_node.loc.start + offense.location.end_pos - 1,
+      def format_offense(processed_source, offset, code_node, offense)
+        range = processed_source.to_source_range(
+          code_node.loc.start + offset + offense.location.begin_pos,
+          code_node.loc.start + offset + offense.location.end_pos - 1,
         )
-        Offense.new(
-          self,
-          loc.line_range,
-          offense.message.strip
-        )
+        Offense.new(self, range, offense.message.strip)
       end
 
       def config_from_hash(hash)

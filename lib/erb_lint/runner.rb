@@ -15,13 +15,12 @@ module ERBLint
       end
     end
 
-    def run(filename, file_content)
-      source = ProcessedSource.new(file_content)
+    def run(processed_source)
       offenses = []
       @linters
-        .reject { |linter| linter.excludes_file?(filename) }
+        .reject { |linter| linter.excludes_file?(processed_source.filename) }
         .each do |linter|
-        offenses += linter.offenses(source)
+        offenses += linter.offenses(processed_source)
       end
       offenses
     end

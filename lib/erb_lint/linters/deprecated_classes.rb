@@ -29,18 +29,34 @@ module ERBLint
       end
 
       def offenses(processed_source)
-        results = []
-        class_name_with_loc(processed_source).each do |class_name, loc|
-          results.push(*generate_errors(class_name, loc.line_range))
-        end
-        text_tags_content(processed_source).each do |content|
-          sub_source = ProcessedSource.new(content)
-          results.push(*offenses(sub_source))
-        end
-        results
+        process_nested_offenses(
+          source: processed_source,
+          offset: 0,
+          parent_source: processed_source,
+        )
       end
 
       private
+
+      def process_nested_offenses(source:, offset:, parent_source:)
+        offenses = []
+        class_name_with_loc(source).each do |class_name, loc|
+          range = parent_source.to_source_range(
+            offset + loc.start,
+            offset + loc.stop
+          )
+          offenses += generate_errors(class_name, range)
+        end
+        text_tags_content(source).each do |content_node|
+          sub_source = ProcessedSource.new(source.filename, content_node.loc.source)
+          offenses += process_nested_offenses(
+            source: sub_source,
+            offset: offset + content_node.loc.start,
+            parent_source: parent_source
+          )
+        end
+        offenses
+      end
 
       def class_name_with_loc(processed_source)
         Enumerator.new do |yielder|
@@ -62,7 +78,7 @@ module ERBLint
               index = processed_source.ast.to_a.find_index(tag.node)
               next_node = processed_source.ast.to_a[index + 1]
 
-              yielder.yield(next_node.loc.source) if next_node.type == :text
+              yielder.yield(next_node) if next_node.type == :text
             end
         end
       end
@@ -79,14 +95,14 @@ module ERBLint
         processed_source.parser.nodes_with_type(:tag)
       end
 
-      def generate_errors(class_name, line_range)
+      def generate_errors(class_name, range)
         violated_rules(class_name).map do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
 
           Offense.new(
             self,
-            line_range,
+            range,
             format(message, class_name, violated_rule[:class_expr], suggestion)
           )
         end

@@ -16,8 +16,8 @@ describe ERBLint::Runner do
   module ERBLint
     module Linters
       class FakeLinter1 < Linter
-        def offenses(_processed_source)
-          [Offense.new(self, 1..1, "#{self.class.name} error")]
+        def offenses(processed_source)
+          [Offense.new(self, processed_source.to_source_range(1, 1), "#{self.class.name} error")]
         end
       end
       class FakeLinter2 < FakeLinter1; end
@@ -27,7 +27,8 @@ describe ERBLint::Runner do
   describe '#run' do
     let(:file) { 'DummyFileContent' }
     let(:filename) { 'somefolder/otherfolder/dummyfile.html.erb' }
-    subject { runner.run(filename, file) }
+    let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
+    subject { runner.run(processed_source) }
 
     context 'when all linters are enabled' do
       let(:config) do

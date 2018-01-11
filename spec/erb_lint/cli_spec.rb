@@ -28,11 +28,11 @@ describe ERBLint::CLI do
   module ERBLint
     module Linters
       class LinterWithErrors < Linter
-        def offenses(_processed_source)
+        def offenses(processed_source)
           [
             Offense.new(
               self,
-              1..1,
+              processed_source.to_source_range(1, 1),
               'fake message from a fake linter'
             )
           ]

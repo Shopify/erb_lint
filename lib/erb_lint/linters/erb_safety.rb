@@ -25,7 +25,11 @@ module ERBLint
         offenses = []
         tester = Tester.new(processed_source.file_content, config: better_html_config)
         tester.errors.each do |error|
-          offenses << format_offense(error)
+          offenses << Offense.new(
+            self,
+            processed_source.to_source_range(error.location.start, error.location.stop),
+            error.message
+          )
         end
         offenses
       end
@@ -42,14 +46,6 @@ module ERBLint
             end
           BetterHtml::Config.new(**config_hash)
         end
-      end
-
-      def format_offense(error)
-        Offense.new(
-          self,
-          error.location.line_range,
-          error.message
-        )
       end
     end
   end
