@@ -53,7 +53,14 @@ module ERBLint
       runner_config = @config.merge(runner_config_override)
       runner = ERBLint::Runner.new(file_loader, runner_config)
       lint_files.each do |filename|
-        run_with_corrections(runner, filename)
+        begin
+          run_with_corrections(runner, filename)
+        rescue => e
+          puts "Exception occured when processing: #{relative_filename(filename)}"
+          puts e.message
+          puts e.backtrace.join("\n").red
+          puts
+        end
       end
 
       if @stats.corrected > 0
@@ -88,44 +95,33 @@ module ERBLint
 
     def run_with_corrections(runner, filename)
       file_content = File.read(filename)
-      processed_source = ERBLint::ProcessedSource.new(filename, file_content)
-      offenses = runner.run(processed_source)
+      offenses = []
 
-      if offenses.any? && autocorrect?
-        corrector = correct(processed_source, offenses)
-        processed_source = ERBLint::ProcessedSource.new(filename, corrector.corrected_content)
+      7.times do
+        processed_source = ERBLint::ProcessedSource.new(filename, file_content)
         offenses = runner.run(processed_source)
+        break unless autocorrect? && offenses.any?
+
+        corrector = correct(processed_source, offenses)
+        break if corrector.corrections.empty?
+        break if processed_source.file_content == corrector.corrected_content
 
         @stats.corrected += corrector.corrections.size
 
-        if file_content != corrector.corrected_content
-          File.open(filename, "wb") do |file|
-            file.write(corrector.corrected_content)
-          end
-
-          if corrector.corrections.any?
-            puts <<~EOF
-              #{corrector.corrections.size} offense(s) corrected
-              In file: #{relative_filename(filename)}
-
-            EOF
-          end
-        else
-          puts <<~EOF.red
-            Attempted autocorrect but file remains unchanged: #{relative_filename(filename)}
-
-          EOF
+        File.open(filename, "wb") do |file|
+          file.write(corrector.corrected_content)
         end
+
+        file_content = corrector.corrected_content
       end
 
+      @stats.found += offenses.size
       offenses.each do |offense|
         puts <<~EOF
           #{offense.message}#{' (not autocorrected)'.red if autocorrect?}
           In file: #{relative_filename(filename)}:#{offense.line_range.begin}
 
         EOF
-
-        @stats.found += 1
       end
     end
 

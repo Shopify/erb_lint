@@ -18,7 +18,10 @@ describe ERBLint::Linters::Rubocop do
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  subject(:offenses) { linter.offenses(processed_source) }
+  let(:offenses) { linter.offenses(processed_source) }
+  let(:corrector) { ERBLint::Corrector.new(processed_source, offenses) }
+  let(:corrected_content) { corrector.corrected_content }
+  subject { offenses }
 
   context 'when rubocop finds no offenses' do
     let(:file) { <<~FILE }
@@ -35,6 +38,12 @@ describe ERBLint::Linters::Rubocop do
 
     it { expect(subject).to eq [arbitrary_error_message(3..15)] }
     it { expect(subject.first.source_range.source).to eq "banned_method" }
+
+    context 'when autocorrecting' do
+      subject { corrected_content }
+
+      it { expect(subject).to eq "<% safe_method %>\n" }
+    end
   end
 
   context 'when rubocop finds offenses in ruby expressions' do
@@ -43,6 +52,43 @@ describe ERBLint::Linters::Rubocop do
     FILE
 
     it { expect(subject).to eq [arbitrary_error_message(4..16)] }
+
+    context 'when autocorrecting' do
+      subject { corrected_content }
+
+      it { expect(subject).to eq "<%= safe_method %>\n" }
+    end
+  end
+
+  context 'when multiple offenses are found in the same block' do
+    let(:file) { <<~FILE }
+      <%
+      banned_method(:foo)
+      banned_method(:bar)
+      banned_method(:baz)
+      %>
+    FILE
+
+    it 'finds offenses' do
+      expect(subject).to eq [
+        arbitrary_error_message(3..15),
+        arbitrary_error_message(23..35),
+        arbitrary_error_message(43..55),
+      ]
+    end
+
+    context 'can autocorrect individual offenses' do
+      let(:corrector) { ERBLint::Corrector.new(processed_source, [offenses.first]) }
+      subject { corrected_content }
+
+      it { expect(subject).to eq <<~FILE }
+        <%
+        safe_method(:foo)
+        banned_method(:bar)
+        banned_method(:baz)
+        %>
+      FILE
+    end
   end
 
   context 'partial ruby statements are ignored' do
@@ -63,6 +109,16 @@ describe ERBLint::Linters::Rubocop do
     FILE
 
     it { expect(subject).to eq [arbitrary_error_message(3..15)] }
+
+    context 'when autocorrecting' do
+      subject { corrected_content }
+
+      it { expect(subject).to eq <<~FILE }
+        <% safe_method.each do %>
+          foo
+        <% end %>
+      FILE
+    end
   end
 
   context 'line numbers take into account both html and erb newlines' do
@@ -77,6 +133,7 @@ describe ERBLint::Linters::Rubocop do
     FILE
 
     it { expect(subject).to eq [arbitrary_error_message(29..41)] }
+    it { expect(subject.first.source_range.source).to eq "banned_method" }
   end
 
   context 'supports loading nested config' do
@@ -113,7 +170,7 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
-  context 'code is aligned to the column matching start of erb tag' do
+  context 'code is aligned to the column matching start of ruby code' do
     let(:linter_config) do
       described_class.config_schema.new(
         only: ['Layout/AlignParameters'],
@@ -134,7 +191,7 @@ describe ERBLint::Linters::Rubocop do
     context 'when alignment is correct' do
       let(:file) { <<~FILE }
         <% ui_helper :foo,
-          checked: true %>
+             checked: true %>
       FILE
 
       it { expect(subject).to eq [] }
@@ -161,7 +218,7 @@ describe ERBLint::Linters::Rubocop do
     context 'correct alignment with html preceeding erb' do
       let(:file) { <<~FILE }
         <div><a><br><% ui_helper :foo,
-                      checked: true %>
+                         checked: true %>
       FILE
 
       it { expect(subject).to eq [] }

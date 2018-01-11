@@ -17,6 +17,7 @@ module ERBLint
 
       self.config_schema = ConfigSchema
 
+      SUFFIX_EXPR = /[[:blank:]]*\Z/
       # copied from Rails: action_view/template/handlers/erb/erubi.rb
       BLOCK_EXPR = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
 
@@ -30,21 +31,79 @@ module ERBLint
       def offenses(processed_source)
         offenses = []
         processed_source.ast.descendants(:erb).each do |erb_node|
-          _, _, code_node, = *erb_node
-          original_source = code_node.loc.source
-          code = original_source.sub(/\A[[:blank:]]*/, '')
-          code = "#{' ' * erb_node.loc.column}#{code}"
-          offset = original_source.size - code.size
-          code = code.sub(BLOCK_EXPR, '')
-          rubocop_offenses = inspect_content(code)
-          rubocop_offenses&.each do |rubocop_offense|
-            offenses << format_offense(processed_source, offset, code_node, rubocop_offense)
-          end
+          offenses.push(*inspect_content(processed_source, erb_node))
         end
         offenses
       end
 
+      def autocorrect(processed_source, offense)
+        return unless offense.correction
+        lambda do |corrector|
+          passthrough = OffsetCorrector.new(
+            processed_source,
+            corrector,
+            offense.offset,
+            offense.bound_range,
+          )
+          offense.correction.call(passthrough)
+        end
+      end
+
       private
+
+      class OffenseWithCorrection < Offense
+        attr_reader :correction, :offset, :bound_range
+        def initialize(linter, source_range, message, correction:, offset:, bound_range:)
+          super(linter, source_range, message)
+          @correction = correction
+          @offset = offset
+          @bound_range = bound_range
+        end
+      end
+
+      def inspect_content(processed_source, erb_node)
+        indicator, _, code_node, = *erb_node
+        return if indicator == '#'
+
+        original_source = code_node.loc.source
+        trimmed_source = original_source.sub(BLOCK_EXPR, '').sub(SUFFIX_EXPR, '')
+        alignment_column = code_node.loc.column
+        aligned_source = "#{' ' * alignment_column}#{trimmed_source}"
+
+        source = rubocop_processed_source(aligned_source)
+        return unless source.valid_syntax?
+
+        offenses = []
+        team = build_team
+        team.inspect_file(source)
+        team.cops.each do |cop|
+          cop.offenses.reject(&:disabled?).each_with_index do |rubocop_offense, index|
+            correction = cop.corrections[index] if rubocop_offense.corrected?
+
+            offset = code_node.loc.start - alignment_column
+            offense_range = processed_source.to_source_range(
+              offset + rubocop_offense.location.begin_pos,
+              offset + rubocop_offense.location.end_pos - 1,
+            )
+
+            bound_range = processed_source.to_source_range(
+              code_node.loc.start,
+              code_node.loc.stop
+            )
+
+            offenses <<
+              OffenseWithCorrection.new(
+                self,
+                offense_range,
+                rubocop_offense.message.strip,
+                correction: correction,
+                offset: offset,
+                bound_range: bound_range,
+              )
+          end
+        end
+        offenses
+      end
 
       def tempfile_from(filename, content)
         Tempfile.create(File.basename(filename), Dir.pwd) do |tempfile|
@@ -55,13 +114,6 @@ module ERBLint
         end
       end
 
-      def inspect_content(content)
-        source = rubocop_processed_source(content)
-        return unless source.valid_syntax?
-        offenses = team.inspect_file(source)
-        offenses.reject(&:disabled?)
-      end
-
       def rubocop_processed_source(content)
         RuboCop::ProcessedSource.new(
           content,
@@ -70,25 +122,26 @@ module ERBLint
         )
       end
 
-      def team
-        cop_classes =
-          if @only_cops.present?
-            selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
-            RuboCop::Cop::Registry.new(selected_cops)
-          elsif @rubocop_config['Rails']['Enabled']
-            RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
-          else
-            RuboCop::Cop::Cop.non_rails
-          end
-        RuboCop::Cop::Team.new(cop_classes, @rubocop_config, extra_details: true, display_cop_names: true)
+      def cop_classes
+        if @only_cops.present?
+          selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
+          RuboCop::Cop::Registry.new(selected_cops)
+        elsif @rubocop_config['Rails']['Enabled']
+          RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
+        else
+          RuboCop::Cop::Cop.non_rails
+        end
       end
 
-      def format_offense(processed_source, offset, code_node, offense)
-        range = processed_source.to_source_range(
-          code_node.loc.start + offset + offense.location.begin_pos,
-          code_node.loc.start + offset + offense.location.end_pos - 1,
+      def build_team
+        RuboCop::Cop::Team.new(
+          cop_classes,
+          @rubocop_config,
+          extra_details: true,
+          display_cop_names: true,
+          auto_correct: true,
+          stdin: "",
         )
-        Offense.new(self, range, offense.message.strip)
       end
 
       def config_from_hash(hash)
