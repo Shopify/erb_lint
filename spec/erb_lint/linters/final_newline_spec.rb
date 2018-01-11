@@ -82,12 +82,16 @@ describe ERBLint::Linters::FinalNewline do
     end
 
     context 'when the file ends with multiple newlines' do
-      let(:file) { "foo\n\n" }
+      let(:file) { "foo\n\n\n\n" }
 
       it 'the offense range includes all newline characters' do
         expect(subject.first.source_range.begin_pos).to eq 3
-        expect(subject.first.source_range.end_pos).to eq 5
-        expect(subject.first.source_range.source).to eq "\n\n"
+        expect(subject.first.source_range.end_pos).to eq 7
+        expect(subject.first.source_range.source).to eq "\n\n\n\n"
+      end
+
+      it 'reports meaningful message' do
+        expect(subject.first.message).to eq 'Remove 4 trailing newline at the end of the file.'
       end
     end
 
