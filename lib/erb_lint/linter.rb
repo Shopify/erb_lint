@@ -23,6 +23,10 @@ module ERBLint
 
         linter.config_schema = LinterConfig
       end
+
+      def support_autocorrect?
+        method_defined?(:autocorrect)
+      end
     end
 
     # Must be implemented by the concrete inheriting class.

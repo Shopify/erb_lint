@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'erb_lint/corrector'
 require 'erb_lint/file_loader'
 require 'erb_lint/linter_config'
 require 'erb_lint/linter_registry'

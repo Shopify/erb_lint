@@ -213,7 +213,7 @@ module ERBLint
       unless processed_source.file_content.include?('this file is fine')
         errors << Offense.new(
           self,
-          1..1,
+          processed_source.to_source_range(0, processed_source.file_content.size),
           "This file isn't fine. #{@config.custom_message}"
         )
       end
@@ -248,6 +248,19 @@ This file isn't fine. We suggest you change this file.
 In file: app/views/layouts/application.html.erb:1
 
 Errors were found in ERB files
+```
+
+To write a linter that can autocorrect offenses it detects, simply add an
+`autocorrect` method that returns a callable. The callable is called with an instance of
+[`RuboCop::Cop::Corrector`](http://www.rubydoc.info/github/bbatsov/RuboCop/RuboCop/Cop/Corrector)
+as argument, and therefore erb-lint correctors work exactly as RuboCop correctors do.
+
+```ruby
+def autocorrect(_processed_source, offense)
+  lambda do |corrector|
+    corrector.insert_after(offense.source_range, "this file is fine")
+  end
+end
 ```
 
 ## License
