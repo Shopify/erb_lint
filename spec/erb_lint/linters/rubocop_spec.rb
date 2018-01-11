@@ -34,6 +34,7 @@ describe ERBLint::Linters::Rubocop do
     FILE
 
     it { expect(subject).to eq [arbitrary_error_message(3..15)] }
+    it { expect(subject.first.source_range.source).to eq "banned_method" }
   end
 
   context 'when rubocop finds offenses in ruby expressions' do
@@ -147,6 +148,9 @@ describe ERBLint::Linters::Rubocop do
 
       it do
         expect(subject.size).to eq(1)
+        expect(subject[0].source_range.begin_pos).to eq 25
+        expect(subject[0].source_range.end_pos).to eq 38
+        expect(subject[0].source_range.source).to eq "checked: true"
         expect(subject[0].line_range).to eq 2..2
         expect(subject[0].message).to \
           eq "Layout/AlignParameters: Use one level of indentation for "\
