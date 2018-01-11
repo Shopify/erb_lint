@@ -109,6 +109,12 @@ describe ERBLint::Linters::DeprecatedClasses do
       it 'reports an offense with message containing suggestion 1' do
         expect(subject.first.message).to include suggestion_1
       end
+
+      it 'reports an offense with position range that is adjusted in the nested context' do
+        expect(subject.first.source_range.begin_pos).to eq 28
+        expect(subject.first.source_range.end_pos).to eq 45
+        expect(subject.first.source_range.source).to eq "<div class=\"abc\">"
+      end
     end
 
     context 'when the file contains both classes from set 1' do
