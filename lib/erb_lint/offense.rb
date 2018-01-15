@@ -21,7 +21,7 @@ module ERBLint
     end
 
     def ==(other)
-      other.class == self.class &&
+      other.class <= ERBLint::Offense &&
         other.linter == linter &&
         other.source_range == source_range &&
         other.message == message

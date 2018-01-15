@@ -189,6 +189,7 @@ The cops disabled in the example configuration above provide a good starting poi
 Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `rubocop_config`       | A valid rubocop configuration hash. Mandatory when this cop is enabled. See [rubocop's manual entry on Configuration](http://rubocop.readthedocs.io/en/latest/configuration/)
+`only`                 | Only run cops listed in this array instead of all cops.
 
 ## Custom Linters
 
