@@ -77,7 +77,7 @@ module ERBLint
         team = build_team
         team.inspect_file(source)
         team.cops.each do |cop|
-          cop.offenses.reject(&:disabled?).each_with_index do |rubocop_offense, index|
+          cop.offenses.select(&:corrected?).each_with_index do |rubocop_offense, index|
             correction = cop.corrections[index] if rubocop_offense.corrected?
 
             offset = code_node.loc.start - alignment_column
