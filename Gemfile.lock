@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    erb_lint (0.0.15)
+    erb_lint (0.0.16)
       activesupport
       better_html (~> 1.0.0)
       colorize
