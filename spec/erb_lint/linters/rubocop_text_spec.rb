@@ -1,0 +1,56 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+require 'better_html'
+
+describe ERBLint::Linters::RubocopText do
+  let(:linter_config) do
+    described_class.config_schema.new(
+      only: ['ErbLint/ArbitraryRule'],
+      rubocop_config: {
+        require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
+        AllCops: {
+          TargetRubyVersion: '2.4',
+        },
+      },
+    )
+  end
+  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:linter) { described_class.new(file_loader, linter_config) }
+  let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
+  subject(:offenses) { linter.offenses(processed_source) }
+
+  context 'when file does not contain any erb text node' do
+    let(:file) { <<~FILE }
+      <span class="<%= banned_method %>"></span>
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
+  context 'when rubocop find offenses inside erb text node' do
+    let(:file) { <<~FILE }
+      <span> <%= banned_method %> </span>
+    FILE
+
+    it { expect(subject).to eq [arbitrary_error_message(11..23)] }
+  end
+
+  context 'when rubocop does not find offenses inside erb text node' do
+    let(:file) { <<~FILE }
+      <span> <%= not_banned_method %> </span>
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
+  private
+
+  def arbitrary_error_message(range)
+    ERBLint::Offense.new(
+      linter,
+      processed_source.to_source_range(range.min, range.max),
+      "ErbLint/ArbitraryRule: An arbitrary rule has been violated."
+    )
+  end
+end
