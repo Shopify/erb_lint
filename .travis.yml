@@ -1,4 +1,6 @@
 language: ruby
+before_install:
+  - rm ./Gemfile.lock
 rvm:
   - 2.4.2
 script:
