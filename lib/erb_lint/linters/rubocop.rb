@@ -3,6 +3,7 @@
 require 'better_html'
 require 'rubocop'
 require 'tempfile'
+require 'erb_lint/utils/offset_corrector'
 
 module ERBLint
   module Linters
@@ -39,7 +40,7 @@ module ERBLint
       def autocorrect(processed_source, offense)
         return unless offense.correction
         lambda do |corrector|
-          passthrough = OffsetCorrector.new(
+          passthrough = Utils::OffsetCorrector.new(
             processed_source,
             corrector,
             offense.offset,
