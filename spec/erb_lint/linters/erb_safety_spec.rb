@@ -62,7 +62,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="<%= foo.to_json.html_safe %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_html_safe(16..36)] }
+    it { expect(subject).to eq [unsafe_html_safe(16..36), unsafe_interpolate(16..36)] }
   end
 
   context '<== in any attribute is unsafe' do
@@ -158,11 +158,12 @@ describe ERBLint::Linters::ErbSafety do
   private
 
   def unsafe_interpolate(range)
-    build_offense(range, "erb interpolation in javascript attribute must call '(...).to_json'")
+    build_offense(range,
+      "erb interpolation in javascript attribute must be wrapped in safe helper such as '(...).to_json'")
   end
 
   def unsafe_html_safe(range)
-    build_offense(range, "erb interpolation with '<%= (...).html_safe %>' inside html attribute is never safe")
+    build_offense(range, "erb interpolation with '<%= (...).html_safe %>' in this context is never safe")
   end
 
   def unsafe_erb_interpolate(range)
@@ -170,7 +171,7 @@ describe ERBLint::Linters::ErbSafety do
   end
 
   def unsafe_raw(range)
-    build_offense(range, "erb interpolation with '<%= raw(...) %>' inside html attribute is never safe")
+    build_offense(range, "erb interpolation with '<%= raw(...) %>' in this context is never safe")
   end
 
   def unsafe_javascript_tag_interpolate(range)

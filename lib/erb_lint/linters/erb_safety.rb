@@ -8,7 +8,6 @@ module ERBLint
     # Detect unsafe ruby interpolations into javascript.
     class ErbSafety < Linter
       include LinterRegistry
-      include BetterHtml::TestHelper::SafeErbTester
 
       class ConfigSchema < LinterConfig
         property :better_html_config, accepts: String
@@ -23,18 +22,38 @@ module ERBLint
 
       def offenses(processed_source)
         offenses = []
-        tester = Tester.new(processed_source.file_content, config: better_html_config)
-        tester.errors.each do |error|
-          offenses << Offense.new(
-            self,
-            processed_source.to_source_range(error.location.start, error.location.stop),
-            error.message
-          )
+
+        parser = BetterHtml::Parser.new(processed_source.file_content, template_language: :html)
+        testers_for(parser).each do |tester|
+          tester.validate
+          tester.errors.each do |error|
+            offenses << Offense.new(
+              self,
+              processed_source.to_source_range(error.location.start, error.location.stop),
+              error.message
+            )
+          end
         end
         offenses
       end
 
       private
+
+      def tester_classes
+        [
+          BetterHtml::TestHelper::SafeErb::NoStatements,
+          BetterHtml::TestHelper::SafeErb::AllowedScriptType,
+          BetterHtml::TestHelper::SafeErb::NoJavascriptTagHelper,
+          BetterHtml::TestHelper::SafeErb::TagInterpolation,
+          BetterHtml::TestHelper::SafeErb::ScriptInterpolation,
+        ]
+      end
+
+      def testers_for(parser)
+        tester_classes.map do |tester_klass|
+          tester_klass.new(parser, config: better_html_config)
+        end
+      end
 
       def better_html_config
         @better_html_config ||= begin
