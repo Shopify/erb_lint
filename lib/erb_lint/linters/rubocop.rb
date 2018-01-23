@@ -30,15 +30,14 @@ module ERBLint
       end
 
       def offenses(processed_source)
-        offenses = []
-        descendant_nodes(processed_source).each do |erb_node|
+        descendant_nodes(processed_source).each_with_object([]) do |erb_node, offenses|
           offenses.push(*inspect_content(processed_source, erb_node))
         end
-        offenses
       end
 
       def autocorrect(processed_source, offense)
-        return unless offense.correction
+        return unless offense.is_a?(OffenseWithCorrection)
+
         lambda do |corrector|
           passthrough = Utils::OffsetCorrector.new(
             processed_source,
@@ -78,12 +77,15 @@ module ERBLint
         source = rubocop_processed_source(aligned_source)
         return unless source.valid_syntax?
 
-        offenses = []
         team = build_team
         team.inspect_file(source)
-        team.cops.each do |cop|
-          cop.offenses.select(&:corrected?).each_with_index do |rubocop_offense, index|
-            correction = cop.corrections[index] if rubocop_offense.corrected?
+        team.cops.each_with_object([]) do |cop, offenses|
+          correction_offset = 0
+          cop.offenses.reject(&:disabled?).each do |rubocop_offense|
+            if rubocop_offense.corrected?
+              correction = cop.corrections[correction_offset]
+              correction_offset += 1
+            end
 
             offset = code_node.loc.start - alignment_column
             offense_range = processed_source.to_source_range(
@@ -96,18 +98,9 @@ module ERBLint
               code_node.loc.stop
             )
 
-            offenses <<
-              OffenseWithCorrection.new(
-                self,
-                offense_range,
-                rubocop_offense.message.strip,
-                correction: correction,
-                offset: offset,
-                bound_range: bound_range,
-              )
+            offenses << add_offense(rubocop_offense, offense_range, correction, offset, bound_range)
           end
         end
-        offenses
       end
 
       def tempfile_from(filename, content)
@@ -178,6 +171,18 @@ module ERBLint
         end
 
         configs.compact
+      end
+
+      def add_offense(offense, offense_range, correction, offset, bound_range)
+        if offense.corrected?
+          klass = OffenseWithCorrection
+          options = { correction: correction, offset: offset, bound_range: bound_range }
+        else
+          klass = Offense
+          options = {}
+        end
+
+        klass.new(self, offense_range, offense.message.strip, **options)
       end
     end
   end
