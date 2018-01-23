@@ -10,6 +10,11 @@ module ERBLint
     class NoJavascriptTagHelper < Linter
       include LinterRegistry
 
+      class ConfigSchema < LinterConfig
+        property :correction_style, converts: :to_sym, accepts: [:cdata, :plain], default: :cdata
+      end
+      self.config_schema = ConfigSchema
+
       def offenses(processed_source)
         offenses = []
 
@@ -69,11 +74,16 @@ module ERBLint
         return if end_node && script_content
 
         if end_node
-          corrector.replace(begin_range, "<script#{arguments}>\n//<![CDATA[\n")
-          corrector.replace(end_range, "\n//]]>\n</script>")
+          begin_content = "<script#{arguments}>"
+          begin_content += "\n//<![CDATA[\n" if @config.correction_style == :cdata
+          corrector.replace(begin_range, begin_content)
+          end_content = "</script>"
+          end_content = "\n//]]>\n" + end_content if @config.correction_style == :cdata
+          corrector.replace(end_range, end_content)
         elsif script_content
+          script_content = "\n//<![CDATA[\n#{script_content}\n//]]>\n" if @config.correction_style == :cdata
           corrector.replace(begin_range,
-            "<script#{arguments}>\n//<![CDATA[\n#{script_content}\n//]]>\n</script>")
+            "<script#{arguments}>#{script_content}</script>")
         end
       rescue Utils::RubyToERB::Error, Utils::BlockMap::ParseError
         nil

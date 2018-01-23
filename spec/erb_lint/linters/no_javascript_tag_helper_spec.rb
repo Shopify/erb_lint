@@ -50,6 +50,17 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
       HTML
     end
 
+    context 'with plain correction style' do
+      let(:linter_config) { described_class.config_schema.new(correction_style: 'plain') }
+      let(:file) { <<~HTML }
+        <%= javascript_tag("var myData = 1;") %>
+      HTML
+
+      it { expect(subject).to eq <<~HTML }
+        <script>var myData = 1;</script>
+      HTML
+    end
+
     context 'with string argument and options' do
       let(:file) { <<~HTML }
         <%= javascript_tag('var myData = 1;', defer: true) %>
@@ -106,6 +117,21 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
           foo
 
         //]]>
+        </script>
+      HTML
+    end
+
+    context 'without options and block when correction style is plain' do
+      let(:linter_config) { described_class.config_schema.new(correction_style: 'plain') }
+      let(:file) { <<~HTML }
+        <%= javascript_tag do %>
+          foo
+        <% end %>
+      HTML
+
+      it { expect(subject).to eq <<~HTML }
+        <script>
+          foo
         </script>
       HTML
     end

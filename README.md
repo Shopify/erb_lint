@@ -238,6 +238,52 @@ linters:
     enabled: true
 ```
 
+### NoJavascriptTagHelper
+
+This linter prevents the usage of
+Rails' [`javascript_tag`](https://apidock.com/rails/ActionView/Helpers/JavaScriptHelper/javascript_tag)
+helper in ERB templates.
+
+The html parser used in this gem knows not to look for html tags within certain other tags
+like `script`, `style`, and others. The html parser does this to avoid confusing javascript
+expressions like `if (1<a || b>1)` for a malformed html tag. Using the `javascript_tag` in
+a ERB template prevents the parser from recognizing the change of parsing context and may
+fail or produce erroneous output as a result.
+
+```erb
+Bad ❌
+<%= javascript_tag(content, defer: true) %>
+Good ✅
+<script><%== content %></script>
+
+Bad ❌
+<%= javascript_tag do %>
+  alert(1)
+<% end %>
+Good ✅
+<script>
+  alert(1)
+</script>
+```
+
+The autocorrection rule adds `//<![CDATA[` and `//]]>` markers to the existing script, as this is the default
+behavior for `javascript_tag`. This can be disabled by changing the `correction_style` linter option
+from `cdata` to `plain`.
+
+Example configuration:
+
+```yaml
+---
+linters:
+  NoJavascriptTagHelper:
+    enabled: true
+    correction_style: 'plain'
+```
+
+Linter-Specific Option | Description
+-----------------------|---------------------------------------------------------
+`correction_style`     | When configured with `cdata`, adds CDATA markers. When configured with `plain`, don't add makers. Defaults to `cdata`.
+
 ## Custom Linters
 
 `erb-lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your

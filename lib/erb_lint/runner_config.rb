@@ -42,6 +42,7 @@ module ERBLint
             ParserErrors: { enabled: true },
             RightTrim: { enabled: true },
             SpaceAroundErbTag: { enabled: true },
+            NoJavascriptTagHelper: { enabled: true },
           },
         )
       end
