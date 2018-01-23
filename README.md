@@ -191,6 +191,24 @@ Linter-Specific Option | Description
 `rubocop_config`       | A valid rubocop configuration hash. Mandatory when this cop is enabled. See [rubocop's manual entry on Configuration](http://rubocop.readthedocs.io/en/latest/configuration/)
 `only`                 | Only run cops listed in this array instead of all cops.
 
+### RightTrim
+
+Trimming at the right of an ERB tag can be done with either `=%>` or `-%>`, this linter enforces one of these two styles.
+
+Example configuration:
+
+```yaml
+---
+linters:
+  RightTrim:
+    enabled: true
+    enforced_style: '-'
+```
+
+Linter-Specific Option | Description
+-----------------------|---------------------------------------------------------
+`enforced_style`       | Which style to enforce, can be either `-` or `=`. Optional. Defaults to `-`.
+
 ## Custom Linters
 
 `erb-lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your

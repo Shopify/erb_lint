@@ -3,7 +3,7 @@ PATH
   specs:
     erb_lint (0.0.18)
       activesupport
-      better_html (~> 1.0.3)
+      better_html (~> 1.0.4)
       colorize
       html_tokenizer
       rubocop (~> 0.51)
@@ -24,7 +24,7 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     ast (2.3.0)
-    better_html (1.0.3)
+    better_html (1.0.4)
       actionview (>= 4.0)
       activesupport (>= 4.0)
       ast (~> 2.0)
@@ -40,7 +40,7 @@ GEM
     erubi (1.7.0)
     fakefs (0.11.3)
     html_tokenizer (0.0.6)
-    i18n (0.9.1)
+    i18n (0.9.3)
       concurrent-ruby (~> 1.0)
     loofah (2.1.1)
       crass (~> 1.0.2)
