@@ -41,6 +41,7 @@ module ERBLint
             FinalNewline: { enabled: true },
             ParserErrors: { enabled: true },
             RightTrim: { enabled: true },
+            SpaceAroundErbTag: { enabled: true },
           },
         )
       end
