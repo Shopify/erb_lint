@@ -38,9 +38,9 @@ module ERBLint
       def default
         new(
           linters: {
-            FinalNewline: {
-              enabled: true,
-            },
+            FinalNewline: { enabled: true },
+            ParserErrors: { enabled: true },
+            RightTrim: { enabled: true },
           },
         )
       end
