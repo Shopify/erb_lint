@@ -209,6 +209,35 @@ Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `enforced_style`       | Which style to enforce, can be either `-` or `=`. Optional. Defaults to `-`.
 
+### SpaceAroundErbTag
+
+Enforce a single space after `<%` and before `%>` in the ERB source.
+This linter ignores opening ERB tags (`<%`) that are followed by a newline,
+and closing ERB tags (`%>`) that are preceded by a newline.
+
+
+```erb
+Bad ❌
+<%foo%>
+<%=foo-%>
+
+Good ✅
+<% foo %>
+
+<%
+  foo
+%>
+```
+
+Example configuration:
+
+```yaml
+---
+linters:
+  SpaceAroundErbTag:
+    enabled: true
+```
+
 ## Custom Linters
 
 `erb-lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your
