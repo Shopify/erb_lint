@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.bindir = 'exe'
   s.executables = s.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
-  s.add_dependency 'better_html', '~> 1.0.2'
+  s.add_dependency 'better_html', '~> 1.0.3'
   s.add_dependency 'html_tokenizer'
   s.add_dependency 'rubocop', '~> 0.51'
   s.add_dependency 'activesupport'
