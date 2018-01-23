@@ -254,7 +254,7 @@ fail or produce erroneous output as a result.
 Bad ❌
 <%= javascript_tag(content, defer: true) %>
 Good ✅
-<script><%== content %></script>
+<script defer="true"><%== content %></script>
 
 Bad ❌
 <%= javascript_tag do %>
