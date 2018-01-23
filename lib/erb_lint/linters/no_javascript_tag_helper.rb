@@ -22,7 +22,7 @@ module ERBLint
 
           next unless (ruby_node = BetterHtml::TestHelper::RubyNode.parse(source))
           send_node = ruby_node.descendants(:send).first
-          next unless send_node.method_name?(:javascript_tag)
+          next unless send_node&.method_name?(:javascript_tag)
 
           offenses << Offense.new(
             self,

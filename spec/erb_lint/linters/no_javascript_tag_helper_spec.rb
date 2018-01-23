@@ -23,6 +23,14 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
 
       it { expect(subject).to eq [build_offense(7..30)] }
     end
+
+    context 'no method calls in erb tag' do
+      let(:file) { <<~FILE }
+        <%= true %>
+      FILE
+
+      it { expect(subject).to eq [] }
+    end
   end
 
   describe 'autocorrect' do
