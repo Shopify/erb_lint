@@ -43,7 +43,6 @@ module ERBLint
         [
           BetterHtml::TestHelper::SafeErb::NoStatements,
           BetterHtml::TestHelper::SafeErb::AllowedScriptType,
-          BetterHtml::TestHelper::SafeErb::NoJavascriptTagHelper,
           BetterHtml::TestHelper::SafeErb::TagInterpolation,
           BetterHtml::TestHelper::SafeErb::ScriptInterpolation,
         ]
