@@ -28,14 +28,13 @@ module ERBLint
             end
 
             end_spaces = code.match(END_SPACES)&.captures&.first || ""
-            if end_spaces.size != 1 && !end_spaces.include?("\n")
-              offenses << Offense.new(
-                self,
-                processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
-                "Use 1 space before `#{rtrim&.loc&.source}%>` "\
-                "instead of #{end_spaces.size} space#{'s' if start_spaces.size > 1}."
-              )
-            end
+            next unless end_spaces.size != 1 && !end_spaces.include?("\n")
+            offenses << Offense.new(
+              self,
+              processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
+              "Use 1 space before `#{rtrim&.loc&.source}%>` "\
+              "instead of #{end_spaces.size} space#{'s' if start_spaces.size > 1}."
+            )
           end
         end
       end
