@@ -43,6 +43,7 @@ module ERBLint
             RightTrim: { enabled: true },
             SpaceAroundErbTag: { enabled: true },
             NoJavascriptTagHelper: { enabled: true },
+            AllowedScriptType: { enabled: true },
           },
         )
       end

@@ -284,6 +284,62 @@ Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `correction_style`     | When configured with `cdata`, adds CDATA markers. When configured with `plain`, don't add makers. Defaults to `cdata`.
 
+### AllowedScriptType
+
+This linter prevent the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values.
+
+It is common practice for web developers to use `<script>` tags with non-executable
+`type` attributes, such as `application/json` or `text/html` to pass arbitrary data into an html page.
+Despite not being executable, these tags are subject to the same parsing quirks as executable script tags, and
+it is therefore more difficult to prevent security issues from creeping in. Consider for instance an application
+where it is possible to inject the string `</script><script>` unescaped into a `text/html` tag, the application
+would be vulnerable to XSS.
+
+This pattern can easily be replaced by `<div>` tags with `data` attributes that can just as easily be read
+from javascript, and have the added benefit of being safer. When `content_tag(:div)` or `tag.div()` is used
+to pass arbitrary user data into the html document, it becomes much harder to inadvertently introduce a
+security issue.
+
+It may also be desirable to avoid typos in `type` attributes.
+
+```html
+Bad ❌
+<script type="text/javacsrïpt"></script>
+Good ✅
+<script type="text/javascript"></script>
+```
+
+By default, this linter allows the `type` attribute to be omitted, as the behavior in browsers is to
+consider `<script>` to be the same as `<script type="text/javascript">`. When the linter is configured with
+`allow_blank: false`, instances of `<script>` tags without a type will be auto-corrected
+to `<script type="text/javascript">`.
+
+It may also be desirable to disallow `<script>` tags from appearing anywhere in your application.
+For instance, Rails applications can benefit from serving static javascript code from the asset
+pipeline, as well as other security benefits.
+The `disallow_inline_scripts: true` config option may be used for that purpose.
+
+Example configuration:
+
+```yaml
+---
+linters:
+  AllowedScriptType:
+    enabled: true
+    allowed_types:
+      - 'application/json'
+      - 'text/javascript'
+      - 'text/html'
+    allow_blank: false
+    disallow_inline_scripts: false
+```
+
+Linter-Specific Option    | Description
+--------------------------|---------------------------------------------------------
+`allowed_types`           | An array of allowed types. Defaults to `["text/javascript"]`.
+`allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag.
+`disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
+
 ## Custom Linters
 
 `erb-lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your
