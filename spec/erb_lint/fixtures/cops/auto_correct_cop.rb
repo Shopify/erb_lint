@@ -3,7 +3,7 @@
 module RuboCop
   module Cop
     module ErbLint
-      class ArbitraryRule < Cop
+      class AutoCorrectCop < Cop
         MSG = 'An arbitrary rule has been violated.'
 
         def on_send(node)

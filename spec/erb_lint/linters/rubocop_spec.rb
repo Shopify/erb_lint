@@ -6,9 +6,9 @@ require 'better_html'
 describe ERBLint::Linters::Rubocop do
   let(:linter_config) do
     described_class.config_schema.new(
-      only: ['ErbLint/ArbitraryRule'],
+      only: ['ErbLint/AutoCorrectCop'],
       rubocop_config: {
-        require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
+        require: [File.expand_path('../../fixtures/cops/auto_correct_cop', __FILE__)],
         AllCops: {
           TargetRubyVersion: '2.4',
         },
@@ -139,7 +139,7 @@ describe ERBLint::Linters::Rubocop do
   context 'supports loading nested config' do
     let(:linter_config) do
       described_class.config_schema.new(
-        only: ['ErbLint/ArbitraryRule'],
+        only: ['ErbLint/AutoCorrectCop'],
         rubocop_config: {
           inherit_from: 'custom_rubocop.yml',
           AllCops: {
@@ -151,7 +151,7 @@ describe ERBLint::Linters::Rubocop do
 
     let(:nested_config) do
       {
-        'ErbLint/ArbitraryRule': {
+        'ErbLint/AutoCorrectCop': {
           'Enabled': false
         }
       }.deep_stringify_keys
@@ -231,7 +231,7 @@ describe ERBLint::Linters::Rubocop do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range.min, range.max),
-      "ErbLint/ArbitraryRule: An arbitrary rule has been violated."
+      "ErbLint/AutoCorrectCop: An arbitrary rule has been violated."
     )
   end
 end
