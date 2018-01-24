@@ -225,6 +225,14 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
+  context 'autocorrected and not autocorrected offenses are aligned' do
+    let(:file) { <<~FILE }
+      <% dont_auto_correct_me(auto_correct_me(dont_auto_correct_me)) %>
+    FILE
+
+    it { expect(corrected_content).to eq "<% dont_auto_correct_me(safe_method(dont_auto_correct_me)) %>\n" }
+  end
+
   private
 
   def arbitrary_error_message(range)

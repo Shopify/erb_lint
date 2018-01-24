@@ -15,8 +15,10 @@ module RuboCop
         alias_method :on_csend, :on_send
 
         def autocorrect(node)
+          return if node.method_name == :dont_auto_correct_me
+
           lambda do |corrector|
-            corrector.replace(node.loc.selector, 'safe_method') if node.method_name == :auto_correct_me
+            corrector.replace(node.loc.selector, 'safe_method')
           end
         end
       end
