@@ -33,11 +33,11 @@ describe ERBLint::Linters::Rubocop do
 
   context 'when rubocop finds offenses in ruby statements' do
     let(:file) { <<~FILE }
-      <% banned_method %>
+      <% auto_correct_me %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(3..15)] }
-    it { expect(subject.first.source_range.source).to eq "banned_method" }
+    it { expect(subject).to eq [arbitrary_error_message(3..17)] }
+    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
 
     context 'when autocorrecting' do
       subject { corrected_content }
@@ -48,10 +48,10 @@ describe ERBLint::Linters::Rubocop do
 
   context 'when rubocop finds offenses in ruby expressions' do
     let(:file) { <<~FILE }
-      <%= banned_method %>
+      <%= auto_correct_me %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(4..16)] }
+    it { expect(subject).to eq [arbitrary_error_message(4..18)] }
 
     context 'when autocorrecting' do
       subject { corrected_content }
@@ -63,17 +63,17 @@ describe ERBLint::Linters::Rubocop do
   context 'when multiple offenses are found in the same block' do
     let(:file) { <<~FILE }
       <%
-      banned_method(:foo)
-      banned_method(:bar)
-      banned_method(:baz)
+      auto_correct_me(:foo)
+      auto_correct_me(:bar)
+      auto_correct_me(:baz)
       %>
     FILE
 
     it 'finds offenses' do
       expect(subject).to eq [
-        arbitrary_error_message(3..15),
-        arbitrary_error_message(23..35),
-        arbitrary_error_message(43..55),
+        arbitrary_error_message(3..17),
+        arbitrary_error_message(25..39),
+        arbitrary_error_message(47..61),
       ]
     end
 
@@ -84,8 +84,8 @@ describe ERBLint::Linters::Rubocop do
       it { expect(subject).to eq <<~FILE }
         <%
         safe_method(:foo)
-        banned_method(:bar)
-        banned_method(:baz)
+        auto_correct_me(:bar)
+        auto_correct_me(:baz)
         %>
       FILE
     end
@@ -93,7 +93,7 @@ describe ERBLint::Linters::Rubocop do
 
   context 'partial ruby statements are ignored' do
     let(:file) { <<~FILE }
-      <% if banned_method %>
+      <% if auto_correct_me %>
         foo
       <% end %>
     FILE
@@ -103,12 +103,12 @@ describe ERBLint::Linters::Rubocop do
 
   context 'statements with partial block expression is processed' do
     let(:file) { <<~FILE }
-      <% banned_method.each do %>
+      <% auto_correct_me.each do %>
         foo
       <% end %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(3..15)] }
+    it { expect(subject).to eq [arbitrary_error_message(3..17)] }
 
     context 'when autocorrecting' do
       subject { corrected_content }
@@ -126,14 +126,14 @@ describe ERBLint::Linters::Rubocop do
       <div>
         <%
           if foo?
-            banned_method
+            auto_correct_me
           end
         %>
       </div>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(29..41)] }
-    it { expect(subject.first.source_range.source).to eq "banned_method" }
+    it { expect(subject).to eq [arbitrary_error_message(29..43)] }
+    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
   end
 
   context 'supports loading nested config' do
@@ -163,7 +163,7 @@ describe ERBLint::Linters::Rubocop do
 
     context 'rules from nested config are merged' do
       let(:file) { <<~FILE }
-        <% banned_method %>
+        <% auto_correct_me %>
       FILE
 
       it { expect(subject).to eq [] }
