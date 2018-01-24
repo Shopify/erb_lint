@@ -6,9 +6,9 @@ require 'better_html'
 describe ERBLint::Linters::RubocopText do
   let(:linter_config) do
     described_class.config_schema.new(
-      only: ['ErbLint/ArbitraryRule'],
+      only: ['ErbLint/AutoCorrectCop'],
       rubocop_config: {
-        require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
+        require: [File.expand_path('../../fixtures/cops/auto_correct_cop', __FILE__)],
         AllCops: {
           TargetRubyVersion: '2.4',
         },
@@ -22,7 +22,7 @@ describe ERBLint::Linters::RubocopText do
 
   context 'when file does not contain any erb text node' do
     let(:file) { <<~FILE }
-      <span class="<%= banned_method %>"></span>
+      <span class="<%= auto_correct_me %>"></span>
     FILE
 
     it { expect(subject).to eq [] }
@@ -30,10 +30,10 @@ describe ERBLint::Linters::RubocopText do
 
   context 'when rubocop find offenses inside erb text node' do
     let(:file) { <<~FILE }
-      <span> <%= banned_method %> </span>
+      <span> <%= auto_correct_me %> </span>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(11..23)] }
+    it { expect(subject).to eq [arbitrary_error_message(11..25)] }
   end
 
   context 'when rubocop does not find offenses inside erb text node' do
@@ -50,7 +50,7 @@ describe ERBLint::Linters::RubocopText do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range.min, range.max),
-      "ErbLint/ArbitraryRule: An arbitrary rule has been violated."
+      "ErbLint/AutoCorrectCop: An arbitrary rule has been violated."
     )
   end
 end

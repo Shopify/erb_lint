@@ -6,9 +6,9 @@ require 'better_html'
 describe ERBLint::Linters::Rubocop do
   let(:linter_config) do
     described_class.config_schema.new(
-      only: ['ErbLint/ArbitraryRule'],
+      only: ['ErbLint/AutoCorrectCop'],
       rubocop_config: {
-        require: [File.expand_path('../../fixtures/cops/example_cop', __FILE__)],
+        require: [File.expand_path('../../fixtures/cops/auto_correct_cop', __FILE__)],
         AllCops: {
           TargetRubyVersion: '2.4',
         },
@@ -33,11 +33,11 @@ describe ERBLint::Linters::Rubocop do
 
   context 'when rubocop finds offenses in ruby statements' do
     let(:file) { <<~FILE }
-      <% banned_method %>
+      <% auto_correct_me %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(3..15)] }
-    it { expect(subject.first.source_range.source).to eq "banned_method" }
+    it { expect(subject).to eq [arbitrary_error_message(3..17)] }
+    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
 
     context 'when autocorrecting' do
       subject { corrected_content }
@@ -48,10 +48,10 @@ describe ERBLint::Linters::Rubocop do
 
   context 'when rubocop finds offenses in ruby expressions' do
     let(:file) { <<~FILE }
-      <%= banned_method %>
+      <%= auto_correct_me %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(4..16)] }
+    it { expect(subject).to eq [arbitrary_error_message(4..18)] }
 
     context 'when autocorrecting' do
       subject { corrected_content }
@@ -63,17 +63,17 @@ describe ERBLint::Linters::Rubocop do
   context 'when multiple offenses are found in the same block' do
     let(:file) { <<~FILE }
       <%
-      banned_method(:foo)
-      banned_method(:bar)
-      banned_method(:baz)
+      auto_correct_me(:foo)
+      auto_correct_me(:bar)
+      auto_correct_me(:baz)
       %>
     FILE
 
     it 'finds offenses' do
       expect(subject).to eq [
-        arbitrary_error_message(3..15),
-        arbitrary_error_message(23..35),
-        arbitrary_error_message(43..55),
+        arbitrary_error_message(3..17),
+        arbitrary_error_message(25..39),
+        arbitrary_error_message(47..61),
       ]
     end
 
@@ -84,8 +84,8 @@ describe ERBLint::Linters::Rubocop do
       it { expect(subject).to eq <<~FILE }
         <%
         safe_method(:foo)
-        banned_method(:bar)
-        banned_method(:baz)
+        auto_correct_me(:bar)
+        auto_correct_me(:baz)
         %>
       FILE
     end
@@ -93,7 +93,7 @@ describe ERBLint::Linters::Rubocop do
 
   context 'partial ruby statements are ignored' do
     let(:file) { <<~FILE }
-      <% if banned_method %>
+      <% if auto_correct_me %>
         foo
       <% end %>
     FILE
@@ -103,12 +103,12 @@ describe ERBLint::Linters::Rubocop do
 
   context 'statements with partial block expression is processed' do
     let(:file) { <<~FILE }
-      <% banned_method.each do %>
+      <% auto_correct_me.each do %>
         foo
       <% end %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(3..15)] }
+    it { expect(subject).to eq [arbitrary_error_message(3..17)] }
 
     context 'when autocorrecting' do
       subject { corrected_content }
@@ -126,20 +126,20 @@ describe ERBLint::Linters::Rubocop do
       <div>
         <%
           if foo?
-            banned_method
+            auto_correct_me
           end
         %>
       </div>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(29..41)] }
-    it { expect(subject.first.source_range.source).to eq "banned_method" }
+    it { expect(subject).to eq [arbitrary_error_message(29..43)] }
+    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
   end
 
   context 'supports loading nested config' do
     let(:linter_config) do
       described_class.config_schema.new(
-        only: ['ErbLint/ArbitraryRule'],
+        only: ['ErbLint/AutoCorrectCop'],
         rubocop_config: {
           inherit_from: 'custom_rubocop.yml',
           AllCops: {
@@ -151,7 +151,7 @@ describe ERBLint::Linters::Rubocop do
 
     let(:nested_config) do
       {
-        'ErbLint/ArbitraryRule': {
+        'ErbLint/AutoCorrectCop': {
           'Enabled': false
         }
       }.deep_stringify_keys
@@ -163,7 +163,7 @@ describe ERBLint::Linters::Rubocop do
 
     context 'rules from nested config are merged' do
       let(:file) { <<~FILE }
-        <% banned_method %>
+        <% auto_correct_me %>
       FILE
 
       it { expect(subject).to eq [] }
@@ -225,13 +225,21 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
+  context 'autocorrected and not autocorrected offenses are aligned' do
+    let(:file) { <<~FILE }
+      <% dont_auto_correct_me(auto_correct_me(dont_auto_correct_me)) %>
+    FILE
+
+    it { expect(corrected_content).to eq "<% dont_auto_correct_me(safe_method(dont_auto_correct_me)) %>\n" }
+  end
+
   private
 
   def arbitrary_error_message(range)
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range.min, range.max),
-      "ErbLint/ArbitraryRule: An arbitrary rule has been violated."
+      "ErbLint/AutoCorrectCop: An arbitrary rule has been violated."
     )
   end
 end
