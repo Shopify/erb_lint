@@ -23,6 +23,16 @@ describe ERBLint::Linters::Rubocop do
   let(:corrected_content) { corrector.corrected_content }
   subject { offenses }
 
+  context 'config is valid when rubocop_config is not explicitly provided' do
+    let(:linter_config) do
+      described_class.config_schema.new(only: ['NotALinter'])
+    end
+    let(:file) { <<~FILE }
+      <% not_banned_method %>
+    FILE
+    it { expect(subject).to eq [] }
+  end
+
   context 'when rubocop finds no offenses' do
     let(:file) { <<~FILE }
       <% not_banned_method %>

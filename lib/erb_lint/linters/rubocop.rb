@@ -13,7 +13,7 @@ module ERBLint
 
       class ConfigSchema < LinterConfig
         property :only, accepts: array_of?(String)
-        property :rubocop_config, accepts: Hash
+        property :rubocop_config, accepts: Hash, default: {}
       end
 
       self.config_schema = ConfigSchema
@@ -150,7 +150,7 @@ module ERBLint
       end
 
       def config_from_hash(hash)
-        inherit_from = hash.delete('inherit_from')
+        inherit_from = hash&.delete('inherit_from')
         resolve_inheritance(hash, inherit_from)
 
         tempfile_from('.erblint-rubocop', hash.to_yaml) do |tempfile|
