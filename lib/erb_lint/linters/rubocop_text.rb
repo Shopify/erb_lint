@@ -27,11 +27,10 @@ module ERBLint
         erb_nodes
       end
 
-      def team
+      def cop_classes
         selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
-        cop_classes = RuboCop::Cop::Registry.new(selected_cops)
 
-        RuboCop::Cop::Team.new(cop_classes, @rubocop_config, extra_details: true, display_cop_names: true)
+        RuboCop::Cop::Registry.new(selected_cops)
       end
     end
   end
