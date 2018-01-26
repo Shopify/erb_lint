@@ -74,7 +74,7 @@ module ERBLint
         alignment_column = code_node.loc.column
         aligned_source = "#{' ' * alignment_column}#{trimmed_source}"
 
-        source = rubocop_processed_source(aligned_source)
+        source = rubocop_processed_source(aligned_source, processed_source.filename)
         return unless source.valid_syntax?
 
         team = build_team
@@ -112,11 +112,11 @@ module ERBLint
         end
       end
 
-      def rubocop_processed_source(content)
+      def rubocop_processed_source(content, filename)
         RuboCop::ProcessedSource.new(
           content,
           @rubocop_config.target_ruby_version,
-          '(erb)'
+          filename
         )
       end
 
