@@ -22,7 +22,11 @@ module ERBLint
       end
       linter_klass = LinterRegistry.find_by_name(klass_name)
       raise Error, "#{klass_name}: linter not found (is it loaded?)" unless linter_klass
-      linter_klass.config_schema.new(linters_config[klass_name] || {})
+      linter_klass.config_schema.new(config_hash_for_linter(klass_name))
+    end
+
+    def global_exclude
+      @config['exclude'] || []
     end
 
     def merge(other_config)
@@ -53,6 +57,13 @@ module ERBLint
 
     def linters_config
       @config['linters'] || {}
+    end
+
+    def config_hash_for_linter(klass_name)
+      config_hash = linters_config[klass_name] || {}
+      config_hash['exclude'] ||= []
+      config_hash['exclude'].concat(global_exclude) if config_hash['exclude'].is_a?(Array)
+      config_hash
     end
   end
 end

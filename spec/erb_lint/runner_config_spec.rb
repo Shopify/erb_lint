@@ -83,6 +83,24 @@ describe ERBLint::RunnerConfig do
           expect(subject.enabled?).to eq(false)
         end
       end
+
+      context 'when global excludes are specified' do
+        let(:linter) { MyCustomLinter }
+        let(:config_hash) do
+          {
+            linters: {
+              'MyCustomLinter' => { exclude: [ 'foo/bar.rb' ] }
+            },
+            exclude: [
+              '**/node_modules/**'
+            ]
+          }
+        end
+
+        it 'excluded files are merged' do
+          expect(subject.exclude).to eq(['foo/bar.rb', '**/node_modules/**'])
+        end
+      end
     end
 
     describe '#merge' do
