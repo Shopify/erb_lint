@@ -26,14 +26,13 @@ module ERBLint
             )
           end
 
-          if !tag.self_closing?
-            offenses << Offense.new(
-              self,
-              processed_source.to_source_range(tag_node.loc.stop, tag_node.loc.stop - 1),
-              "Tag `#{tag.name}` is self-closing, it must end with `/>`.",
-              '/'
-            )
-          end
+          next if tag.self_closing?
+          offenses << Offense.new(
+            self,
+            processed_source.to_source_range(tag_node.loc.stop, tag_node.loc.stop - 1),
+            "Tag `#{tag.name}` is self-closing, it must end with `/>`.",
+            '/'
+          )
         end
       end
 
