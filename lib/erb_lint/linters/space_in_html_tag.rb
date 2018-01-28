@@ -75,7 +75,8 @@ module ERBLint
           Offense.new(
             self,
             processed_source.to_source_range(begin_pos, end_pos - 1),
-            "Non-whitespace character(s) detected: #{non_space.captures.map(&:inspect).join(", ")}.",
+            "Non-whitespace character(s) detected: "\
+              "#{non_space.captures.map(&:inspect).join(', ')}.",
             expected
           )
         elsif newlines && accept_newline
@@ -83,7 +84,8 @@ module ERBLint
             Offense.new(
               self,
               processed_source.to_source_range(begin_pos, end_pos - 1),
-              "#{chars.empty? ? 'No' : 'Extra'} space detected where there should be a single space or a single line break.",
+              "#{chars.empty? ? 'No' : 'Extra'} space detected where there should be "\
+                "a single space or a single line break.",
               expected
             )
           end
