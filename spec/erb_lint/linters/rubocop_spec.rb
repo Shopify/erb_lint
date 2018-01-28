@@ -41,6 +41,28 @@ describe ERBLint::Linters::Rubocop do
     it { expect(subject).to eq [] }
   end
 
+  context 'when rubocop encounters a erb comment' do
+    let(:file) { <<~FILE }
+      <%# this whole erb block is a comment
+        auto_correct_me
+      %>
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
+  context 'when rubocop encounters a ruby comment' do
+    let(:file) { <<~FILE }
+      <%
+        # only this line is a comment
+        auto_correct_me
+      %>
+    FILE
+
+    it { expect(subject).to eq [arbitrary_error_message(37..51)] }
+    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
+  end
+
   context 'when rubocop finds offenses in ruby statements' do
     let(:file) { <<~FILE }
       <% auto_correct_me %>
