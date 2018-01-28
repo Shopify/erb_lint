@@ -89,7 +89,7 @@ describe ERBLint::RunnerConfig do
         let(:config_hash) do
           {
             linters: {
-              'MyCustomLinter' => { exclude: [ 'foo/bar.rb' ] }
+              'MyCustomLinter' => { exclude: ['foo/bar.rb'] }
             },
             exclude: [
               '**/node_modules/**'
