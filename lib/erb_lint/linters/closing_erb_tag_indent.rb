@@ -12,7 +12,7 @@ module ERBLint
 
       def offenses(processed_source)
         processed_source.ast.descendants(:erb).each_with_object([]) do |erb_node, offenses|
-          indicator, ltrim, code_node, rtrim = *erb_node
+          _, _, code_node, = *erb_node
           code = code_node.children.first
 
           start_spaces = code.match(START_SPACES)&.captures&.first || ""
