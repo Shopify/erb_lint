@@ -2,7 +2,7 @@
 
 module ERBLint
   module Linters
-    # Detects trailing whitespace at the end of a line
+    # Detects multiple blank lines
     class ExtraNewline < Linter
       include LinterRegistry
 
