@@ -34,6 +34,16 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       it { expect(subject).to eq [] }
     end
 
+    context 'when tag contains extra spaces and multiple newlines' do
+      let(:file) { "<%  \n\n\n  foo  \n\n\n %>" }
+      it do
+        expect(subject).to eq [
+          build_offense(2..8, "Use 1 newline after `<%` instead of 3."),
+          build_offense(12..17, "Use 1 newline before `%>` instead of 3.")
+        ]
+      end
+    end
+
     context 'when space is missing on the left of statement' do
       let(:file) { "<%foo %>" }
       it do
@@ -118,6 +128,11 @@ describe ERBLint::Linters::SpaceAroundErbTag do
     context 'when tag contains extra spaces and newlines' do
       let(:file) { "<%  \n  foo  \n %>" }
       it { expect(subject).to eq file }
+    end
+
+    context 'when tag contains extra spaces and multiple newlines' do
+      let(:file) { "<%  \n\n\n  foo  \n\n\n %>" }
+      it { expect(subject).to eq "<%  \n  foo  \n %>" }
     end
 
     context 'when space is missing on the left of statement' do

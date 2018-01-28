@@ -23,25 +23,46 @@ module ERBLint
                 self,
                 processed_source.to_source_range(code_node.loc.start, code_node.loc.start + start_spaces.size - 1),
                 "Use 1 space after `<%#{indicator&.loc&.source}#{ltrim&.loc&.source}` "\
-                "instead of #{start_spaces.size} space#{'s' if start_spaces.size > 1}."
+                "instead of #{start_spaces.size} space#{'s' if start_spaces.size > 1}.",
+                ' '
+              )
+            elsif start_spaces.count("\n") > 1
+              lines = start_spaces.split("\n", -1)
+              offenses << Offense.new(
+                self,
+                processed_source.to_source_range(code_node.loc.start, code_node.loc.start + start_spaces.size - 1),
+                "Use 1 newline after `<%#{indicator&.loc&.source}#{ltrim&.loc&.source}` "\
+                "instead of #{start_spaces.count("\n")}.",
+                "#{lines.first}\n#{lines.last}"
               )
             end
 
             end_spaces = code.match(END_SPACES)&.captures&.first || ""
-            next unless end_spaces.size != 1 && !end_spaces.include?("\n")
-            offenses << Offense.new(
-              self,
-              processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
-              "Use 1 space before `#{rtrim&.loc&.source}%>` "\
-              "instead of #{end_spaces.size} space#{'s' if start_spaces.size > 1}."
-            )
+            if end_spaces.size != 1 && !end_spaces.include?("\n")
+              offenses << Offense.new(
+                self,
+                processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
+                "Use 1 space before `#{rtrim&.loc&.source}%>` "\
+                "instead of #{end_spaces.size} space#{'s' if start_spaces.size > 1}.",
+                ' '
+              )
+            elsif end_spaces.count("\n") > 1
+              lines = end_spaces.split("\n", -1)
+              offenses << Offense.new(
+                self,
+                processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
+                "Use 1 newline before `#{rtrim&.loc&.source}%>` "\
+                "instead of #{end_spaces.count("\n")}.",
+                "#{lines.first}\n#{lines.last}"
+              )
+            end
           end
         end
       end
 
       def autocorrect(_processed_source, offense)
         lambda do |corrector|
-          corrector.replace(offense.source_range, ' ')
+          corrector.replace(offense.source_range, offense.context)
         end
       end
     end
