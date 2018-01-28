@@ -13,7 +13,7 @@ module ERBLint
         return [] unless matches
 
         offenses = []
-        matches.captures.each_with_index do |newlines, index|
+        matches.captures.each_with_index do |_newlines, index|
           offenses << Offense.new(
             self,
             processed_source.to_source_range(
