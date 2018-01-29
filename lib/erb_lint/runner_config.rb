@@ -52,6 +52,7 @@ module ERBLint
             SelfClosingTag: { enabled: true },
             SpaceAroundErbTag: { enabled: true },
             SpaceIndentation: { enabled: true },
+            SpaceInHtmlTag: { enabled: true },
             TrailingWhitespace: { enabled: true },
           },
         )
