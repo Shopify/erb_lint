@@ -67,7 +67,7 @@ module ERBLint
 
       def inspect_content(processed_source, erb_node)
         indicator, _, code_node, = *erb_node
-        return if indicator == '#'
+        return if indicator&.children&.first == '#'
 
         original_source = code_node.loc.source
         trimmed_source = original_source.sub(BLOCK_EXPR, '').sub(SUFFIX_EXPR, '')
