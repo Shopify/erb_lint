@@ -32,6 +32,26 @@ describe ERBLint::Linters::FinalNewline do
       end
     end
 
+    context 'when the file ends with multiple newlines' do
+      let(:file) { "<div id=\"a\">\nContent\n</div>\n\n\n" }
+
+      it 'reports 1 offense' do
+        expect(subject.size).to eq 1
+      end
+
+      it 'the offense range is set to an empty range after the last character of the file' do
+        expect(subject.first.source_range.begin_pos).to eq 28
+        expect(subject.first.source_range.end_pos).to eq 30
+        expect(subject.first.source_range.source).to eq "\n\n"
+        expect(subject.first.message).to eq \
+          "Remove multiple trailing newline at the end of the file."
+      end
+
+      it 'autocorrects' do
+        expect(corrected_content).to eq "<div id=\"a\">\nContent\n</div>\n"
+      end
+    end
+
     context 'when the file does not end with a newline' do
       let(:file) { "<div id=\"a\">\nContent\n</div>" }
 
