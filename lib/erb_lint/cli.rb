@@ -35,11 +35,12 @@ module ERBLint
       load_options(args)
       @files = args.dup
 
+      load_config
+
       if lint_files.empty?
         success!("no files given...\n#{option_parser}")
       end
 
-      load_config
       ensure_files_exist(lint_files)
 
       if enabled_linter_classes.empty?
@@ -50,8 +51,7 @@ module ERBLint
         "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect?}linters..."
       puts
 
-      runner_config = @config.merge(runner_config_override)
-      runner = ERBLint::Runner.new(file_loader, runner_config)
+      runner = ERBLint::Runner.new(file_loader, @config)
       lint_files.each do |filename|
         begin
           run_with_corrections(runner, filename)
@@ -142,6 +142,7 @@ module ERBLint
         warn "#{config_filename} not found: using default config".yellow
         @config = RunnerConfig.default
       end
+      @config.merge!(runner_config_override)
     rescue Psych::SyntaxError => e
       failure!("error parsing config: #{e.message}")
     end
@@ -157,9 +158,19 @@ module ERBLint
     def lint_files
       if @options[:lint_all]
         pattern = File.expand_path(DEFAULT_LINT_ALL_GLOB, Dir.pwd)
-        Dir[pattern]
+        Dir[pattern].select { |filename| !excluded?(filename) }
       else
-        @files.map { |f| f.include?('*') ? Dir[f] : f }.flatten.map { |f| File.expand_path(f, Dir.pwd) }
+        @files
+          .map { |f| f.include?('*') ? Dir[f] : f }
+          .flatten
+          .map { |f| File.expand_path(f, Dir.pwd) }
+          .select { |filename| !excluded?(filename) }
+      end
+    end
+
+    def excluded?(filename)
+      @config.global_exclude.any? do |path|
+        File.fnmatch?(path, filename)
       end
     end
 
