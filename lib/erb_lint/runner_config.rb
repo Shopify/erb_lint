@@ -44,6 +44,7 @@ module ERBLint
             SpaceAroundErbTag: { enabled: true },
             NoJavascriptTagHelper: { enabled: true },
             AllowedScriptType: { enabled: true },
+            SpaceIndentation: { enabled: true },
           },
         )
       end
