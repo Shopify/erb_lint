@@ -59,6 +59,23 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it { expect(subject).to eq [] }
       end
+
+      context 'tag with erb' do
+        let(:file) { <<~HTML }
+          <input <%= attributes %> />
+        HTML
+        it { expect(subject).to eq [] }
+      end
+
+      context 'multi-line tag with erb' do
+        let(:file) { <<~HTML }
+          <input
+            type="password"
+            <%= attributes %>
+            class="foo" />
+        HTML
+        it { expect(subject).to eq [] }
+      end
     end
 
     context 'when no space should be present' do

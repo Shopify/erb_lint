@@ -9,7 +9,7 @@ module ERBLint
       def offenses(processed_source)
         offenses = []
         processed_source.ast.descendants(:tag).each do |tag_node|
-          start_solidus, name, attributes, end_solidus = *tag_node.children
+          start_solidus, name, attributes, end_solidus = *tag_node
 
           next_loc = name&.loc&.start || attributes&.loc&.start ||
             end_solidus&.loc&.start || tag_node.loc.stop
