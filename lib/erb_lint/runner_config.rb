@@ -42,16 +42,17 @@ module ERBLint
       def default
         new(
           linters: {
+            AllowedScriptType: { enabled: true },
+            ClosingErbTagIndent: { enabled: true },
+            ExtraNewline: { enabled: true },
             FinalNewline: { enabled: true },
+            NoJavascriptTagHelper: { enabled: true },
             ParserErrors: { enabled: true },
             RightTrim: { enabled: true },
+            SelfClosingTag: { enabled: true },
             SpaceAroundErbTag: { enabled: true },
-            NoJavascriptTagHelper: { enabled: true },
-            AllowedScriptType: { enabled: true },
-            ExtraNewline: { enabled: true },
-            ClosingErbTagIndent: { enabled: true },
-            TrailingWhitespace: { enabled: true },
             SpaceIndentation: { enabled: true },
+            TrailingWhitespace: { enabled: true },
           },
         )
       end
