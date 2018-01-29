@@ -49,6 +49,7 @@ module ERBLint
             NoJavascriptTagHelper: { enabled: true },
             AllowedScriptType: { enabled: true },
             ExtraNewline: { enabled: true },
+            ClosingErbTagIndent: { enabled: true },
             TrailingWhitespace: { enabled: true },
             SpaceIndentation: { enabled: true },
           },
