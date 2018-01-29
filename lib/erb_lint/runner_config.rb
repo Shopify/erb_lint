@@ -50,6 +50,7 @@ module ERBLint
             AllowedScriptType: { enabled: true },
             TrailingWhitespace: { enabled: true },
             SpaceIndentation: { enabled: true },
+            SpaceInHtmlTag: { enabled: true },
           },
         )
       end
