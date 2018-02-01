@@ -12,17 +12,33 @@ module ERBLint
         hardcoded_strings = processed_source.ast.descendants(:text).each_with_object([]) do |text_node, to_check|
           next if javascript?(processed_source, text_node)
 
-          offended_str = text_node.to_a.find { |node| relevant_node(node) }
-          to_check << [text_node, offended_str] if offended_str
+          offended_strings = text_node.to_a.select { |node| relevant_node(node) }
+          offended_strings.each do |offended_string|
+            offended_string.split("\n").each do |str|
+              to_check << [text_node, str] unless str.empty?
+            end
+          end
         end
 
         hardcoded_strings.compact.map do |text_node, offended_str|
+          range_begin, range_stop = find_range(text_node, offended_str)
+          source_range = processed_source.to_source_range(range_begin, range_stop)
+
           Offense.new(
             self,
-            processed_source.to_source_range(text_node.loc.start, text_node.loc.stop),
-            message(offended_str)
+            source_range,
+            message(source_range.source)
           )
         end
+      end
+
+      def find_range(node, str)
+        match = node.loc.source.match(Regexp.new(Regexp.quote(str.strip)))
+        return unless match
+
+        range_begin = match.begin(0) + node.loc.start
+        range_end   = match.end(0) + node.loc.start - 1
+        [range_begin, range_end]
       end
 
       private
