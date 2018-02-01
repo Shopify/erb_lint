@@ -3,8 +3,9 @@
 require 'spec_helper'
 
 describe ERBLint::Linters::HardCodedString do
+  let(:linter_options) { {} }
   let(:linter_config) do
-    described_class.config_schema.new
+    described_class.config_schema.new(linter_options)
   end
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
@@ -161,6 +162,77 @@ describe ERBLint::Linters::HardCodedString do
       ]
 
       expect(subject).to eq expected
+    end
+  end
+
+  context 'with corrector' do
+    let(:tempfile) do
+      @tempfile = Tempfile.new(['my_class', '.rb']).tap do |f|
+        f.write(<<~EOM)
+          class MySuperCorrector
+            attr_reader :node
+
+            def initialize(filename, range)
+            end
+
+            def autocorrect(node, tag_start:, tag_end:)
+              ->(corrector) do
+                node
+              end
+            end
+          end
+        EOM
+        f.rewind
+      end
+    end
+
+    after(:each) do
+      tempfile.unlink
+      tempfile.close
+    end
+
+    let(:linter_options) do
+      { corrector: { path: tempfile.path, name: 'MySuperCorrector' } }
+    end
+
+    let(:file) { <<~FILE }
+      <span> Hello </span>
+    FILE
+
+    it 'require the corrector' do
+      offense = untranslated_string_error(7..11, 'String not translated: Hello')
+      linter.autocorrect(processed_source, offense)
+
+      expect(defined?(MySuperCorrector)).to eq('constant')
+    end
+
+    it 'calls the autocorrect method and pass a rubocop node' do
+      offense = untranslated_string_error(7..11, 'String not translated: Hello')
+      node = linter.autocorrect(processed_source, offense).call('')
+
+      expect(node.str_content).to eq('Hello')
+    end
+
+    context 'without corrector' do
+      let(:linter_options) { {} }
+
+      it 'rescue the MissingCorrector error when no corrector option is passed' do
+        offense = untranslated_string_error(7..11, 'String not translated: Hello')
+
+        expect(linter.autocorrect(processed_source, offense)).to eq(nil)
+      end
+    end
+
+    context 'can not constanize the class' do
+      let(:linter_options) do
+        { corrector: { path: tempfile.path, name: 'UnknownClass' } }
+      end
+
+      it 'does not continue the auto correction' do
+        offense = untranslated_string_error(7..11, 'String not translated: Hello')
+
+        expect(linter.autocorrect(processed_source, offense)).to eq(nil)
+      end
     end
   end
 

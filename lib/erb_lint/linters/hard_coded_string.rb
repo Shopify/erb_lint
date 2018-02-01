@@ -1,12 +1,20 @@
 # frozen_string_literal: true
 
 require 'better_html/tree/tag'
+require 'active_support/core_ext/string/inflections'
 
 module ERBLint
   module Linters
     # Checks for hardcoded strings. Useful if you want to ensure a string can be translated using i18n.
     class HardCodedString < Linter
       include LinterRegistry
+
+      MissingCorrector = Class.new(StandardError)
+
+      class ConfigSchema < LinterConfig
+        property :corrector, accepts: Hash, required: false, default: {}
+      end
+      self.config_schema = ConfigSchema
 
       def offenses(processed_source)
         hardcoded_strings = processed_source.ast.descendants(:text).each_with_object([]) do |text_node, to_check|
@@ -41,7 +49,25 @@ module ERBLint
         [range_begin, range_end]
       end
 
+      def autocorrect(processed_source, offense)
+        string = offense.source_range.source
+        return unless klass = load_corrector
+        return unless string.strip.length > 1
+
+        corrector = klass.new(processed_source.filename, offense.source_range)
+        node = RuboCop::AST::StrNode.new(:str, [string])
+        corrector.autocorrect(node, tag_start: '<%= ', tag_end: ' %>')
+      rescue MissingCorrector
+        nil
+      end
+
       private
+
+      def load_corrector
+        require @config['corrector'].fetch('path') { raise MissingCorrector }
+
+        @config['corrector'].fetch('name').safe_constantize
+      end
 
       def javascript?(processed_source, text_node)
         ast = processed_source.parser.ast.to_a
