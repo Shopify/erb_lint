@@ -89,12 +89,8 @@ describe ERBLint::Linters::HardCodedString do
       </span>
     FILE
 
-    it 'add offense' do
-      expected = untranslated_string_error(
-        26..26,
-        "Consider using Rails helpers to move out the single character \`%\` from the html."
-      )
-      expect(subject).to eq [expected]
+    it 'does not add offense' do
+      expect(subject).to eq []
     end
   end
 
