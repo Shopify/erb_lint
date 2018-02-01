@@ -169,7 +169,7 @@ describe ERBLint::Linters::HardCodedString do
     let(:tempfile) do
       @tempfile = Tempfile.new(['my_class', '.rb']).tap do |f|
         f.write(<<~EOM)
-          class MySuperCorrector
+          class I18nCorrector
             attr_reader :node
 
             def initialize(filename, range)
@@ -192,7 +192,7 @@ describe ERBLint::Linters::HardCodedString do
     end
 
     let(:linter_options) do
-      { corrector: { path: tempfile.path, name: 'MySuperCorrector' } }
+      { corrector: { path: tempfile.path, name: 'I18nCorrector' } }
     end
 
     let(:file) { <<~FILE }
@@ -203,7 +203,7 @@ describe ERBLint::Linters::HardCodedString do
       offense = untranslated_string_error(7..11, 'String not translated: Hello')
       linter.autocorrect(processed_source, offense)
 
-      expect(defined?(MySuperCorrector)).to eq('constant')
+      expect(defined?(I18nCorrector)).to eq('constant')
     end
 
     it 'calls the autocorrect method and pass a rubocop node' do
@@ -228,10 +228,11 @@ describe ERBLint::Linters::HardCodedString do
         { corrector: { path: tempfile.path, name: 'UnknownClass' } }
       end
 
-      it 'does not continue the auto correction' do
+      it 'does not continue the auto correction when the class passed is not whitelisted' do
         offense = untranslated_string_error(7..11, 'String not translated: Hello')
 
-        expect(linter.autocorrect(processed_source, offense)).to eq(nil)
+        error = ERBLint::Linters::HardCodedString::ForbiddenCorrector
+        expect { linter.autocorrect(processed_source, offense) }.to raise_error(error)
       end
     end
   end

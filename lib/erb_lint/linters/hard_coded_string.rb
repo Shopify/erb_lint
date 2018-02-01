@@ -9,7 +9,13 @@ module ERBLint
     class HardCodedString < Linter
       include LinterRegistry
 
+      ForbiddenCorrector = Class.new(StandardError)
       MissingCorrector = Class.new(StandardError)
+
+      ALLOWED_CORRECTORS = %w(
+        I18nCorrector
+        RuboCop::I18nCorrector
+      )
 
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: {}
@@ -64,9 +70,11 @@ module ERBLint
       private
 
       def load_corrector
+        corrector_name = @config['corrector'].fetch('name') { raise MissingCorrector }
+        raise ForbiddenCorrector unless ALLOWED_CORRECTORS.include?(corrector_name)
         require @config['corrector'].fetch('path') { raise MissingCorrector }
 
-        @config['corrector'].fetch('name').safe_constantize
+        corrector_name.safe_constantize
       end
 
       def javascript?(processed_source, text_node)
