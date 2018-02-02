@@ -29,7 +29,7 @@ module ERBLint
           offended_strings = text_node.to_a.select { |node| relevant_node(node) }
           offended_strings.each do |offended_string|
             offended_string.split("\n").each do |str|
-              to_check << [text_node, str] unless str.empty?
+              to_check << [text_node, str] if str.length > 1
             end
           end
         end
@@ -101,11 +101,7 @@ module ERBLint
       def message(string)
         stripped_string = string.strip
 
-        if stripped_string.length > 1
-          "String not translated: #{stripped_string}"
-        else
-          "Consider using Rails helpers to move out the single character `#{stripped_string}` from the html."
-        end
+        "String not translated: #{stripped_string}"
       end
     end
   end
