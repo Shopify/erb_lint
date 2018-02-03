@@ -20,7 +20,7 @@ module ERBLint
             start_solidus = tag_node.children.first
             offenses << Offense.new(
               self,
-              processed_source.to_source_range(start_solidus.loc.start, start_solidus.loc.stop),
+              start_solidus.loc,
               "Tag `#{tag.name}` is self-closing, it must not start with `</`.",
               ''
             )
@@ -29,7 +29,7 @@ module ERBLint
           next if tag.self_closing?
           offenses << Offense.new(
             self,
-            processed_source.to_source_range(tag_node.loc.stop, tag_node.loc.stop - 1),
+            tag_node.loc.end.offset(-1),
             "Tag `#{tag.name}` is self-closing, it must end with `/>`.",
             '/'
           )

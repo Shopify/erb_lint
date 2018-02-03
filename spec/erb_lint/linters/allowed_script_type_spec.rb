@@ -24,7 +24,7 @@ describe ERBLint::Linters::AllowedScriptType do
       let(:file) { '<script type="text/yavascript">' }
       it do
         expect(subject).to eq [
-          build_offense(8..30,
+          build_offense(8..29,
             "Avoid using \"text/yavascript\" as type for `<script>` tag. "\
             "Must be one of: text/javascript (or no type attribute).")
         ]
@@ -63,7 +63,7 @@ describe ERBLint::Linters::AllowedScriptType do
         let(:file) { '<script type="">' }
         it 'is not valid' do
           expect(subject).to eq [
-            build_offense(8..15,
+            build_offense(8..14,
               "Avoid using \"\" as type for `<script>` tag. Must be one of: text/javascript (or no type attribute).")
           ]
         end
@@ -146,7 +146,7 @@ describe ERBLint::Linters::AllowedScriptType do
   def build_offense(range, message)
     ERBLint::Offense.new(
       linter,
-      processed_source.to_source_range(range.begin, range.end),
+      processed_source.to_source_range(range),
       message
     )
   end

@@ -24,14 +24,14 @@ module ERBLint
           if !start_with_newline && end_with_newline
             offenses << Offense.new(
               self,
-              processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
+              code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Remove newline before `%>` to match start of tag.",
               ' '
             )
           elsif start_with_newline && !end_with_newline
             offenses << Offense.new(
               self,
-              processed_source.to_source_range(code_node.loc.stop, code_node.loc.stop),
+              code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Insert newline before `%>` to match start of tag.",
               "\n"
             )
@@ -40,7 +40,7 @@ module ERBLint
             if erb_node.loc.column != current_indent.size
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(code_node.loc.stop - current_indent.size + 1, code_node.loc.stop),
+                code_node.loc.end.adjust(begin_pos: -current_indent.size),
                 "Indent `%>` on column #{erb_node.loc.column} to match start of tag.",
                 ' ' * erb_node.loc.column
               )

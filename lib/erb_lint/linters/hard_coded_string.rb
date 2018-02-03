@@ -35,8 +35,8 @@ module ERBLint
         end
 
         hardcoded_strings.compact.map do |text_node, offended_str|
-          range_begin, range_stop = find_range(text_node, offended_str)
-          source_range = processed_source.to_source_range(range_begin, range_stop)
+          range = find_range(text_node, offended_str)
+          source_range = processed_source.to_source_range(range)
 
           Offense.new(
             self,
@@ -50,9 +50,9 @@ module ERBLint
         match = node.loc.source.match(Regexp.new(Regexp.quote(str.strip)))
         return unless match
 
-        range_begin = match.begin(0) + node.loc.start
-        range_end   = match.end(0) + node.loc.start - 1
-        [range_begin, range_end]
+        range_begin = match.begin(0) + node.loc.begin_pos
+        range_end   = match.end(0) + node.loc.begin_pos
+        (range_begin...range_end)
       end
 
       def autocorrect(processed_source, offense)

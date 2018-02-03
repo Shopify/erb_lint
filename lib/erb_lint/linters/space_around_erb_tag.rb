@@ -21,7 +21,7 @@ module ERBLint
             if start_spaces.size != 1 && !start_spaces.include?("\n")
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(code_node.loc.start, code_node.loc.start + start_spaces.size - 1),
+                code_node.loc.resize(start_spaces.size),
                 "Use 1 space after `<%#{indicator&.loc&.source}#{ltrim&.loc&.source}` "\
                 "instead of #{start_spaces.size} space#{'s' if start_spaces.size > 1}.",
                 ' '
@@ -30,7 +30,7 @@ module ERBLint
               lines = start_spaces.split("\n", -1)
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(code_node.loc.start, code_node.loc.start + start_spaces.size - 1),
+                code_node.loc.resize(start_spaces.size),
                 "Use 1 newline after `<%#{indicator&.loc&.source}#{ltrim&.loc&.source}` "\
                 "instead of #{start_spaces.count("\n")}.",
                 "#{lines.first}\n#{lines.last}"
@@ -41,7 +41,7 @@ module ERBLint
             if end_spaces.size != 1 && !end_spaces.include?("\n")
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
+                code_node.loc.end.adjust(begin_pos: -end_spaces.size),
                 "Use 1 space before `#{rtrim&.loc&.source}%>` "\
                 "instead of #{end_spaces.size} space#{'s' if start_spaces.size > 1}.",
                 ' '
@@ -50,7 +50,7 @@ module ERBLint
               lines = end_spaces.split("\n", -1)
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(code_node.loc.stop - end_spaces.size + 1, code_node.loc.stop),
+                code_node.loc.end.adjust(begin_pos: -end_spaces.size),
                 "Use 1 newline before `#{rtrim&.loc&.source}%>` "\
                 "instead of #{end_spaces.count("\n")}.",
                 "#{lines.first}\n#{lines.last}"

@@ -35,7 +35,7 @@ describe ERBLint::Linters::ParserErrors do
   def build_offense(range, message)
     ERBLint::Offense.new(
       linter,
-      processed_source.to_source_range(range.begin, range.end),
+      processed_source.to_source_range(range),
       message
     )
   end

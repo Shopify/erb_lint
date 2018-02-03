@@ -1,3 +1,17 @@
+GIT
+  remote: https://github.com/Shopify/better-html
+  revision: 9678aae9ede13ce9d6e6603b8756fed73fc0198b
+  branch: use-parser-source-buffer
+  specs:
+    better_html (1.0.5)
+      actionview (>= 4.0)
+      activesupport (>= 4.0)
+      ast (~> 2.0)
+      erubi (~> 1.4)
+      html_tokenizer (~> 0.0.6)
+      parser (>= 2.4)
+      smart_properties
+
 PATH
   remote: .
   specs:
@@ -24,14 +38,6 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     ast (2.4.0)
-    better_html (1.0.5)
-      actionview (>= 4.0)
-      activesupport (>= 4.0)
-      ast (~> 2.0)
-      erubi (~> 1.4)
-      html_tokenizer (~> 0.0.6)
-      parser (>= 2.4)
-      smart_properties
     builder (3.2.3)
     colorize (0.8.1)
     concurrent-ruby (1.0.5)
@@ -92,6 +98,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport (~> 5.1)
+  better_html!
   erb_lint!
   fakefs
   rake

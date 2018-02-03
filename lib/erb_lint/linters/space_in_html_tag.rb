@@ -11,27 +11,27 @@ module ERBLint
         processed_source.ast.descendants(:tag).each do |tag_node|
           start_solidus, name, attributes, end_solidus = *tag_node
 
-          next_loc = name&.loc&.start || attributes&.loc&.start ||
-            end_solidus&.loc&.start || tag_node.loc.stop
+          next_loc = name&.loc&.begin_pos || attributes&.loc&.begin_pos ||
+            end_solidus&.loc&.begin_pos || (tag_node.loc.end_pos - 1)
           if start_solidus
-            offenses << no_space(processed_source, tag_node.loc.start + 1, start_solidus.loc.start)
-            offenses << no_space(processed_source, start_solidus.loc.stop + 1, next_loc)
+            offenses << no_space(processed_source, (tag_node.loc.begin_pos + 1)...start_solidus.loc.begin_pos)
+            offenses << no_space(processed_source, start_solidus.loc.end_pos...next_loc)
           else
-            offenses << no_space(processed_source, tag_node.loc.start + 1, next_loc)
+            offenses << no_space(processed_source, (tag_node.loc.begin_pos + 1)...next_loc)
           end
 
           if attributes
-            offenses << single_space_or_newline(processed_source, name.loc.stop + 1, attributes.loc.start) if name
+            offenses << single_space_or_newline(processed_source, name.loc.end_pos...attributes.loc.begin_pos) if name
             offenses.concat(process_attributes(processed_source, attributes) || [])
           end
 
-          previous_loc = attributes&.loc&.stop || name&.loc&.stop ||
-            start_solidus&.loc&.stop || tag_node.loc.start
+          previous_loc = attributes&.loc&.end_pos || name&.loc&.end_pos ||
+            start_solidus&.loc&.end_pos || (tag_node.loc.begin_pos + 1)
           if end_solidus
-            offenses << single_space(processed_source, previous_loc + 1, end_solidus.loc.start)
-            offenses << no_space(processed_source, end_solidus.loc.stop + 1, tag_node.loc.stop)
+            offenses << single_space(processed_source, previous_loc...end_solidus.loc.begin_pos)
+            offenses << no_space(processed_source, end_solidus.loc.end_pos...(tag_node.loc.end_pos - 1))
           else
-            offenses << no_space(processed_source, previous_loc + 1, tag_node.loc.stop)
+            offenses << no_space(processed_source, previous_loc...(tag_node.loc.end_pos - 1))
           end
         end
         offenses.compact
@@ -45,25 +45,23 @@ module ERBLint
 
       private
 
-      def no_space(processed_source, begin_pos, end_pos)
-        range = Range.new(begin_pos, end_pos - 1)
+      def no_space(processed_source, range)
         chars = processed_source.file_content[range]
         return if chars.empty?
 
         Offense.new(
           self,
-          processed_source.to_source_range(begin_pos, end_pos - 1),
+          processed_source.to_source_range(range),
           "Extra space detected where there should be no space.",
           ''
         )
       end
 
-      def single_space_or_newline(processed_source, begin_pos, end_pos)
-        single_space(processed_source, begin_pos, end_pos, accept_newline: true)
+      def single_space_or_newline(processed_source, range)
+        single_space(processed_source, range, accept_newline: true)
       end
 
-      def single_space(processed_source, begin_pos, end_pos, accept_newline: false)
-        range = Range.new(begin_pos, end_pos - 1)
+      def single_space(processed_source, range, accept_newline: false)
         chars = processed_source.file_content[range]
         return if chars == ' '
 
@@ -74,7 +72,7 @@ module ERBLint
         if non_space && !non_space.captures.empty?
           Offense.new(
             self,
-            processed_source.to_source_range(begin_pos, end_pos - 1),
+            processed_source.to_source_range(range),
             "Non-whitespace character(s) detected: "\
               "#{non_space.captures.map(&:inspect).join(', ')}.",
             expected
@@ -83,7 +81,7 @@ module ERBLint
           if expected != chars
             Offense.new(
               self,
-              processed_source.to_source_range(begin_pos, end_pos - 1),
+              processed_source.to_source_range(range),
               "#{chars.empty? ? 'No' : 'Extra'} space detected where there should be "\
                 "a single space or a single line break.",
               expected
@@ -92,7 +90,7 @@ module ERBLint
         else
           Offense.new(
             self,
-            processed_source.to_source_range(begin_pos, end_pos - 1),
+            processed_source.to_source_range(range),
             "#{chars.empty? ? 'No' : 'Extra'} space detected where there should be a single space.",
             expected
           )
@@ -103,14 +101,14 @@ module ERBLint
         offenses = []
         attributes.children.each_with_index do |attribute, index|
           name, equal, value = *attribute
-          offenses << no_space(processed_source, name.loc.stop + 1, equal.loc.start) if equal
-          offenses << no_space(processed_source, equal.loc.stop + 1, value.loc.start) if equal && value
+          offenses << no_space(processed_source, name.loc.end_pos...equal.loc.begin_pos) if equal
+          offenses << no_space(processed_source, equal.loc.end_pos...value.loc.begin_pos) if equal && value
 
           next if index >= attributes.children.size - 1
           next_attribute = attributes.children[index + 1]
 
           offenses << single_space_or_newline(processed_source,
-            attribute.loc.stop + 1, next_attribute.loc.start)
+            attribute.loc.end_pos...next_attribute.loc.begin_pos)
         end
         offenses
       end

@@ -32,7 +32,7 @@ describe ERBLint::CLI do
           [
             Offense.new(
               self,
-              processed_source.to_source_range(1, 1),
+              processed_source.to_source_range(1..1),
               'fake message from a fake linter'
             )
           ]

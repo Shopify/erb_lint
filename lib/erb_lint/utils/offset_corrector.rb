@@ -40,15 +40,14 @@ module ERBLint
 
       def range_with_offset(range)
         @processed_source.to_source_range(
-          bound(@offset + range.begin_pos),
-          bound(@offset + range.end_pos - 1),
+          bound(@offset + range.begin_pos)..bound(@offset + (range.end_pos - 1))
         )
       end
 
       def bound(pos)
         [
-          [pos, @bound_range.begin_pos].max,
-          @bound_range.end_pos - 1
+          [pos, @bound_range.min].max,
+          @bound_range.max
         ].min
       end
     end

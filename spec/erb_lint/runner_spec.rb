@@ -17,7 +17,7 @@ describe ERBLint::Runner do
     module Linters
       class FakeLinter1 < Linter
         def offenses(processed_source)
-          [Offense.new(self, processed_source.to_source_range(1, 1), "#{self.class.name} error")]
+          [Offense.new(self, processed_source.to_source_range(1..1), "#{self.class.name} error")]
         end
       end
       class FakeLinter2 < FakeLinter1; end

@@ -31,7 +31,7 @@ module ERBLint
 
           offenses << Offense.new(
             self,
-            processed_source.to_source_range(erb_node.loc.start, erb_node.loc.stop),
+            erb_node.loc,
             "Avoid using 'javascript_tag do' as it confuses tests "\
             "that validate html, use inline <script> instead",
             [erb_node, send_node]
@@ -56,10 +56,6 @@ module ERBLint
         return unless (1..2).cover?(nodes.size)
 
         begin_node, end_node = nodes
-        begin_range = processed_source
-          .to_source_range(begin_node.loc.start, begin_node.loc.stop)
-        end_range = processed_source
-          .to_source_range(end_node.loc.start, end_node.loc.stop) if end_node
 
         argument_nodes = send_node.arguments
         return unless (0..2).cover?(argument_nodes.size)
@@ -76,13 +72,13 @@ module ERBLint
         if end_node
           begin_content = "<script#{arguments}>"
           begin_content += "\n//<![CDATA[\n" if @config.correction_style == :cdata
-          corrector.replace(begin_range, begin_content)
+          corrector.replace(begin_node.loc, begin_content)
           end_content = "</script>"
           end_content = "\n//]]>\n" + end_content if @config.correction_style == :cdata
-          corrector.replace(end_range, end_content)
+          corrector.replace(end_node.loc, end_content)
         elsif script_content
           script_content = "\n//<![CDATA[\n#{script_content}\n//]]>\n" if @config.correction_style == :cdata
-          corrector.replace(begin_range,
+          corrector.replace(begin_node.loc,
             "<script#{arguments}>#{script_content}</script>")
         end
       rescue Utils::RubyToERB::Error, Utils::BlockMap::ParseError

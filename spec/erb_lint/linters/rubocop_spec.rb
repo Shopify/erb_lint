@@ -270,7 +270,7 @@ describe ERBLint::Linters::Rubocop do
   def arbitrary_error_message(range)
     ERBLint::Offense.new(
       linter,
-      processed_source.to_source_range(range.min, range.max),
+      processed_source.to_source_range(range),
       "ErbLint/AutoCorrectCop: An arbitrary rule has been violated."
     )
   end

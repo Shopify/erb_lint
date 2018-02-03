@@ -87,18 +87,12 @@ module ERBLint
               correction_offset += 1
             end
 
-            offset = code_node.loc.start - alignment_column
-            offense_range = processed_source.to_source_range(
-              offset + rubocop_offense.location.begin_pos,
-              offset + rubocop_offense.location.end_pos - 1,
-            )
+            offset = code_node.loc.begin_pos - alignment_column
+            offense_range = processed_source
+              .to_source_range(rubocop_offense.location)
+              .offset(offset)
 
-            bound_range = processed_source.to_source_range(
-              code_node.loc.start,
-              code_node.loc.stop
-            )
-
-            offenses << add_offense(rubocop_offense, offense_range, correction, offset, bound_range)
+            offenses << add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
           end
         end
       end
