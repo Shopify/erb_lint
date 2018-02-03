@@ -29,23 +29,23 @@ module ERBLint
         @rubocop_config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
 
-      def offenses(processed_source)
-        descendant_nodes(processed_source).each_with_object([]) do |erb_node, offenses|
-          offenses.push(*inspect_content(processed_source, erb_node))
+      def run(processed_source)
+        descendant_nodes(processed_source).each do |erb_node|
+          inspect_content(processed_source, erb_node)
         end
       end
 
       def autocorrect(processed_source, offense)
-        return unless offense.is_a?(OffenseWithCorrection)
+        return unless offense.context
 
         lambda do |corrector|
           passthrough = Utils::OffsetCorrector.new(
             processed_source,
             corrector,
-            offense.offset,
-            offense.bound_range,
+            offense.context[:offset],
+            offense.context[:bound_range],
           )
-          offense.correction.call(passthrough)
+          offense.context[:rubocop_correction].call(passthrough)
         end
       end
 
@@ -53,16 +53,6 @@ module ERBLint
 
       def descendant_nodes(processed_source)
         processed_source.ast.descendants(:erb)
-      end
-
-      class OffenseWithCorrection < Offense
-        attr_reader :correction, :offset, :bound_range
-        def initialize(linter, source_range, message, correction:, offset:, bound_range:)
-          super(linter, source_range, message)
-          @correction = correction
-          @offset = offset
-          @bound_range = bound_range
-        end
       end
 
       def inspect_content(processed_source, erb_node)
@@ -79,7 +69,7 @@ module ERBLint
 
         team = build_team
         team.inspect_file(source)
-        team.cops.each_with_object([]) do |cop, offenses|
+        team.cops.each do |cop|
           correction_offset = 0
           cop.offenses.reject(&:disabled?).each do |rubocop_offense|
             if rubocop_offense.corrected?
@@ -92,7 +82,7 @@ module ERBLint
               .to_source_range(rubocop_offense.location)
               .offset(offset)
 
-            offenses << add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
+            add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
           end
         end
       end
@@ -167,16 +157,12 @@ module ERBLint
         configs.compact
       end
 
-      def add_offense(offense, offense_range, correction, offset, bound_range)
-        if offense.corrected?
-          klass = OffenseWithCorrection
-          options = { correction: correction, offset: offset, bound_range: bound_range }
-        else
-          klass = Offense
-          options = {}
+      def add_offense(rubocop_offense, offense_range, correction, offset, bound_range)
+        context = if rubocop_offense.corrected?
+          { rubocop_correction: correction, offset: offset, bound_range: bound_range }
         end
 
-        klass.new(self, offense_range, offense.message.strip, **options)
+        super(offense_range, rubocop_offense.message.strip, context)
       end
     end
   end

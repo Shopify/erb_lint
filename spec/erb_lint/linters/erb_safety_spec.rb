@@ -13,7 +13,8 @@ describe ERBLint::Linters::ErbSafety do
   let(:file_loader) { MockFileLoader.new(better_html_config) }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  subject(:offenses) { linter.offenses(processed_source) }
+  subject { linter.offenses }
+  before { linter.run(processed_source) }
 
   class MockFileLoader
     def initialize(config)

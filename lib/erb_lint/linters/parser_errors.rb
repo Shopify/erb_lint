@@ -5,10 +5,9 @@ module ERBLint
     class ParserErrors < Linter
       include LinterRegistry
 
-      def offenses(processed_source)
-        processed_source.parser.parser_errors.map do |error|
-          Offense.new(
-            self,
+      def run(processed_source)
+        processed_source.parser.parser_errors.each do |error|
+          add_offense(
             error.loc,
             "#{error.message} (at #{error.loc.source})"
           )

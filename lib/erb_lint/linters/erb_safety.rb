@@ -20,21 +20,17 @@ module ERBLint
         @config_filename = @config.better_html_config
       end
 
-      def offenses(processed_source)
-        offenses = []
-
+      def run(processed_source)
         parser = BetterHtml::Parser.new(processed_source.source_buffer, template_language: :html)
         testers_for(parser).each do |tester|
           tester.validate
           tester.errors.each do |error|
-            offenses << Offense.new(
-              self,
+            add_offense(
               error.location,
               error.message
             )
           end
         end
-        offenses
       end
 
       private

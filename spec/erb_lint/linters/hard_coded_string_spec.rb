@@ -10,7 +10,8 @@ describe ERBLint::Linters::HardCodedString do
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  subject(:offenses) { linter.offenses(processed_source) }
+  subject { linter.offenses }
+  before { linter.run(processed_source) }
 
   context 'when file contains hard coded string' do
     let(:file) { <<~FILE }

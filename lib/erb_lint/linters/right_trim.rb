@@ -12,18 +12,15 @@ module ERBLint
       end
       self.config_schema = ConfigSchema
 
-      def offenses(processed_source)
-        [].tap do |offenses|
-          processed_source.ast.descendants(:erb).each do |erb_node|
-            _, _, _, trim_node = *erb_node
-            next if trim_node.nil? || trim_node.loc.source == @config.enforced_style
+      def run(processed_source)
+        processed_source.ast.descendants(:erb).each do |erb_node|
+          _, _, _, trim_node = *erb_node
+          next if trim_node.nil? || trim_node.loc.source == @config.enforced_style
 
-            offenses << Offense.new(
-              self,
-              trim_node.loc,
-              "Prefer #{@config.enforced_style}%> instead of #{trim_node.loc.source}%> for trimming on the right."
-            )
-          end
+          add_offense(
+            trim_node.loc,
+            "Prefer #{@config.enforced_style}%> instead of #{trim_node.loc.source}%> for trimming on the right."
+          )
         end
       end
 

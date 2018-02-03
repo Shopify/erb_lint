@@ -8,16 +8,15 @@ module ERBLint
 
       TRAILING_WHITESPACE = /([[:space:]]*)\Z/
 
-      def offenses(processed_source)
+      def run(processed_source)
         lines = processed_source.file_content.split("\n", -1)
         document_pos = 0
-        lines.each_with_object([]) do |line, offenses|
+        lines.each do |line|
           document_pos += line.length + 1
           whitespace = line.match(TRAILING_WHITESPACE)&.captures&.first
           next unless whitespace && !whitespace.empty?
 
-          offenses << Offense.new(
-            self,
+          add_offense(
             processed_source.to_source_range((document_pos - whitespace.length - 1)...(document_pos - 1)),
             "Extra whitespace detected at end of line."
           )

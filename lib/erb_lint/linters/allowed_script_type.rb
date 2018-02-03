@@ -19,45 +19,40 @@ module ERBLint
       end
       self.config_schema = ConfigSchema
 
-      def offenses(processed_source)
+      def run(processed_source)
         parser = processed_source.parser
-        [].tap do |offenses|
-          parser.nodes_with_type(:tag).each do |tag_node|
-            tag = BetterHtml::Tree::Tag.from_node(tag_node)
-            next if tag.closing?
-            next unless tag.name == 'script'
+        parser.nodes_with_type(:tag).each do |tag_node|
+          tag = BetterHtml::Tree::Tag.from_node(tag_node)
+          next if tag.closing?
+          next unless tag.name == 'script'
 
-            if @config.disallow_inline_scripts?
-              name_node = tag_node.to_a[1]
-              offenses << Offense.new(
-                self,
-                name_node.loc,
-                "Avoid using inline `<script>` tags altogether. "\
-                "Instead, move javascript code into a static file."
-              )
-              next
-            end
+          if @config.disallow_inline_scripts?
+            name_node = tag_node.to_a[1]
+            add_offense(
+              name_node.loc,
+              "Avoid using inline `<script>` tags altogether. "\
+              "Instead, move javascript code into a static file."
+            )
+            next
+          end
 
-            type_attribute = tag.attributes['type']
-            type_present = type_attribute.present? && type_attribute.value_node.present?
+          type_attribute = tag.attributes['type']
+          type_present = type_attribute.present? && type_attribute.value_node.present?
 
-            if !type_present && !@config.allow_blank?
-              name_node = tag_node.to_a[1]
-              offenses << Offense.new(
-                self,
-                name_node.loc,
-                "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.",
-                [type_attribute]
-              )
-            elsif type_present && !@config.allowed_types.include?(type_attribute.value)
-              offenses << Offense.new(
-                self,
-                type_attribute.loc,
-                "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. "\
-                "Must be one of: #{@config.allowed_types.join(', ')}"\
-                "#{' (or no type attribute)' if @config.allow_blank?}."
-              )
-            end
+          if !type_present && !@config.allow_blank?
+            name_node = tag_node.to_a[1]
+            add_offense(
+              name_node.loc,
+              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.",
+              [type_attribute]
+            )
+          elsif type_present && !@config.allowed_types.include?(type_attribute.value)
+            add_offense(
+              type_attribute.loc,
+              "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. "\
+              "Must be one of: #{@config.allowed_types.join(', ')}"\
+              "#{' (or no type attribute)' if @config.allow_blank?}."
+            )
           end
         end
       end

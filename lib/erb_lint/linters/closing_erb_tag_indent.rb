@@ -10,8 +10,8 @@ module ERBLint
       START_SPACES = /\A([[:space:]]*)/m
       END_SPACES = /([[:space:]]*)\z/m
 
-      def offenses(processed_source)
-        processed_source.ast.descendants(:erb).each_with_object([]) do |erb_node, offenses|
+      def run(processed_source)
+        processed_source.ast.descendants(:erb).each do |erb_node|
           _, _, code_node, = *erb_node
           code = code_node.children.first
 
@@ -22,15 +22,13 @@ module ERBLint
           end_with_newline = end_spaces.include?("\n")
 
           if !start_with_newline && end_with_newline
-            offenses << Offense.new(
-              self,
+            add_offense(
               code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Remove newline before `%>` to match start of tag.",
               ' '
             )
           elsif start_with_newline && !end_with_newline
-            offenses << Offense.new(
-              self,
+            add_offense(
               code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Insert newline before `%>` to match start of tag.",
               "\n"
@@ -38,8 +36,7 @@ module ERBLint
           elsif start_with_newline && end_with_newline
             current_indent = end_spaces.split("\n", -1).last
             if erb_node.loc.column != current_indent.size
-              offenses << Offense.new(
-                self,
+              add_offense(
                 code_node.loc.end.adjust(begin_pos: -current_indent.size),
                 "Indent `%>` on column #{erb_node.loc.column} to match start of tag.",
                 ' ' * erb_node.loc.column
