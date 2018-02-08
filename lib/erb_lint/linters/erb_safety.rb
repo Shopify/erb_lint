@@ -21,8 +21,7 @@ module ERBLint
       end
 
       def run(processed_source)
-        parser = BetterHtml::Parser.new(processed_source.source_buffer, template_language: :html)
-        testers_for(parser).each do |tester|
+        testers_for(processed_source.parser).each do |tester|
           tester.validate
           tester.errors.each do |error|
             add_offense(
