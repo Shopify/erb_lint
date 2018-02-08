@@ -9,7 +9,7 @@ module ERBLint
         processed_source.parser.parser_errors.map do |error|
           Offense.new(
             self,
-            processed_source.to_source_range(error.loc.start, error.loc.stop - 1),
+            error.loc,
             "#{error.message} (at #{error.loc.source})"
           )
         end

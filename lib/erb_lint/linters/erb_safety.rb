@@ -23,13 +23,13 @@ module ERBLint
       def offenses(processed_source)
         offenses = []
 
-        parser = BetterHtml::Parser.new(processed_source.file_content, template_language: :html)
+        parser = BetterHtml::Parser.new(processed_source.source_buffer, template_language: :html)
         testers_for(parser).each do |tester|
           tester.validate
           tester.errors.each do |error|
             offenses << Offense.new(
               self,
-              processed_source.to_source_range(error.location.start, error.location.stop),
+              error.location,
               error.message
             )
           end

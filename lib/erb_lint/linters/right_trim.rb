@@ -20,7 +20,7 @@ module ERBLint
 
             offenses << Offense.new(
               self,
-              processed_source.to_source_range(trim_node.loc.start, trim_node.loc.stop),
+              trim_node.loc,
               "Prefer #{@config.enforced_style}%> instead of #{trim_node.loc.source}%> for trimming on the right."
             )
           end

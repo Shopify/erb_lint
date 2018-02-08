@@ -31,7 +31,7 @@ module ERBLint
               name_node = tag_node.to_a[1]
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(name_node.loc.start, name_node.loc.stop),
+                name_node.loc,
                 "Avoid using inline `<script>` tags altogether. "\
                 "Instead, move javascript code into a static file."
               )
@@ -45,14 +45,14 @@ module ERBLint
               name_node = tag_node.to_a[1]
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(name_node.loc.start, name_node.loc.stop),
+                name_node.loc,
                 "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.",
                 [type_attribute]
               )
             elsif type_present && !@config.allowed_types.include?(type_attribute.value)
               offenses << Offense.new(
                 self,
-                processed_source.to_source_range(type_attribute.loc.start, tag_node.loc.stop),
+                type_attribute.loc,
                 "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. "\
                 "Must be one of: #{@config.allowed_types.join(', ')}"\
                 "#{' (or no type attribute)' if @config.allow_blank?}."
@@ -62,15 +62,14 @@ module ERBLint
         end
       end
 
-      def autocorrect(processed_source, offense)
+      def autocorrect(_processed_source, offense)
         return unless offense.context
         lambda do |corrector|
           type_attribute, = *offense.context
           if type_attribute.nil?
             corrector.insert_after(offense.source_range, ' type="text/javascript"')
           elsif !type_attribute.value.present?
-            range = processed_source.to_source_range(type_attribute.node.loc.start, type_attribute.node.loc.stop)
-            corrector.replace(range, 'type="text/javascript"')
+            corrector.replace(type_attribute.node.loc, 'type="text/javascript"')
           end
         end
       end

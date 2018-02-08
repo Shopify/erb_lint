@@ -26,7 +26,7 @@ module ERBLint
       private
 
       def erb_nodes
-        erb_ast.descendants(:erb).sort { |a, b| a.loc.start <=> b.loc.start }
+        erb_ast.descendants(:erb).sort { |a, b| a.loc.begin_pos <=> b.loc.begin_pos }
       end
 
       class Entry
@@ -72,14 +72,14 @@ module ERBLint
         def ordered(nodes)
           nodes
             .uniq(&:loc)
-            .sort { |a, b| a.loc.start <=> b.loc.start }
+            .sort { |a, b| a.loc.begin_pos <=> b.loc.begin_pos }
         end
       end
 
       def build_map
         erb_nodes.each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
-          length = code_node.loc.stop - code_node.loc.start
+          length = code_node.loc.size
           start = current_pos
           if indicator_node.nil?
             append("#{code_node.loc.source}\n")

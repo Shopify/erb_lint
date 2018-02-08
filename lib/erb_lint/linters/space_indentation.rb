@@ -22,7 +22,7 @@ module ERBLint
           if spaces.include?("\t")
             offenses << Offense.new(
               self,
-              processed_source.to_source_range(document_pos, document_pos + spaces.length - 1),
+              processed_source.to_source_range(document_pos...(document_pos + spaces.length)),
               "Indent with spaces instead of tabs.",
               spaces.gsub("\t", ' ' * @config.tab_width)
             )

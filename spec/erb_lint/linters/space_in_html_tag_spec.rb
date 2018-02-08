@@ -36,6 +36,11 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         it { expect(subject).to eq [] }
       end
 
+      context 'empty tag' do
+        let(:file) { "<>" }
+        it { expect(subject).to eq [] }
+      end
+
       context 'plain tag with attribute' do
         let(:file) { '<div class="foo">' }
         it { expect(subject).to eq [] }
@@ -561,7 +566,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
   def build_offense(range, message)
     ERBLint::Offense.new(
       linter,
-      processed_source.to_source_range(range.begin, range.end),
+      processed_source.to_source_range(range),
       message
     )
   end

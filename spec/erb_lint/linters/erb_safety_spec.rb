@@ -183,6 +183,6 @@ describe ERBLint::Linters::ErbSafety do
   end
 
   def build_offense(range, message)
-    ERBLint::Offense.new(linter, processed_source.to_source_range(range.min, range.max), message)
+    ERBLint::Offense.new(linter, processed_source.to_source_range(range), message)
   end
 end

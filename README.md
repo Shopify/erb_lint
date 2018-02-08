@@ -363,7 +363,7 @@ module ERBLint
         unless processed_source.file_content.include?('this file is fine')
           errors << Offense.new(
             self,
-            processed_source.to_source_range(0, processed_source.file_content.size),
+            processed_source.to_source_range(0 ... processed_source.file_content.size),
             "This file isn't fine. #{@config.custom_message}"
           )
         end

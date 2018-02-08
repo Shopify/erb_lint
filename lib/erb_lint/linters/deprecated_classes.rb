@@ -42,17 +42,14 @@ module ERBLint
       def process_nested_offenses(source:, offset:, parent_source:)
         offenses = []
         class_name_with_loc(source).each do |class_name, loc|
-          range = parent_source.to_source_range(
-            offset + loc.start,
-            offset + loc.stop
-          )
+          range = parent_source.to_source_range(loc).offset(offset)
           offenses += generate_errors(class_name, range)
         end
         text_tags_content(source).each do |content_node|
           sub_source = ProcessedSource.new(source.filename, content_node.loc.source)
           offenses += process_nested_offenses(
             source: sub_source,
-            offset: offset + content_node.loc.start,
+            offset: offset + content_node.loc.begin_pos,
             parent_source: parent_source
           )
         end

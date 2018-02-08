@@ -178,7 +178,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
   def build_offense(range)
     ERBLint::Offense.new(
       linter,
-      processed_source.to_source_range(range.min, range.max),
+      processed_source.to_source_range(range),
       "Avoid using 'javascript_tag do' as it confuses tests "\
       "that validate html, use inline <script> instead"
     )

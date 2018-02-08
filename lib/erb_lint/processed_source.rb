@@ -7,7 +7,7 @@ module ERBLint
     def initialize(filename, file_content)
       @filename = filename
       @file_content = file_content
-      @parser = BetterHtml::Parser.new(file_content, template_language: :html)
+      @parser = BetterHtml::Parser.new(source_buffer, template_language: :html)
     end
 
     def ast
@@ -22,8 +22,13 @@ module ERBLint
       end
     end
 
-    def to_source_range(begin_pos, end_pos)
-      Parser::Source::Range.new(source_buffer, begin_pos, end_pos + 1)
+    def to_source_range(range)
+      range = (range.begin_pos...range.end_pos) if range.is_a?(::Parser::Source::Range)
+      BetterHtml::Tokenizer::Location.new(
+        source_buffer,
+        range.begin,
+        range.exclude_end? ? range.end : range.end + 1
+      )
     end
   end
 end

@@ -105,10 +105,10 @@ describe ERBLint::Utils::BlockMap do
         expect(subject.size).to eq(2)
         expect(subject[0].type).to eq(:block)
         expect(subject[0].nodes.map(&:loc).map(&:source)).to eq(["<% foo do %>", "<% end %>"])
-        expect(subject[0].nodes.map(&:loc).map(&:range)).to eq([0..11, 48..56])
+        expect(subject[0].nodes.map(&:loc).map(&:range)).to eq([0...12, 48...57])
         expect(subject[1].type).to eq(:if)
         expect(subject[1].nodes.map(&:loc).map(&:source)).to eq(["<% if bar %>", "<% end %>"])
-        expect(subject[1].nodes.map(&:loc).map(&:range)).to eq([15..26, 38..46])
+        expect(subject[1].nodes.map(&:loc).map(&:range)).to eq([15...27, 38...47])
       end
     end
 
@@ -125,7 +125,7 @@ describe ERBLint::Utils::BlockMap do
         expect(subject.size).to eq(1)
         expect(subject[0].type).to eq(:block)
         expect(subject[0].nodes.map(&:loc).map(&:source)).to eq(["<% foo do\n  if bar %>", "<% end %>", "<% end %>"])
-        expect(subject[0].nodes.map(&:loc).map(&:range)).to eq([0..20, 32..40, 42..50])
+        expect(subject[0].nodes.map(&:loc).map(&:range)).to eq([0...21, 32...41, 42...51])
       end
     end
 

@@ -238,7 +238,7 @@ describe ERBLint::Linters::HardCodedString do
   def untranslated_string_error(range, string)
     ERBLint::Offense.new(
       linter,
-      processed_source.to_source_range(range.min, range.max),
+      processed_source.to_source_range(range),
       string
     )
   end
