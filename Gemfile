@@ -10,5 +10,3 @@ group 'test' do
 end
 
 gemspec
-
-gem 'better_html', git: 'https://github.com/Shopify/better-html', branch: 'use-parser-source-buffer'
