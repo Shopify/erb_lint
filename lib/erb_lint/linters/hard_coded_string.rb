@@ -29,7 +29,7 @@ module ERBLint
           offended_strings = text_node.to_a.select { |node| relevant_node(node) }
           offended_strings.each do |offended_string|
             offended_string.split("\n").each do |str|
-              to_check << [text_node, str] if str.length > 1
+              to_check << [text_node, str] if str.gsub(/\s*/, '').length > 1
             end
           end
         end
