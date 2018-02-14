@@ -147,6 +147,7 @@ describe ERBLint::Linters::HardCodedString do
         John
         Albert
         Smith
+        <%= test %>
       </div>
     FILE
 
