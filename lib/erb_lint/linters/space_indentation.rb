@@ -13,15 +13,14 @@ module ERBLint
 
       START_SPACES = /\A([[:blank:]]*)/
 
-      def offenses(processed_source)
+      def run(processed_source)
         lines = processed_source.file_content.split("\n", -1)
         document_pos = 0
-        lines.each_with_object([]) do |line, offenses|
+        lines.each do |line|
           spaces = line.match(START_SPACES)&.captures&.first
 
           if spaces.include?("\t")
-            offenses << Offense.new(
-              self,
+            add_offense(
               processed_source.to_source_range(document_pos...(document_pos + spaces.length)),
               "Indent with spaces instead of tabs.",
               spaces.gsub("\t", ' ' * @config.tab_width)

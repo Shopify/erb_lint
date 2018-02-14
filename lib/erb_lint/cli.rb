@@ -51,10 +51,9 @@ module ERBLint
         "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect?}linters..."
       puts
 
-      runner = ERBLint::Runner.new(file_loader, @config)
       lint_files.each do |filename|
         begin
-          run_with_corrections(runner, filename)
+          run_with_corrections(filename)
         rescue => e
           puts "Exception occured when processing: #{relative_filename(filename)}"
           puts e.message
@@ -93,16 +92,17 @@ module ERBLint
       @options[:autocorrect]
     end
 
-    def run_with_corrections(runner, filename)
+    def run_with_corrections(filename)
       file_content = File.read(filename)
-      offenses = []
+
+      runner = ERBLint::Runner.new(file_loader, @config)
 
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
-        offenses = runner.run(processed_source)
-        break unless autocorrect? && offenses.any?
+        runner.run(processed_source)
+        break unless autocorrect? && runner.offenses.any?
 
-        corrector = correct(processed_source, offenses)
+        corrector = correct(processed_source, runner.offenses)
         break if corrector.corrections.empty?
         break if processed_source.file_content == corrector.corrected_content
 
@@ -115,8 +115,8 @@ module ERBLint
         file_content = corrector.corrected_content
       end
 
-      @stats.found += offenses.size
-      offenses.each do |offense|
+      @stats.found += runner.offenses.size
+      runner.offenses.each do |offense|
         puts <<~EOF
           #{offense.message}#{' (not autocorrected)'.red if autocorrect?}
           In file: #{relative_filename(filename)}:#{offense.line_range.begin}

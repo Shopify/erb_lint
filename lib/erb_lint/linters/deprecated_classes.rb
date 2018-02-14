@@ -29,7 +29,7 @@ module ERBLint
         @addendum = @config.addendum
       end
 
-      def offenses(processed_source)
+      def run(processed_source)
         process_nested_offenses(
           source: processed_source,
           offset: 0,
@@ -40,20 +40,18 @@ module ERBLint
       private
 
       def process_nested_offenses(source:, offset:, parent_source:)
-        offenses = []
         class_name_with_loc(source).each do |class_name, loc|
           range = parent_source.to_source_range(loc).offset(offset)
-          offenses += generate_errors(class_name, range)
+          generate_offenses(class_name, range)
         end
         text_tags_content(source).each do |content_node|
           sub_source = ProcessedSource.new(source.filename, content_node.loc.source)
-          offenses += process_nested_offenses(
+          process_nested_offenses(
             source: sub_source,
             offset: offset + content_node.loc.begin_pos,
             parent_source: parent_source
           )
         end
-        offenses
       end
 
       def class_name_with_loc(processed_source)
@@ -93,13 +91,12 @@ module ERBLint
         processed_source.parser.nodes_with_type(:tag)
       end
 
-      def generate_errors(class_name, range)
-        violated_rules(class_name).map do |violated_rule|
+      def generate_offenses(class_name, range)
+        violated_rules(class_name).each do |violated_rule|
           suggestion = " #{violated_rule[:suggestion]}".rstrip
           message = "Deprecated class `%s` detected matching the pattern `%s`.%s #{@addendum}".strip
 
-          Offense.new(
-            self,
+          add_offense(
             range,
             format(message, class_name, violated_rule[:class_expr], suggestion)
           )

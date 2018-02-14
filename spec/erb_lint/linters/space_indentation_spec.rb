@@ -8,9 +8,10 @@ describe ERBLint::Linters::SpaceIndentation do
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  let(:offenses) { linter.offenses(processed_source) }
+  let(:offenses) { linter.offenses }
   let(:corrector) { ERBLint::Corrector.new(processed_source, offenses) }
   let(:corrected_content) { corrector.corrected_content }
+  before { linter.run(processed_source) }
 
   describe 'offenses' do
     subject { offenses }

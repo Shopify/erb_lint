@@ -18,7 +18,9 @@ describe ERBLint::Linters::RubocopText do
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  subject(:offenses) { linter.offenses(processed_source) }
+  let(:offenses) { linter.offenses }
+  subject { offenses }
+  before { linter.run(processed_source) }
 
   context 'when file does not contain any erb text node' do
     let(:file) { <<~FILE }

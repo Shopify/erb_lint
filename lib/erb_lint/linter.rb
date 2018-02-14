@@ -29,12 +29,15 @@ module ERBLint
       end
     end
 
+    attr_reader :offenses
+
     # Must be implemented by the concrete inheriting class.
     def initialize(file_loader, config)
       @file_loader = file_loader
       @config = config
       raise ArgumentError, "expect `config` to be #{self.class.config_schema} instance, "\
         "not #{config.class}" unless config.is_a?(self.class.config_schema)
+      @offenses = []
     end
 
     def enabled?
@@ -45,8 +48,12 @@ module ERBLint
       @config.excludes_file?(filename)
     end
 
-    def offenses(_processed_source)
+    def run(_processed_source)
       raise NotImplementedError, "must implement ##{__method__}"
+    end
+
+    def add_offense(source_range, message, context = nil)
+      @offenses << Offense.new(self, source_range, message, context)
     end
   end
 end

@@ -15,9 +15,7 @@ module ERBLint
       end
       self.config_schema = ConfigSchema
 
-      def offenses(processed_source)
-        offenses = []
-
+      def run(processed_source)
         parser = processed_source.parser
         parser.ast.descendants(:erb).each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
@@ -29,16 +27,13 @@ module ERBLint
           send_node = ruby_node.descendants(:send).first
           next unless send_node&.method_name?(:javascript_tag)
 
-          offenses << Offense.new(
-            self,
+          add_offense(
             erb_node.loc,
             "Avoid using 'javascript_tag do' as it confuses tests "\
             "that validate html, use inline <script> instead",
             [erb_node, send_node]
           )
         end
-
-        offenses
       end
 
       def autocorrect(processed_source, offense)

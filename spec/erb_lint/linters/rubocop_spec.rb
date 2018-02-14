@@ -18,10 +18,16 @@ describe ERBLint::Linters::Rubocop do
   let(:file_loader) { ERBLint::FileLoader.new('.') }
   let(:linter) { described_class.new(file_loader, linter_config) }
   let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
-  let(:offenses) { linter.offenses(processed_source) }
+  let(:offenses) { linter.offenses }
   let(:corrector) { ERBLint::Corrector.new(processed_source, offenses) }
   let(:corrected_content) { corrector.corrected_content }
+  let(:nested_config) { nil }
+  let(:inherit_from_filename) { 'custom_rubocop.yml' }
   subject { offenses }
+  before do
+    allow(file_loader).to receive(:yaml).with(inherit_from_filename).and_return(nested_config)
+  end
+  before { linter.run(processed_source) }
 
   context 'config is valid when rubocop_config is not explicitly provided' do
     let(:linter_config) do
@@ -173,7 +179,7 @@ describe ERBLint::Linters::Rubocop do
       described_class.config_schema.new(
         only: ['ErbLint/AutoCorrectCop'],
         rubocop_config: {
-          inherit_from: 'custom_rubocop.yml',
+          inherit_from: inherit_from_filename,
           AllCops: {
             TargetRubyVersion: '2.3',
           },
@@ -187,10 +193,6 @@ describe ERBLint::Linters::Rubocop do
           'Enabled': false
         }
       }.deep_stringify_keys
-    end
-
-    before do
-      expect(file_loader).to receive(:yaml).with('custom_rubocop.yml').and_return(nested_config)
     end
 
     context 'rules from nested config are merged' do

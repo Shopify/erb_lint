@@ -22,7 +22,7 @@ module ERBLint
       end
       self.config_schema = ConfigSchema
 
-      def offenses(processed_source)
+      def run(processed_source)
         hardcoded_strings = processed_source.ast.descendants(:text).each_with_object([]) do |text_node, to_check|
           next if javascript?(processed_source, text_node)
 
@@ -34,12 +34,11 @@ module ERBLint
           end
         end
 
-        hardcoded_strings.compact.map do |text_node, offended_str|
+        hardcoded_strings.compact.each do |text_node, offended_str|
           range = find_range(text_node, offended_str)
           source_range = processed_source.to_source_range(range)
 
-          Offense.new(
-            self,
+          add_offense(
             source_range,
             message(source_range.source)
           )

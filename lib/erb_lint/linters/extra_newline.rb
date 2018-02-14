@@ -8,21 +8,16 @@ module ERBLint
 
       EXTRA_NEWLINES = /(\n{3,})/m
 
-      def offenses(processed_source)
-        matches = processed_source.file_content.match(EXTRA_NEWLINES)
-        return [] unless matches
+      def run(processed_source)
+        return unless (matches = processed_source.file_content.match(EXTRA_NEWLINES))
 
-        offenses = []
         matches.captures.each_index do |index|
-          offenses << Offense.new(
-            self,
-            processed_source.to_source_range(
-              (matches.begin(index) + 2)...matches.end(index)
-            ),
+          add_offense(
+            processed_source
+              .to_source_range((matches.begin(index) + 2)...matches.end(index)),
             "Extra blank line detected."
           )
         end
-        offenses
       end
 
       def autocorrect(_processed_source, offense)
