@@ -63,8 +63,9 @@ module ERBLint
       end
 
       if @stats.corrected > 0
-        if @stats.found > 0
-          warn "#{@stats.corrected} error(s) corrected and #{@stats.found} error(s) remaining in ERB files".red
+        corrected_found_diff = @stats.found - @stats.corrected
+        if corrected_found_diff > 0
+          warn "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files".red
         else
           puts "#{@stats.corrected} error(s) corrected in ERB files".green
         end
@@ -99,6 +100,7 @@ module ERBLint
 
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
+        previous_offenses = runner.offenses
         runner.run(processed_source)
         break unless autocorrect? && runner.offenses.any?
 
@@ -113,6 +115,7 @@ module ERBLint
         end
 
         file_content = corrector.corrected_content
+        break if previous_offenses.eql?(runner.offenses)
       end
 
       @stats.found += runner.offenses.size
