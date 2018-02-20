@@ -55,5 +55,9 @@ module ERBLint
     def add_offense(source_range, message, context = nil)
       @offenses << Offense.new(self, source_range, message, context)
     end
+
+    def clear_offenses
+      @offenses = []
+    end
   end
 end

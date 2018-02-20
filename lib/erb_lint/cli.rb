@@ -100,7 +100,6 @@ module ERBLint
 
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
-        previous_offenses = runner.offenses
         runner.run(processed_source)
         break unless autocorrect? && runner.offenses.any?
 
@@ -115,7 +114,7 @@ module ERBLint
         end
 
         file_content = corrector.corrected_content
-        break if previous_offenses.eql?(runner.offenses)
+        runner.clear_offenses
       end
 
       @stats.found += runner.offenses.size
