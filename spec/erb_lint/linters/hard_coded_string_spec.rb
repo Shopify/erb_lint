@@ -81,6 +81,14 @@ describe ERBLint::Linters::HardCodedString do
     it { expect(subject).to eq [] }
   end
 
+  context 'when file contains blacklisted extraction' do
+    let(:file) { <<~FILE }
+      &nbsp;
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
   context 'when file contains irrelevant hard coded string' do
     let(:file) { <<~FILE }
       <span class="example">
