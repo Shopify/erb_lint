@@ -29,7 +29,7 @@ module ERBLint
           offended_strings = text_node.to_a.select { |node| relevant_node(node) }
           offended_strings.each do |offended_string|
             offended_string.split("\n").each do |str|
-              to_check << [text_node, str] if str.gsub(/\s*/, '').length > 1
+              to_check << [text_node, str] if check_string?(str)
             end
           end
         end
@@ -67,6 +67,11 @@ module ERBLint
       end
 
       private
+
+      def check_string?(str)
+        string = str.gsub(/\s*/, '')
+        string.length > 1 && !%w(&nbsp;).include?(string)
+      end
 
       def load_corrector
         corrector_name = @config['corrector'].fetch('name') { raise MissingCorrector }
