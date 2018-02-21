@@ -114,5 +114,21 @@ describe ERBLint::Runner do
         expect(subject[0].message).to eq("Missing a trailing newline at the end of the file.")
       end
     end
+
+    context 'clear_offenses clears offenses' do
+      let(:config) do
+        ERBLint::RunnerConfig.new(
+          linters: {
+            'FakeLinter1' => { 'enabled' => true },
+            'FakeLinter2' => { 'enabled' => true }
+          }
+        )
+      end
+
+      it 'clears all offenses from the offenses ivar' do
+        runner.clear_offenses
+        expect(subject).to eq []
+      end
+    end
   end
 end
