@@ -35,10 +35,11 @@ describe ERBLint::Linters::HardCodedString do
 
   context 'when file contains a mix of hard coded string and erb' do
     let(:file) { <<~FILE }
-      <span><%= foo %> Example </span>
+      <span>Example </span>
+      <%= foo %>
     FILE
 
-    it { expect(subject).to eq [untranslated_string_error(17..23, 'String not translated: Example')] }
+    it { expect(subject).to eq [untranslated_string_error(6..12, 'String not translated: Example')] }
   end
 
   context 'when file contains hard coded string nested inside erb' do
@@ -89,6 +90,15 @@ describe ERBLint::Linters::HardCodedString do
     it { expect(subject).to eq [] }
   end
 
+  context 'when file does not contain any hard coded string and only has erb code' do
+    let(:file) { <<~FILE }
+      <% one %>
+      <% two %>
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
   context 'when file contains irrelevant hard coded string' do
     let(:file) { <<~FILE }
       <span class="example">
@@ -133,15 +143,33 @@ describe ERBLint::Linters::HardCodedString do
   context 'when file contains multiple chunks of hardcoded strings' do
     let(:file) { <<~FILE }
       <div>
-        Foo <%= bar %> Foo2 <% bar %> Foo3
+        <%= bar %> Foo Foo2 <% bar %> Foo3
+        Test
       </div>
     FILE
 
     it do
       expected = [
-        untranslated_string_error(8..10, "String not translated: Foo"),
-        untranslated_string_error(23..26, "String not translated: Foo2"),
-        untranslated_string_error(38..41, "String not translated: Foo3")
+        untranslated_string_error(8..41, "String not translated: <%= bar %> Foo Foo2 <% bar %> Foo3"),
+        untranslated_string_error(45..48, "String not translated: Test")
+      ]
+
+      expect(subject).to eq expected
+    end
+  end
+
+  context 'when file contains multiple chunks of hardcoded strings seperated by a period' do
+    let(:file) { <<~FILE }
+      <div>
+        <%= bar %>. Foo Foo2 <% bar %>. Foo3
+        Test
+      </div>
+    FILE
+
+    it do
+      expected = [
+        untranslated_string_error(8..43, "String not translated: <%= bar %>. Foo Foo2 <% bar %>. Foo3"),
+        untranslated_string_error(47..50, "String not translated: Test")
       ]
 
       expect(subject).to eq expected
@@ -165,6 +193,49 @@ describe ERBLint::Linters::HardCodedString do
         untranslated_string_error(14..17, "String not translated: John"),
         untranslated_string_error(21..26, "String not translated: Albert"),
         untranslated_string_error(30..34, "String not translated: Smith")
+      ]
+
+      expect(subject).to eq expected
+    end
+  end
+
+  context 'when file contains multiple hardcoded with a string having an interpolation' do
+    let(:file) { <<~FILE }
+      <div>
+        Foo
+        John
+        Albert
+        Smith <%= test %>
+      </div>
+    FILE
+
+    it 'creates a new offense for each' do
+      expected = [
+        untranslated_string_error(8..10, "String not translated: Foo"),
+        untranslated_string_error(14..17, "String not translated: John"),
+        untranslated_string_error(21..26, "String not translated: Albert"),
+        untranslated_string_error(30..46, "String not translated: Smith <%= test %>")
+      ]
+
+      expect(subject).to eq expected
+    end
+  end
+
+  context 'when file contains a string with an interpolation spanning on multiple lines' do
+    let(:file) { <<~FILE }
+      <div>
+        Smith <%= test
+          something: "foo",
+          something2: "bar" %>
+      </div>
+    FILE
+
+    it 'creates a single offense' do
+      expected = [
+        untranslated_string_error(
+          8..68,
+          "String not translated: Smith <%= test\n    something: \"foo\",\n    something2: \"bar\" %>"
+        )
       ]
 
       expect(subject).to eq expected
@@ -217,6 +288,19 @@ describe ERBLint::Linters::HardCodedString do
       node = linter.autocorrect(processed_source, offense).call('')
 
       expect(node.str_content).to eq('Hello')
+    end
+
+    context 'with interpolations' do
+      let(:file) { <<~FILE }
+        Foo <%= bar %> Foo2 <% bar %> Foo3
+      FILE
+
+      it 'calls autocorrect method and pass a rubocop node with method interpolation' do
+        offense = untranslated_string_error(0..33, 'String not translated: Foo <%= bar %> Foo2 <% bar %> Foo3')
+        node = linter.autocorrect(processed_source, offense).call('')
+
+        expect(node.parent.source).to eq("\"Foo \#{bar} Foo2 \#{bar} Foo3\"")
+      end
     end
 
     context 'without corrector' do
