@@ -4,6 +4,7 @@ require 'better_html'
 require 'rubocop'
 require 'tempfile'
 require 'erb_lint/utils/offset_corrector'
+require 'pry'
 
 module ERBLint
   module Linters
@@ -30,6 +31,14 @@ module ERBLint
       end
 
       def run(processed_source)
+        code = descendant_nodes(processed_source).map do |erb_node|
+          indicator, _, code_node, = *erb_node
+
+          code_node.loc.source.sub(SUFFIX_EXPR, '')
+        end
+        rubocop_processed_source(code.join("\n"), processed_source.filename)
+
+
         descendant_nodes(processed_source).each do |erb_node|
           inspect_content(processed_source, erb_node)
         end
@@ -60,11 +69,16 @@ module ERBLint
         return if indicator&.children&.first == '#'
 
         original_source = code_node.loc.source
+
         trimmed_source = original_source.sub(BLOCK_EXPR, '').sub(SUFFIX_EXPR, '')
         alignment_column = code_node.loc.column
         aligned_source = "#{' ' * alignment_column}#{trimmed_source}"
 
-        source = rubocop_processed_source(aligned_source, processed_source.filename)
+        source = if BLOCK_EXPR !~ original_source
+          rubocop_processed_source(aligned_source, processed_source.filename)
+        else
+          rubocop_processed_source(block_source(processed_source, erb_node), processed_source.filename)
+        end
         return unless source.valid_syntax?
 
         team = build_team
@@ -85,6 +99,27 @@ module ERBLint
             add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
           end
         end
+      end
+
+      def block_source(processed_source, erb_node)
+        @block ||= block_map = Utils::BlockMap.new(processed_source)
+        connecting_nodes = block_map.find_connected_nodes(erb_node)
+        nodes = descendant_nodes(processed_source).to_a
+        nodes_in_block = []
+
+        descendant_nodes(processed_source).with_object(connecting_nodes.first) do |node|
+          _, _, code_node, = *node
+          original_source = code_node.loc.source
+
+          trimmed_source = original_source.sub(SUFFIX_EXPR, '')
+          alignment_column = code_node.loc.column
+          aligned_source = "#{' ' * alignment_column}#{trimmed_source}"
+
+          nodes_in_block.append(aligned_source)
+          break if node.eql?(nodes.last)
+        end
+
+        nodes_in_block.join("\n")
       end
 
       def tempfile_from(filename, content)

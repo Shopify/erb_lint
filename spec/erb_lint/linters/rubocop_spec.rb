@@ -29,6 +29,16 @@ describe ERBLint::Linters::Rubocop do
   end
   before { linter.run(processed_source) }
 
+  context 'block passed' do
+    let(:file) { <<~FILE }
+      <% ui_title_bar do |title_bar| %>
+        <% title_bar.heading_group("Title") %>
+      <% end %>
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
   context 'config is valid when rubocop_config is not explicitly provided' do
     let(:linter_config) do
       described_class.config_schema.new(only: ['NotALinter'])
