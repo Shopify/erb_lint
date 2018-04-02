@@ -49,12 +49,12 @@ describe ERBLint::Linters::DeprecatedClasses do
       [
         {
           'deprecated' => deprecated_set_1,
-          'suggestion' => suggestion_1
+          'suggestion' => suggestion_1,
         },
         {
           'deprecated' => deprecated_set_2,
-          'suggestion' => suggestion_2
-        }
+          'suggestion' => suggestion_2,
+        },
       ]
     end
 

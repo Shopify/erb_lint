@@ -87,7 +87,7 @@ describe ERBLint::Utils::BlockMap do
           "<% elsif bar %>",
           "<% elsif baz %>",
           "<% elsif qux %>",
-          "<% end %>"
+          "<% end %>",
         ])
       end
     end
@@ -161,7 +161,7 @@ describe ERBLint::Utils::BlockMap do
           "<% begin %>",
           "<% rescue Error1 => e %>",
           "<% rescue Error2 => e %>",
-          "<% end %>"
+          "<% end %>",
         ])
       end
     end
@@ -186,7 +186,7 @@ describe ERBLint::Utils::BlockMap do
           "<% when :bar %>",
           "<% when :baz %>",
           "<% else %>",
-          "<% end %>"
+          "<% end %>",
         ])
       end
     end

@@ -190,8 +190,8 @@ describe ERBLint::Linters::Rubocop do
     let(:nested_config) do
       {
         'ErbLint/AutoCorrectCop': {
-          'Enabled': false
-        }
+          'Enabled': false,
+        },
       }.deep_stringify_keys
     end
 
@@ -217,7 +217,7 @@ describe ERBLint::Linters::Rubocop do
             EnforcedStyle: 'with_fixed_indentation',
             SupportedStyles: %w(with_first_parameter with_fixed_indentation),
             IndentationWidth: nil,
-          }
+          },
         },
       )
     end

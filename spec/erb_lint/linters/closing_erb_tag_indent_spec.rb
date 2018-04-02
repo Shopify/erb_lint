@@ -38,7 +38,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
       ERB
       it do
         expect(subject).to eq [
-          build_offense(9..12, "Indent `%>` on column 0 to match start of tag.")
+          build_offense(9..12, "Indent `%>` on column 0 to match start of tag."),
         ]
       end
     end
@@ -53,7 +53,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
       ERB
       it do
         expect(subject).to eq [
-          build_offense(13..16, "Indent `%>` on column 2 to match start of tag.")
+          build_offense(13..16, "Indent `%>` on column 2 to match start of tag."),
         ]
       end
     end
@@ -65,7 +65,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
       ERB
       it do
         expect(subject).to eq [
-          build_offense(8..8, "Insert newline before `%>` to match start of tag.")
+          build_offense(8..8, "Insert newline before `%>` to match start of tag."),
         ]
       end
     end
@@ -77,7 +77,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
       ERB
       it do
         expect(subject).to eq [
-          build_offense(6..6, "Remove newline before `%>` to match start of tag.")
+          build_offense(6..6, "Remove newline before `%>` to match start of tag."),
         ]
       end
     end

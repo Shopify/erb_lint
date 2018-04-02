@@ -40,7 +40,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       it do
         expect(subject).to eq [
           build_offense(2..8, "Use 1 newline after `<%` instead of 3."),
-          build_offense(12..17, "Use 1 newline before `%>` instead of 3.")
+          build_offense(12..17, "Use 1 newline before `%>` instead of 3."),
         ]
       end
     end
@@ -49,7 +49,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<%foo %>" }
       it do
         expect(subject).to eq [
-          build_offense(2..1, "Use 1 space after `<%` instead of 0 space.")
+          build_offense(2..1, "Use 1 space after `<%` instead of 0 space."),
         ]
       end
     end
@@ -58,7 +58,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<%=foo %>" }
       it do
         expect(subject).to eq [
-          build_offense(3..2, "Use 1 space after `<%=` instead of 0 space.")
+          build_offense(3..2, "Use 1 space after `<%=` instead of 0 space."),
         ]
       end
     end
@@ -67,7 +67,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<%-foo %>" }
       it do
         expect(subject).to eq [
-          build_offense(3..2, "Use 1 space after `<%-` instead of 0 space.")
+          build_offense(3..2, "Use 1 space after `<%-` instead of 0 space."),
         ]
       end
     end
@@ -76,7 +76,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<%  foo %>" }
       it do
         expect(subject).to eq [
-          build_offense(2..3, "Use 1 space after `<%` instead of 2 spaces.")
+          build_offense(2..3, "Use 1 space after `<%` instead of 2 spaces."),
         ]
       end
     end
@@ -85,7 +85,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<% foo%>" }
       it do
         expect(subject).to eq [
-          build_offense(6..5, "Use 1 space before `%>` instead of 0 space.")
+          build_offense(6..5, "Use 1 space before `%>` instead of 0 space."),
         ]
       end
     end
@@ -94,7 +94,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<% foo-%>" }
       it do
         expect(subject).to eq [
-          build_offense(6..5, "Use 1 space before `-%>` instead of 0 space.")
+          build_offense(6..5, "Use 1 space before `-%>` instead of 0 space."),
         ]
       end
     end
@@ -103,7 +103,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       let(:file) { "<% foo   %>" }
       it do
         expect(subject).to eq [
-          build_offense(6..8, "Use 1 space before `%>` instead of 3 space.")
+          build_offense(6..8, "Use 1 space before `%>` instead of 3 space."),
         ]
       end
     end

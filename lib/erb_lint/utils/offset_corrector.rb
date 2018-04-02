@@ -47,7 +47,7 @@ module ERBLint
       def bound(pos)
         [
           [pos, @bound_range.min].max,
-          @bound_range.max
+          @bound_range.max,
         ].min
       end
     end

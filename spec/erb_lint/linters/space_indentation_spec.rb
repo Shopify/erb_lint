@@ -31,7 +31,7 @@ describe ERBLint::Linters::SpaceIndentation do
       it do
         expect(subject).to eq [
           build_offense(0..1, "Indent with spaces instead of tabs."),
-          build_offense(17..18, "Indent with spaces instead of tabs.")
+          build_offense(17..18, "Indent with spaces instead of tabs."),
         ]
       end
     end
@@ -41,7 +41,7 @@ describe ERBLint::Linters::SpaceIndentation do
       it do
         expect(subject).to eq [
           build_offense(0..6, "Indent with spaces instead of tabs."),
-          build_offense(22..26, "Indent with spaces instead of tabs.")
+          build_offense(22..26, "Indent with spaces instead of tabs."),
         ]
       end
     end

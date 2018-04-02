@@ -36,7 +36,7 @@ describe ERBLint::Runner do
         ERBLint::RunnerConfig.new(
           linters: {
             'FakeLinter1' => { 'enabled' => true },
-            'FakeLinter2' => { 'enabled' => true }
+            'FakeLinter2' => { 'enabled' => true },
           }
         )
       end
@@ -55,7 +55,7 @@ describe ERBLint::Runner do
         ERBLint::RunnerConfig.new(
           linters: {
             'FakeLinter1' => { 'enabled' => true },
-            'FakeLinter2' => { 'enabled' => false }
+            'FakeLinter2' => { 'enabled' => false },
           }
         )
       end
@@ -72,7 +72,7 @@ describe ERBLint::Runner do
         ERBLint::RunnerConfig.new(
           linters: {
             'FakeLinter1' => { 'enabled' => false },
-            'FakeLinter2' => { 'enabled' => false }
+            'FakeLinter2' => { 'enabled' => false },
           }
         )
       end
@@ -87,7 +87,7 @@ describe ERBLint::Runner do
         ERBLint::RunnerConfig.new(
           linters: {
             'FakeLinter1' => { 'enabled' => true, 'exclude' => ['**/otherfolder/**'] },
-            'FakeLinter2' => { 'enabled' => true, 'exclude' => ['somefolder/**.html.erb'] }
+            'FakeLinter2' => { 'enabled' => true, 'exclude' => ['somefolder/**.html.erb'] },
           }
         )
       end
@@ -120,7 +120,7 @@ describe ERBLint::Runner do
         ERBLint::RunnerConfig.new(
           linters: {
             'FakeLinter1' => { 'enabled' => true },
-            'FakeLinter2' => { 'enabled' => true }
+            'FakeLinter2' => { 'enabled' => true },
           }
         )
       end

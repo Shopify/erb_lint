@@ -64,7 +64,7 @@ describe ERBLint::Linters::HardCodedString do
       expect(subject).to eq [
         untranslated_string_error(7..13, 'String not translated: Example'),
         untranslated_string_error(30..32, 'String not translated: Foo'),
-        untranslated_string_error(49..52, 'String not translated: Test')
+        untranslated_string_error(49..52, 'String not translated: Test'),
       ]
     end
   end
@@ -141,7 +141,7 @@ describe ERBLint::Linters::HardCodedString do
       expected = [
         untranslated_string_error(8..10, "String not translated: Foo"),
         untranslated_string_error(23..26, "String not translated: Foo2"),
-        untranslated_string_error(38..41, "String not translated: Foo3")
+        untranslated_string_error(38..41, "String not translated: Foo3"),
       ]
 
       expect(subject).to eq expected
@@ -164,7 +164,7 @@ describe ERBLint::Linters::HardCodedString do
         untranslated_string_error(8..10, "String not translated: Foo"),
         untranslated_string_error(14..17, "String not translated: John"),
         untranslated_string_error(21..26, "String not translated: Albert"),
-        untranslated_string_error(30..34, "String not translated: Smith")
+        untranslated_string_error(30..34, "String not translated: Smith"),
       ]
 
       expect(subject).to eq expected

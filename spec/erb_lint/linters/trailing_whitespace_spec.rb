@@ -25,7 +25,7 @@ describe ERBLint::Linters::TrailingWhitespace do
       let(:file) { "a not so perfect line    " }
       it do
         expect(subject).to eq [
-          build_offense(21..24, "Extra whitespace detected at end of line.")
+          build_offense(21..24, "Extra whitespace detected at end of line."),
         ]
       end
     end
@@ -34,7 +34,7 @@ describe ERBLint::Linters::TrailingWhitespace do
       let(:file) { "a not so perfect line    \n" }
       it do
         expect(subject).to eq [
-          build_offense(21..24, "Extra whitespace detected at end of line.")
+          build_offense(21..24, "Extra whitespace detected at end of line."),
         ]
       end
     end
@@ -43,7 +43,7 @@ describe ERBLint::Linters::TrailingWhitespace do
       let(:file) { "a not so perfect line  \t\r\t  \n" }
       it do
         expect(subject).to eq [
-          build_offense(21..27, "Extra whitespace detected at end of line.")
+          build_offense(21..27, "Extra whitespace detected at end of line."),
         ]
       end
     end
@@ -52,7 +52,7 @@ describe ERBLint::Linters::TrailingWhitespace do
       let(:file) { "a line\n       \nanother line\n" }
       it do
         expect(subject).to eq [
-          build_offense(7..13, "Extra whitespace detected at end of line.")
+          build_offense(7..13, "Extra whitespace detected at end of line."),
         ]
       end
     end
