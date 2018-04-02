@@ -3,7 +3,7 @@ PATH
   specs:
     erb_lint (0.0.22)
       activesupport
-      better_html (~> 1.0.6)
+      better_html (~> 1.0.7)
       colorize
       html_tokenizer
       rubocop (~> 0.51)
