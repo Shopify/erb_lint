@@ -27,10 +27,10 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
 
     context 'regression with <%%= syntax does not raise an exception' do
       let(:file) { <<~FILE }
-<%%= ma_tile do |tile| %>
-  <%%= tile.image 'styleguide/toronto-stunning-sunset' %>
-<%% end %>
-<% end %>
+        <%%= ma_tile do |tile| %>
+          <%%= tile.image 'styleguide/toronto-stunning-sunset' %>
+        <%% end %>
+        <% end %>
       FILE
 
       it { expect(subject).to eq [] }
