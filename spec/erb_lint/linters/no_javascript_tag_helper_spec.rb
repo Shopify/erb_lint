@@ -25,6 +25,17 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
       it { expect(subject).to eq [build_offense(7..30)] }
     end
 
+    context 'regression with <%%= syntax does not raise an exception' do
+      let(:file) { <<~FILE }
+<%%= ma_tile do |tile| %>
+  <%%= tile.image 'styleguide/toronto-stunning-sunset' %>
+<%% end %>
+<% end %>
+      FILE
+
+      it { expect(subject).to eq [] }
+    end
+
     context 'no method calls in erb tag' do
       let(:file) { <<~FILE }
         <%= true %>
