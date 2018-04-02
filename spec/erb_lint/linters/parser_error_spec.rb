@@ -25,7 +25,7 @@ describe ERBLint::Linters::ParserErrors do
       let(:file) { "<>" }
       it do
         expect(subject).to eq [
-          build_offense(1..1, "expected '/' or tag name (at >)")
+          build_offense(1..1, "expected '/' or tag name (at >)"),
         ]
       end
     end

@@ -28,7 +28,7 @@ describe ERBLint::Linters::RightTrim do
         let(:file) { "<% foo =%>" }
         it do
           expect(subject).to eq [
-            build_offense(7..7, "Prefer -%> instead of =%> for trimming on the right.")
+            build_offense(7..7, "Prefer -%> instead of =%> for trimming on the right."),
           ]
         end
       end
@@ -56,7 +56,7 @@ describe ERBLint::Linters::RightTrim do
         let(:file) { "<% foo -%>" }
         it do
           expect(subject).to eq [
-            build_offense(7..7, "Prefer =%> instead of -%> for trimming on the right.")
+            build_offense(7..7, "Prefer =%> instead of -%> for trimming on the right."),
           ]
         end
       end

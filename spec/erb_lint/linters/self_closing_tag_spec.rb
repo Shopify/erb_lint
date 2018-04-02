@@ -30,7 +30,7 @@ describe ERBLint::Linters::SelfClosingTag do
       let(:file) { "<br>" }
       it do
         expect(subject).to eq [
-          build_offense(3..2, "Tag `br` is self-closing, it must end with `/>`.")
+          build_offense(3..2, "Tag `br` is self-closing, it must end with `/>`."),
         ]
       end
     end
@@ -39,7 +39,7 @@ describe ERBLint::Linters::SelfClosingTag do
       let(:file) { "</br/>" }
       it do
         expect(subject).to eq [
-          build_offense(1..1, "Tag `br` is self-closing, it must not start with `</`.")
+          build_offense(1..1, "Tag `br` is self-closing, it must not start with `</`."),
         ]
       end
     end
@@ -49,7 +49,7 @@ describe ERBLint::Linters::SelfClosingTag do
       it do
         expect(subject).to eq [
           build_offense(1..1, "Tag `br` is self-closing, it must not start with `</`."),
-          build_offense(4..3, "Tag `br` is self-closing, it must end with `/>`.")
+          build_offense(4..3, "Tag `br` is self-closing, it must end with `/>`."),
         ]
       end
     end

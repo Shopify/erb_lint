@@ -48,7 +48,7 @@ describe ERBLint::Linters::ExtraNewline do
       FILE
       it do
         expect(subject).to eq [
-          build_offense(8..8, "Extra blank line detected.")
+          build_offense(8..8, "Extra blank line detected."),
         ]
       end
     end
@@ -64,7 +64,7 @@ describe ERBLint::Linters::ExtraNewline do
       FILE
       it do
         expect(subject).to eq [
-          build_offense(8..10, "Extra blank line detected.")
+          build_offense(8..10, "Extra blank line detected."),
         ]
       end
     end

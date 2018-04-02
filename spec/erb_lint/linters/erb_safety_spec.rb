@@ -7,7 +7,7 @@ describe ERBLint::Linters::ErbSafety do
   let(:linter_config) { described_class.config_schema.new }
   let(:better_html_config) do
     {
-      javascript_safe_methods: ['to_json']
+      javascript_safe_methods: ['to_json'],
     }
   end
   let(:file_loader) { MockFileLoader.new(better_html_config) }

@@ -27,7 +27,7 @@ describe ERBLint::Linters::AllowedScriptType do
         expect(subject).to eq [
           build_offense(8..29,
             "Avoid using \"text/yavascript\" as type for `<script>` tag. "\
-            "Must be one of: text/javascript (or no type attribute).")
+            "Must be one of: text/javascript (or no type attribute)."),
         ]
       end
     end
@@ -41,7 +41,7 @@ describe ERBLint::Linters::AllowedScriptType do
           expect(subject).to eq [
             build_offense(1..6,
               "Avoid using inline `<script>` tags altogether. "\
-              "Instead, move javascript code into a static file.")
+              "Instead, move javascript code into a static file."),
           ]
         end
       end
@@ -65,7 +65,7 @@ describe ERBLint::Linters::AllowedScriptType do
         it 'is not valid' do
           expect(subject).to eq [
             build_offense(8..14,
-              "Avoid using \"\" as type for `<script>` tag. Must be one of: text/javascript (or no type attribute).")
+              "Avoid using \"\" as type for `<script>` tag. Must be one of: text/javascript (or no type attribute)."),
           ]
         end
       end
@@ -79,7 +79,7 @@ describe ERBLint::Linters::AllowedScriptType do
         it do
           expect(subject).to eq [
             build_offense(1..6,
-              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.")
+              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag."),
           ]
         end
       end
@@ -89,7 +89,7 @@ describe ERBLint::Linters::AllowedScriptType do
         it do
           expect(subject).to eq [
             build_offense(1..6,
-              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.")
+              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag."),
           ]
         end
       end
