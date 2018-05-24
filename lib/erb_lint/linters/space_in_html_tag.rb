@@ -94,7 +94,7 @@ module ERBLint
       def process_attributes(processed_source, attributes)
         attributes.children.each_with_index do |attribute, index|
           name, equal, value = *attribute
-          no_space(processed_source, name.loc.end_pos...equal.loc.begin_pos) if equal
+          no_space(processed_source, name.loc.end_pos...equal.loc.begin_pos) if name && equal
           no_space(processed_source, equal.loc.end_pos...value.loc.begin_pos) if equal && value
 
           next if index >= attributes.children.size - 1
