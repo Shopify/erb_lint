@@ -13,14 +13,16 @@ module ERBLint
 
       def run(processed_source)
         processed_source.ast.descendants(:erb).each do |erb_node|
-          indicator, ltrim, code_node, rtrim = *erb_node
+          indicator_node, ltrim, code_node, rtrim = *erb_node
+          indicator = indicator_node&.loc&.source
+          next if indicator == '#' || indicator == '%'
           code = code_node.children.first
 
           start_spaces = code.match(START_SPACES)&.captures&.first || ""
           if start_spaces.size != 1 && !start_spaces.include?("\n")
             add_offense(
               code_node.loc.resize(start_spaces.size),
-              "Use 1 space after `<%#{indicator&.loc&.source}#{ltrim&.loc&.source}` "\
+              "Use 1 space after `<%#{indicator}#{ltrim&.loc&.source}` "\
               "instead of #{start_spaces.size} space#{'s' if start_spaces.size > 1}.",
               ' '
             )

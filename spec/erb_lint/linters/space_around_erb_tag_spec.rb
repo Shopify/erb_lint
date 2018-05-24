@@ -21,6 +21,16 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       it { expect(subject).to eq [] }
     end
 
+    context 'for escaped erb tag' do
+      let(:file) { "this is text <%%=text %> not erb\n" }
+      it { expect(subject).to eq [] }
+    end
+
+    context 'for erb comment' do
+      let(:file) { "this is text <%#comment %> not erb\n" }
+      it { expect(subject).to eq [] }
+    end
+
     context 'when tag starts with a newline' do
       let(:file) { <<~ERB }
         <%
