@@ -385,6 +385,15 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it { expect(subject).to eq file }
       end
+
+      context 'escaped <%%= tag' do
+        let(:file) { <<~ERB }
+          <%- if options.stylesheet? -%>
+            <%%= content_for :application_stylesheets, stylesheet_link_tag('application') %>
+          <%- end -%>
+        ERB
+        it { expect(subject).to eq file }
+      end
     end
 
     context 'when no space should be present' do
