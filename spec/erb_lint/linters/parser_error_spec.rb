@@ -30,13 +30,10 @@ describe ERBLint::Linters::ParserErrors do
       end
     end
 
-    context 'malformed html' do
+    context 'escaped erb is ignored' do
       let(:file) { "<%%= erb %>" }
       it do
-        expect(subject).to eq [
-          build_offense(9...10, "expected '/', '>', \", ' or '=' after attribute name (at %)"),
-          build_offense(9...10, "expected whitespace, '>', attribute name or value (at %)"),
-        ]
+        expect(subject).to eq []
       end
     end
   end
