@@ -137,7 +137,7 @@ module ERBLint
         runner.offenses.each do |offense|
           puts "#{relative_filename(filename)}:" \
             "#{offense.line_range.begin}:" \
-            "#{offense.source_range.column_range.begin}:" \
+            "#{offense.source_range.column}:" \
             "#{offense.message}"
         end
       end
