@@ -118,12 +118,28 @@ module ERBLint
       end
 
       @stats.found += runner.offenses.size
-      runner.offenses.each do |offense|
-        puts <<~EOF
-          #{offense.message}#{' (not autocorrected)'.red if autocorrect?}
-          In file: #{relative_filename(filename)}:#{offense.line_range.begin}
 
-        EOF
+      format = @options[:output_format] || :multiline
+      output_offenses(runner, filename, format)
+    end
+
+    def output_offenses(runner, filename, format)
+      case format
+      when :multiline
+        runner.offenses.each do |offense|
+          puts <<~EOF
+            #{offense.message}#{' (not autocorrected)'.red if autocorrect?}
+            In file: #{relative_filename(filename)}:#{offense.line_range.begin}
+
+          EOF
+        end
+      when :oneline
+        runner.offenses.each do |offense|
+          puts "#{relative_filename(filename)}:" \
+            "#{offense.line_range.begin}:" \
+            "#{offense.source_range.column_range.begin}:" \
+            "#{offense.message}"
+        end
       end
     end
 
@@ -261,6 +277,10 @@ module ERBLint
 
         opts.on("--autocorrect", "Correct offenses that can be corrected automatically (default: false)") do |config|
           @options[:autocorrect] = config
+        end
+
+        opts.on("--output-format [oneline|multiline]", "Specify an output format") do |format|
+          @options[:output_format] = format.to_sym
         end
 
         opts.on_tail("-h", "--help", "Show this message") do

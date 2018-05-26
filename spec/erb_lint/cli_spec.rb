@@ -138,6 +138,27 @@ describe ERBLint::CLI do
           end
         end
 
+        context 'with --outpuf-format oneline' do
+          let(:args) do
+            [
+              '--enable-linter', 'linter_with_errors,final_newline',
+              '--output-format', 'oneline',
+              linted_file
+            ]
+          end
+
+          it 'shows all error messages and line numbers' do
+            expect { subject }.to output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout
+              /app/views/template.html.erb:1:1:fake message from a fake linter
+              /app/views/template.html.erb:1:19:Missing a trailing newline at the end of the file.
+            EOF
+          end
+
+          it 'is not successful' do
+            expect(subject).to be(false)
+          end
+        end
+
         context 'when no errors are found' do
           let(:args) { ['--enable-linter', 'linter_without_errors', linted_file] }
 
