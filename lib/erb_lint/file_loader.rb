@@ -11,8 +11,6 @@ module ERBLint
 
     def yaml(filename)
       YAML.safe_load(read_content(filename), [Regexp], [], false, filename) || {}
-    rescue Psych::SyntaxError
-      {}
     end
 
     private
