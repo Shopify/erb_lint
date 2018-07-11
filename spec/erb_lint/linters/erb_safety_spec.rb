@@ -7,7 +7,7 @@ describe ERBLint::Linters::ErbSafety do
   let(:linter_config) { described_class.config_schema.new }
   let(:better_html_config) do
     {
-      javascript_safe_methods: ['to_json'],
+      javascript_safe_methods: %w(to_json),
     }
   end
   let(:file_loader) { MockFileLoader.new(better_html_config) }
@@ -146,12 +146,12 @@ describe ERBLint::Linters::ErbSafety do
     end
 
     context 'with non-default config' do
-      let(:better_html_config) { { javascript_safe_methods: ['foobar'] } }
+      let(:better_html_config) { { javascript_safe_methods: %w(foobar) } }
       it { expect(subject).to eq [] }
     end
 
     context 'with string keys in config' do
-      let(:better_html_config) { { 'javascript_safe_methods' => ['foobar'] } }
+      let(:better_html_config) { { 'javascript_safe_methods' => %w(foobar) } }
       it { expect(subject).to eq [] }
     end
   end
