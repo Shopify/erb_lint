@@ -17,6 +17,8 @@ module ERBLint
         RuboCop::I18nCorrector
       )
 
+      NON_TEXT_TAGS = %w(script style xmp iframe noembed noframes listing)
+
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: {}
       end
@@ -24,7 +26,7 @@ module ERBLint
 
       def run(processed_source)
         hardcoded_strings = processed_source.ast.descendants(:text).each_with_object([]) do |text_node, to_check|
-          next if javascript?(processed_source, text_node)
+          next if non_text_tag?(processed_source, text_node)
 
           offended_strings = text_node.to_a.select { |node| relevant_node(node) }
           offended_strings.each do |offended_string|
@@ -81,7 +83,7 @@ module ERBLint
         corrector_name.safe_constantize
       end
 
-      def javascript?(processed_source, text_node)
+      def non_text_tag?(processed_source, text_node)
         ast = processed_source.parser.ast.to_a
         index = ast.find_index(text_node)
 
@@ -90,7 +92,7 @@ module ERBLint
         if previous_node.type == :tag
           tag = BetterHtml::Tree::Tag.from_node(previous_node)
 
-          tag.name == "script" && !tag.closing?
+          NON_TEXT_TAGS.include?(tag.name) && !tag.closing?
         end
       end
 
