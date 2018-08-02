@@ -11,7 +11,7 @@ require 'colorize'
 module ERBLint
   class CLI
     DEFAULT_CONFIG_FILENAME = '.erb-lint.yml'
-    DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
+    DEFAULT_LINT_ALL_GLOB = "**/*.erb"
 
     class ExitWithFailure < RuntimeError; end
     class ExitWithSuccess < RuntimeError; end
