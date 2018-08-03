@@ -10,7 +10,7 @@ module ERBLint
     end
 
     def yaml(filename)
-      YAML.safe_load(read_content(filename), [Regexp], [], false, filename) || {}
+      YAML.safe_load(read_content(filename), [Regexp, Symbol], [], false, filename) || {}
     end
 
     private
