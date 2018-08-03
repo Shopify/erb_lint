@@ -204,6 +204,40 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
+  context 'BracesAroundHashParameters works' do
+    let(:linter_config) do
+      described_class.config_schema.new(
+        only: ['Style/BracesAroundHashParameters'],
+        rubocop_config: {
+          AllCops: {
+            TargetRubyVersion: '2.4',
+          },
+          'Style/BracesAroundHashParameters': {
+            Enabled: true,
+            EnforcedStyle: 'no_braces',
+            SupportedStyles: %w(braces no_braces context_dependent),
+          },
+        },
+      )
+    end
+    let(:file) { <<~FILE }
+      <%= ui_title_bar do |title_bar| %>
+        <%= title_bar.heading_group('Destinations') %>
+      <% end %>
+
+      <%= ui_layout do |layout| %>
+        <%= layout.section do |section| %>
+          <%= render 'services/search', {
+            url: search_services_destinations_path,
+            label: 'Find a destination by its UUID or name (includes soft deleted destinations)'
+          } %>
+        <% end %>
+      <% end %>
+    FILE
+
+    it { expect(corrected_content).to eq "" }
+  end
+
   context 'code is aligned to the column matching start of ruby code' do
     let(:linter_config) do
       described_class.config_schema.new(
