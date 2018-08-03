@@ -26,7 +26,7 @@ describe ERBLint::Linter do
 
     describe '.clear_offenses' do
       it 'clears all offenses from the offenses ivar' do
-        linter.offenses = ["someoffense"]
+        linter.offenses = %w(someoffense)
         linter.clear_offenses
         expect(linter.offenses).to eq []
       end

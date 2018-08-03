@@ -44,10 +44,5 @@ describe ERBLint::FileLoader do
       YAML
       it { expect { subject }.to raise_exception(Psych::DisallowedClass) }
     end
-
-    context "gracefully falls back when syntax is wrong" do
-      let(:yaml_content) { "---\n- foo\nbar:" }
-      it { expect(subject).to eq({}) }
-    end
   end
 end
