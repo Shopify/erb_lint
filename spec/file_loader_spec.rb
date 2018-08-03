@@ -27,6 +27,14 @@ describe ERBLint::FileLoader do
       it { expect(subject).to eq('some_config' => [/\Afoo/i]) }
     end
 
+    context "it allows symbol to be loaded" do
+      let(:yaml_content) { <<~YAML }
+        ---
+        :some_config: :symbol
+      YAML
+      it { expect(subject).to eq(some_config: :symbol) }
+    end
+
     context "it does not allow other objects to be loaded" do
       let(:yaml_content) { <<~YAML }
         ---
