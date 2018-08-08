@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
+require 'erb_lint/runner_config_resolver'
+
 module ERBLint
   class RunnerConfig
     class Error < StandardError; end
 
-    def initialize(config = nil)
+    def initialize(config = nil, file_loader = nil)
       @config = (config || {}).dup.deep_stringify_keys
+
+      resolver.resolve_inheritance_from_gems(@config, @config.delete('inherit_gem'))
+      resolver.resolve_inheritance(@config, file_loader) if file_loader
+      @config.delete("inherit_from")
     end
 
     def to_hash
@@ -70,6 +76,10 @@ module ERBLint
       config_hash['exclude'] ||= []
       config_hash['exclude'].concat(global_exclude) if config_hash['exclude'].is_a?(Array)
       config_hash
+    end
+
+    def resolver
+      @resolver ||= ERBLint::RunnerConfigResolver.new
     end
   end
 end
