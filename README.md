@@ -185,6 +185,7 @@ linters:
 ```
 
 The cops disabled in the example configuration above provide a good starting point.
+If you use a lot of multiline Ruby blocks, you might also want to disable `Layout/LeadingBlankLines`.
 
 Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
