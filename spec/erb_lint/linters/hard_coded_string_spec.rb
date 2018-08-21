@@ -116,6 +116,30 @@ describe ERBLint::Linters::HardCodedString do
     it { expect(subject).to eq [] }
   end
 
+  context 'when file contains hard coded string inside style' do
+    let(:file) { <<~FILE }
+      <style>
+        p {
+          background: white;
+        }
+      </style>
+    FILE
+
+    it { expect(subject).to eq [] }
+  end
+
+  %w(xmp iframe noembed noframes listing).each do |tag|
+    context "when file contains hard coded string inside #{tag}" do
+      let(:file) { <<~FILE }
+        <#{tag}>
+          hardcoded string
+        </#{tag}>
+      FILE
+
+      it { expect(subject).to eq [] }
+    end
+  end
+
   context 'when file contains hard coded string following a javascript block' do
     let(:file) { <<~FILE }
       <script type="text/template">
