@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rubocop', '~> 0.51'
   s.add_dependency 'activesupport'
   s.add_dependency 'smart_properties'
-  s.add_dependency 'colorize'
+  s.add_dependency 'rainbow'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
