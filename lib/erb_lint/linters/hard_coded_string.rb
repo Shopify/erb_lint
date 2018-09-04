@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require "set"
 require 'better_html/tree/tag'
 require 'active_support/core_ext/string/inflections'
 
@@ -17,7 +17,8 @@ module ERBLint
         RuboCop::I18nCorrector
       )
 
-      NON_TEXT_TAGS = %w(script style xmp iframe noembed noframes listing)
+      NON_TEXT_TAGS = Set.new(%w(script style xmp iframe noembed noframes listing))
+      BLACK_LISTED_TEXT = Set.new(%w(&nbsp; &ensp; &emsp; &thinsp;))
 
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: {}
@@ -72,7 +73,7 @@ module ERBLint
 
       def check_string?(str)
         string = str.gsub(/\s*/, '')
-        string.length > 1 && !%w(&nbsp;).include?(string)
+        string.length > 1 && !BLACK_LISTED_TEXT.include?(string)
       end
 
       def load_corrector
