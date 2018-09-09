@@ -4,8 +4,8 @@ PATH
     erb_lint (0.0.26)
       activesupport
       better_html (~> 1.0.7)
-      colorize
       html_tokenizer
+      rainbow
       rubocop (~> 0.51)
       smart_properties
 
@@ -33,7 +33,6 @@ GEM
       parser (>= 2.4)
       smart_properties
     builder (3.2.3)
-    colorize (0.8.1)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
     diff-lcs (1.3)

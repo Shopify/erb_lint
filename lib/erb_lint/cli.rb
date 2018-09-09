@@ -6,7 +6,7 @@ require 'active_support/inflector'
 require 'optparse'
 require 'psych'
 require 'yaml'
-require 'colorize'
+require 'rainbow'
 
 module ERBLint
   class CLI
@@ -57,7 +57,7 @@ module ERBLint
         rescue => e
           puts "Exception occured when processing: #{relative_filename(filename)}"
           puts e.message
-          puts e.backtrace.join("\n").red
+          puts Rainbow(e.backtrace.join("\n")).red
           puts
         end
       end
@@ -65,25 +65,27 @@ module ERBLint
       if @stats.corrected > 0
         corrected_found_diff = @stats.found - @stats.corrected
         if corrected_found_diff > 0
-          warn "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files".red
+          warn Rainbow(
+            "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
+          ).red
         else
-          puts "#{@stats.corrected} error(s) corrected in ERB files".green
+          puts Rainbow("#{@stats.corrected} error(s) corrected in ERB files").green
         end
       elsif @stats.found > 0
-        warn "#{@stats.found} error(s) were found in ERB files".red
+        warn Rainbow("#{@stats.found} error(s) were found in ERB files").red
       else
-        puts "No errors were found in ERB files".green
+        puts Rainbow("No errors were found in ERB files").green
       end
 
       @stats.found == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
-      warn e.message.red
+      warn Rainbow(e.message).red
       false
     rescue ExitWithSuccess => e
       puts e.message
       true
     rescue => e
-      warn "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}".red
+      warn Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red
       false
     end
 
@@ -120,7 +122,7 @@ module ERBLint
       @stats.found += runner.offenses.size
       runner.offenses.each do |offense|
         puts <<~EOF
-          #{offense.message}#{' (not autocorrected)'.red if autocorrect?}
+          #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect?}
           In file: #{relative_filename(filename)}:#{offense.line_range.begin}
 
         EOF
@@ -142,7 +144,7 @@ module ERBLint
         config = RunnerConfig.new(file_loader.yaml(config_filename))
         @config = RunnerConfig.default.merge(config)
       else
-        warn "#{config_filename} not found: using default config".yellow
+        warn Rainbow("#{config_filename} not found: using default config").yellow
         @config = RunnerConfig.default
       end
       @config.merge!(runner_config_override)
