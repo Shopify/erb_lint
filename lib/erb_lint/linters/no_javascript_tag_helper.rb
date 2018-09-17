@@ -23,11 +23,12 @@ module ERBLint
           next if indicator == '#'
           source = code_node.loc.source
 
-          ruby_node = begin
-            BetterHtml::TestHelper::RubyNode.parse(source)
-          rescue ::Parser::SyntaxError
-            nil
-          end
+          ruby_node =
+            begin
+              BetterHtml::TestHelper::RubyNode.parse(source)
+            rescue ::Parser::SyntaxError
+              nil
+            end
           next unless ruby_node
           send_node = ruby_node.descendants(:send).first
           next unless send_node&.method_name?(:javascript_tag)
