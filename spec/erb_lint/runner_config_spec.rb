@@ -154,5 +154,152 @@ describe ERBLint::RunnerConfig do
         it { expect(subject.to_hash).to eq('nested' => { 'foo' => 1, 'bar' => 2 }) }
       end
     end
+
+    context "inheritance" do
+      let(:tmp_root) { 'tmp' }
+      let(:gem_root) { "#{tmp_root}/gems" }
+
+      after { FileUtils.rm_rf(tmp_root) }
+
+      it "inherits from a gem and loads the config" do
+        create_file("#{gem_root}/gemone/config/erb-lint.yml", <<-YAML.strip_indent)
+          MyCustomLinter:
+            my_option: custom value
+        YAML
+
+        gem_class = Struct.new(:gem_dir)
+        %w(gemone).each do |gem_name|
+          mock_spec = gem_class.new(File.join(gem_root, gem_name))
+          expect(Gem::Specification).to receive(:find_by_name)
+            .at_least(:once).with(gem_name).and_return(mock_spec)
+        end
+
+        runner_config = described_class.new({
+          'inherit_gem' => {
+            'gemone' => 'config/erb-lint.yml',
+          },
+        }, ERBLint::FileLoader.new(Dir.pwd))
+
+        expect(runner_config.to_hash['MyCustomLinter']).to eq("my_option" => "custom value")
+      end
+
+      it "inherits from a gem and merges the config" do
+        create_file("#{gem_root}/gemone/config/erb-lint.yml", <<-YAML.strip_indent)
+          MyCustomLinter1:
+            a: value to be overwritten
+            b: value for b
+        YAML
+
+        gem_class = Struct.new(:gem_dir)
+        %w(gemone).each do |gem_name|
+          mock_spec = gem_class.new(File.join(gem_root, gem_name))
+          expect(Gem::Specification).to receive(:find_by_name)
+            .at_least(:once).with(gem_name).and_return(mock_spec)
+        end
+
+        runner_config = described_class.new({
+          'inherit_gem' => {
+            'gemone' => 'config/erb-lint.yml',
+          },
+          'MyCustomLinter1' => {
+            'a' => 'value for a',
+            'c' => 'value for c',
+          },
+          'MyCustomLinter2' => {
+            'd' => 'value for d',
+          },
+        }, ERBLint::FileLoader.new(Dir.pwd))
+
+        config_hash = runner_config.to_hash
+        expect(config_hash['MyCustomLinter1']).to eq("a" => "value for a", "b" => "value for b", "c" => "value for c")
+        expect(config_hash['MyCustomLinter2']).to eq("d" => "value for d")
+      end
+
+      it "inherits from a file and merges the config" do
+        create_file("#{tmp_root}/erb-lint-default.yml", <<-YAML.strip_indent)
+          MyCustomLinter1:
+            a: value to be overwritten
+            b: value for b
+        YAML
+
+        runner_config = described_class.new({
+          'inherit_from' => "#{tmp_root}/erb-lint-default.yml",
+          'MyCustomLinter1' => {
+            'a' => 'value for a',
+            'c' => 'value for c',
+          },
+          'MyCustomLinter2' => {
+            'd' => 'value for d',
+          },
+        }, ERBLint::FileLoader.new(Dir.pwd))
+
+        config_hash = runner_config.to_hash
+        expect(config_hash['MyCustomLinter1']).to eq("a" => "value for a", "b" => "value for b", "c" => "value for c")
+        expect(config_hash['MyCustomLinter2']).to eq("d" => "value for d")
+      end
+
+      it "does not inherit from a file if file loader is not provided" do
+        create_file("#{tmp_root}/erb-lint-default.yml", <<-YAML.strip_indent)
+          MyCustomLinter1:
+            a: value to be overwritten
+            b: value for b
+        YAML
+
+        runner_config = described_class.new(
+          'inherit_from' => "#{tmp_root}/erb-lint-default.yml",
+          'MyCustomLinter1' => {
+            'a' => 'value for a',
+            'c' => 'value for c',
+          },
+          'MyCustomLinter2' => {
+            'd' => 'value for d',
+          },
+        )
+
+        config_hash = runner_config.to_hash
+        expect(config_hash['MyCustomLinter1']).to eq("a" => "value for a", "c" => "value for c")
+        expect(config_hash['MyCustomLinter2']).to eq("d" => "value for d")
+      end
+
+      it "inherits from a gem if file load is not provided" do
+        create_file("#{gem_root}/gemone/config/erb-lint.yml", <<-YAML.strip_indent)
+          MyCustomLinter:
+            my_option: custom value
+        YAML
+
+        gem_class = Struct.new(:gem_dir)
+        %w(gemone).each do |gem_name|
+          mock_spec = gem_class.new(File.join(gem_root, gem_name))
+          expect(Gem::Specification).to receive(:find_by_name)
+            .at_least(:once).with(gem_name).and_return(mock_spec)
+        end
+
+        runner_config = described_class.new(
+          'inherit_gem' => {
+            'gemone' => 'config/erb-lint.yml',
+          },
+        )
+
+        expect(runner_config.to_hash).to eq({})
+      end
+    end
+  end
+
+  private
+
+  def create_file(file_path, content)
+    file_path = File.expand_path(file_path)
+
+    dir_path = File.dirname(file_path)
+    FileUtils.makedirs dir_path unless File.exist?(dir_path)
+
+    File.open(file_path, 'w') do |file|
+      case content
+      when String
+        file.puts content
+      when Array
+        file.puts content.join("\n")
+      end
+    end
   end
 end

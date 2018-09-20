@@ -15,12 +15,9 @@ module ERBLint
 
     private
 
-    def join(filename)
-      File.join(base_path, filename)
-    end
-
     def read_content(filename)
-      File.read(join(filename))
+      path = File.expand_path(filename, base_path)
+      File.read(path)
     end
   end
 end
