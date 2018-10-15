@@ -37,7 +37,9 @@ module ERBLint
 
       load_config
 
-      if lint_files.empty?
+      if !@files.empty? && lint_files.empty?
+        success!("no files found...\n")
+      elsif lint_files.empty?
         success!("no files given...\n#{option_parser}")
       end
 
@@ -166,6 +168,7 @@ module ERBLint
         Dir[pattern].select { |filename| !excluded?(filename) }
       else
         @files
+          .map { |f| Dir.exist?(f) ? Dir[File.join(f, DEFAULT_LINT_ALL_GLOB)] : f }
           .map { |f| f.include?('*') ? Dir[f] : f }
           .flatten
           .map { |f| File.expand_path(f, Dir.pwd) }
