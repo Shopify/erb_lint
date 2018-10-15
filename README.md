@@ -4,9 +4,9 @@
 
 ## Requirements
 
-* Ruby 2.2.0+ (Runtime)
-* Ruby 2.3.0+ (Development)
- - This is due to the use of the tilde-heredoc `<<~` syntax in some tests.
+* Ruby 2.3.0+
+ - This is due to use of the safe navigation operator (`&.`)
+ - This is also due to the use of the tilde-heredoc `<<~` syntax in some tests.
 
 ## Installation
 
