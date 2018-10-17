@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe ERBLint::Linters::HardCodedString do
-  let(:linter_options) { {} }
+  let(:linter_options) { { i18n_load_path: 'test/load/path' } }
   let(:linter_config) do
     described_class.config_schema.new(linter_options)
   end
@@ -195,14 +195,14 @@ describe ERBLint::Linters::HardCodedString do
     end
   end
 
-  context 'with corrector' do
-    let(:tempfile) do
-      @tempfile = Tempfile.new(['my_class', '.rb']).tap do |f|
+  context 'with corrector and load_path' do
+    let(:corrector_file) do
+      Tempfile.new(['my_class', '.rb']).tap do |f|
         f.write(<<~EOM)
           class I18nCorrector
             attr_reader :node
 
-            def initialize(filename, range)
+            def initialize(filename, i18n_load_path, range)
             end
 
             def autocorrect(node, tag_start:, tag_end:)
@@ -216,13 +216,24 @@ describe ERBLint::Linters::HardCodedString do
       end
     end
 
+    let(:translation_file) do
+      Tempfile.new(['en', '.yml']).tap do |f|
+        f.write(<<~EOM)
+          ---
+        EOM
+        f.rewind
+      end
+    end
+
     after(:each) do
-      tempfile.unlink
-      tempfile.close
+      corrector_file.unlink
+      corrector_file.close
+      translation_file.unlink
+      translation_file.close
     end
 
     let(:linter_options) do
-      { corrector: { path: tempfile.path, name: 'I18nCorrector' } }
+      { corrector: { path: corrector_file.path, name: 'I18nCorrector', i18n_load_path: translation_file.path } }
     end
 
     let(:file) { <<~FILE }
@@ -243,6 +254,18 @@ describe ERBLint::Linters::HardCodedString do
       expect(node.str_content).to eq('Hello')
     end
 
+    context 'without i18n load path' do
+      let(:linter_options) do
+        { corrector: { path: corrector_file.path, name: 'I18nCorrector' } }
+      end
+
+      it 'rescues the MissingI18nLoadPath error when no load path options is passed' do
+        offense = untranslated_string_error(7..11, 'String not translated: Hello')
+
+        expect(linter.autocorrect(processed_source, offense)).to eq(nil)
+      end
+    end
+
     context 'without corrector' do
       let(:linter_options) { {} }
 
@@ -255,7 +278,7 @@ describe ERBLint::Linters::HardCodedString do
 
     context 'can not constanize the class' do
       let(:linter_options) do
-        { corrector: { path: tempfile.path, name: 'UnknownClass' } }
+        { corrector: { path: corrector_file.path, i18n_load_path: translation_file.path, name: 'UnknownClass' } }
       end
 
       it 'does not continue the auto correction when the class passed is not whitelisted' do
