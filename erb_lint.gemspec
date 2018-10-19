@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email = ['justin.the.c@gmail.com']
   s.summary = 'ERB lint tool'
   s.description = 'ERB Linter tool.'
-  s.homepage = 'https://github.com/justinthec/erb-lint'
+  s.homepage = 'https://github.com/Shopify/erb-lint'
   s.license = 'MIT'
 
   s.files = Dir['lib/**/*.rb', 'exe/*']
