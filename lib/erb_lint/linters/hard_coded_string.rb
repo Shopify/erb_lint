@@ -11,10 +11,11 @@ module ERBLint
 
       ForbiddenCorrector = Class.new(StandardError)
       MissingCorrector = Class.new(StandardError)
+      MissingI18nLoadPath = Class.new(StandardError)
 
       ALLOWED_CORRECTORS = %w(
         I18nCorrector
-        RuboCop::I18nCorrector
+        RuboCop::Corrector::I18n::HardCodedString
       )
 
       NON_TEXT_TAGS = Set.new(%w(script style xmp iframe noembed noframes listing))
@@ -22,6 +23,7 @@ module ERBLint
 
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: {}
+        property :i18n_load_path, accepts: String, required: false, default: ''
       end
       self.config_schema = ConfigSchema
 
@@ -61,11 +63,10 @@ module ERBLint
         string = offense.source_range.source
         return unless klass = load_corrector
         return unless string.strip.length > 1
-
-        corrector = klass.new(processed_source.filename, offense.source_range)
+        corrector = klass.new(processed_source.filename, corrector_i18n_load_path, offense.source_range)
         node = RuboCop::AST::StrNode.new(:str, [string])
         corrector.autocorrect(node, tag_start: '<%= ', tag_end: ' %>')
-      rescue MissingCorrector
+      rescue MissingCorrector, MissingI18nLoadPath
         nil
       end
 
@@ -82,6 +83,10 @@ module ERBLint
         require @config['corrector'].fetch('path') { raise MissingCorrector }
 
         corrector_name.safe_constantize
+      end
+
+      def corrector_i18n_load_path
+        @config['corrector'].fetch('i18n_load_path') { raise MissingI18nLoadPath }
       end
 
       def non_text_tag?(processed_source, text_node)
