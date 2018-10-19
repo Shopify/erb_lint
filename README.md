@@ -20,6 +20,12 @@ gem install erb_lint
 gem 'erb_lint'
 ```
 
+_Note:_ if you only want to use `better_html` for linting, and not as a replacecment for Erb as your template parser, also add the following to your `Gemfile`:
+
+```ruby
+gem 'better_html', require: false
+```
+
 ## Configuration
 
 Create a `.erb-lint.yml` file in your project, with the following structure:
