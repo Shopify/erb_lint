@@ -17,7 +17,7 @@ gem install erb_lint
 ...or add the following to your `Gemfile` and run `bundle install`:
 
 ```ruby
-gem 'erb_lint'
+gem 'erb_lint', require: false
 ```
 
 ## Configuration
