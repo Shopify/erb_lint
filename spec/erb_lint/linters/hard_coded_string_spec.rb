@@ -202,10 +202,10 @@ describe ERBLint::Linters::HardCodedString do
           class I18nCorrector
             attr_reader :node
 
-            def initialize(filename, i18n_load_path, range)
+            def initialize(node, filename, i18n_load_path, range)
             end
 
-            def autocorrect(node, tag_start:, tag_end:)
+            def autocorrect(tag_start:, tag_end:)
               ->(corrector) do
                 node
               end
@@ -245,13 +245,6 @@ describe ERBLint::Linters::HardCodedString do
       linter.autocorrect(processed_source, offense)
 
       expect(defined?(I18nCorrector)).to eq('constant')
-    end
-
-    it 'calls the autocorrect method and pass a rubocop node' do
-      offense = untranslated_string_error(7..11, 'String not translated: Hello')
-      node = linter.autocorrect(processed_source, offense).call('')
-
-      expect(node.str_content).to eq('Hello')
     end
 
     context 'without i18n load path' do
