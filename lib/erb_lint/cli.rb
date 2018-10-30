@@ -29,6 +29,7 @@ module ERBLint
       @config = nil
       @files = []
       @stats = Stats.new
+      @formatter = Formatters::DefaultFormatter.new
     end
 
     def run(args = ARGV)
@@ -64,20 +65,7 @@ module ERBLint
         end
       end
 
-      if @stats.corrected > 0
-        corrected_found_diff = @stats.found - @stats.corrected
-        if corrected_found_diff > 0
-          warn Rainbow(
-            "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
-          ).red
-        else
-          puts Rainbow("#{@stats.corrected} error(s) corrected in ERB files").green
-        end
-      elsif @stats.found > 0
-        warn Rainbow("#{@stats.found} error(s) were found in ERB files").red
-      else
-        puts Rainbow("No errors were found in ERB files").green
-      end
+      @formatter.report(@stats, @options)
 
       @stats.found == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
@@ -122,13 +110,7 @@ module ERBLint
       end
 
       @stats.found += runner.offenses.size
-      runner.offenses.each do |offense|
-        puts <<~EOF
-          #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect?}
-          In file: #{relative_filename(filename)}:#{offense.line_range.begin}
-
-        EOF
-      end
+      @formatter.file_completed filename, runner
     end
 
     def correct(processed_source, offenses)
