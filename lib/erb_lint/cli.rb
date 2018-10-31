@@ -29,11 +29,11 @@ module ERBLint
       @config = nil
       @files = []
       @stats = Stats.new
-      @formatter = Formatters::DefaultFormatter.new
     end
 
     def run(args = ARGV)
       load_options(args)
+      @formatter ||= Formatters::DefaultFormatter.new
       @files = args.dup
 
       load_config
@@ -65,7 +65,7 @@ module ERBLint
         end
       end
 
-      @formatter.report(@stats, @options)
+      report
 
       @stats.found == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
@@ -80,6 +80,16 @@ module ERBLint
     end
 
     private
+
+    def report
+      io =
+        if @options[:out]
+          File.open(@options[:out], 'w')
+        else
+          STDOUT
+        end
+      @formatter.report(@stats, @options, io)
+    end
 
     def autocorrect?
       @options[:autocorrect]
@@ -110,7 +120,7 @@ module ERBLint
       end
 
       @stats.found += runner.offenses.size
-      @formatter.file_completed filename, runner
+      @formatter.file_completed relative_filename(filename), runner
     end
 
     def correct(processed_source, offenses)
@@ -248,6 +258,23 @@ module ERBLint
 
         opts.on("--autocorrect", "Correct offenses that can be corrected automatically (default: false)") do |config|
           @options[:autocorrect] = config
+        end
+
+        opts.on("--format FORMAT", "Select output format. (default: default, available formats: default, json)") do |format|
+          @formatter =
+            case format
+            when 'json'
+              Formatters::JSONFormatter.new
+            when 'default'
+              Formatters::DefaultFormatter.new
+            else
+              failure!("#{format}: not a valid format (available formats: default, json)")
+            end
+          @options[:format] = format
+        end
+
+        opts.on("--out FILE", "Write output to a file instead of STDOUT.") do |file|
+          @options[:out] = file
         end
 
         opts.on_tail("-h", "--help", "Show this message") do
