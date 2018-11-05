@@ -284,6 +284,43 @@ Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `correction_style`     | When configured with `cdata`, adds CDATA markers. When configured with `plain`, don't add makers. Defaults to `cdata`.
 
+### SelfClosingTag
+
+This linter enforces self closing tag styles for void elements.
+
+The void elements are `area`, `base`, `br`, `col`, `embed`, `hr`, `img`, `input`, `keygen`, `link`, `menuitem`, `meta`, `param`, `source`, `track`, and `wbr`.
+
+If `enforced_style` is set to `always` (XHTML style):
+
+```erb
+Bad ❌
+<link rel="stylesheet" type="text/css" href="styles.css">
+Good ✅
+<img src="someimage.png" alt="Some Image" />
+```
+
+If `enforced_style` is set to `never` (HTML5 style):
+```erb
+Bad ❌
+<hr />
+Good ✅
+<meta charset="UTF-8">
+```
+
+Example configuration:
+
+```yaml
+---
+linters:
+  SelfClosingTag:
+    enabled: true
+    enforced_style: 'always'
+```
+
+Linter-Specific Option | Description
+-----------------------|---------------------------------------------------------
+`enforced_style`       |  If we should `always` or `never` expect self closing tags for void elements. Defaults to `never`.
+
 ### AllowedScriptType
 
 This linter prevent the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values.
@@ -382,7 +419,7 @@ linters:
   CustomLinter:
     enabled: true
     custom_message: We suggest you change this file.
-```
+**```**
 
 Test your linter by running `erblint`'s command-line interface:
 
