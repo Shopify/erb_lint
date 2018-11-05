@@ -6,6 +6,11 @@ module ERBLint
     class SelfClosingTag < Linter
       include LinterRegistry
 
+      class ConfigSchema < LinterConfig
+        property :enforced_style, converts: :to_sym, accepts: [:always, :never], default: :never
+      end
+      self.config_schema = ConfigSchema
+
       SELF_CLOSING_TAGS = %w(
         area base br col command embed hr input keygen
         link menuitem meta param source track wbr img
@@ -20,16 +25,25 @@ module ERBLint
             start_solidus = tag_node.children.first
             add_offense(
               start_solidus.loc,
-              "Tag `#{tag.name}` is self-closing, it must not start with `</`.",
+              "Tag `#{tag.name}` is a void element, it must not start with `</`.",
               ''
             )
           end
 
-          next if tag.self_closing?
+          if @config.enforced_style == :always && !tag.self_closing?
+            add_offense(
+              tag_node.loc.end.offset(-1),
+              "Tag `#{tag.name}` is self-closing, it must end with `/>`.",
+              '/'
+            )
+          end
+
+          next unless @config.enforced_style == :never && tag.self_closing?
+          end_solidus = tag_node.children.last
           add_offense(
-            tag_node.loc.end.offset(-1),
-            "Tag `#{tag.name}` is self-closing, it must end with `/>`.",
-            '/'
+            end_solidus.loc,
+            "Tag `#{tag.name}` is a void element, it must end with `>` and not `/>`.",
+            ''
           )
         end
       end
