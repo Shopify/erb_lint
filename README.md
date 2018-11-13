@@ -419,7 +419,7 @@ linters:
   CustomLinter:
     enabled: true
     custom_message: We suggest you change this file.
-**```**
+```
 
 Test your linter by running `erblint`'s command-line interface:
 
