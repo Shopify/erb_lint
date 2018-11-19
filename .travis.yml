@@ -1,6 +1,7 @@
 language: ruby
 before_install:
   - rm ./Gemfile.lock
+cache: bundler
 rvm:
   - 2.3.4
   - 2.4.1
