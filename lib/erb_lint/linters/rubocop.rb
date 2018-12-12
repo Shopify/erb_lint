@@ -4,6 +4,7 @@ require 'better_html'
 require 'rubocop'
 require 'tempfile'
 require 'erb_lint/utils/offset_corrector'
+require 'erb_lint/rubocop_offense'
 
 module ERBLint
   module Linters
@@ -82,7 +83,8 @@ module ERBLint
               .to_source_range(rubocop_offense.location)
               .offset(offset)
 
-            add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
+            ctx = context(rubocop_offense, correction, offset, code_node.loc.range)
+            add_offense(offense_range, rubocop_offense.message.strip, ctx)
           end
         end
       end
@@ -157,12 +159,14 @@ module ERBLint
         configs.compact
       end
 
-      def add_offense(rubocop_offense, offense_range, correction, offset, bound_range)
-        context = if rubocop_offense.corrected?
+      def add_offense(source_range, message, context = nil)
+        @offenses << ERBLint::RubocopOffense.new(self, source_range, message, context)
+      end
+
+      def context(rubocop_offense, correction, offset, bound_range)
+        if rubocop_offense.corrected?
           { rubocop_correction: correction, offset: offset, bound_range: bound_range }
         end
-
-        super(offense_range, rubocop_offense.message.strip, context)
       end
     end
   end
