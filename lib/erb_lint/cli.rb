@@ -5,7 +5,6 @@ require 'active_support'
 require 'active_support/inflector'
 require 'rainbow'
 
-
 module ERBLint
   class CLI
     STATUS_SUCCESS  = 0
