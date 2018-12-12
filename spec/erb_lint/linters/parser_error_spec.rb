@@ -18,22 +18,22 @@ describe ERBLint::Linters::ParserErrors do
 
     context 'when file is valid' do
       let(:file) { "<a>" }
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when file is invalid' do
       let(:file) { "<>" }
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(1..1, "expected '/' or tag name (at >)"),
-        ]
+        ]))
       end
     end
 
     context 'escaped erb is ignored' do
       let(:file) { "<%%= erb %>" }
       it do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
   end

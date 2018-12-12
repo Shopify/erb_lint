@@ -21,26 +21,26 @@ describe ERBLint::Linters::RightTrim do
 
       context 'when trim is correct' do
         let(:file) { "<% foo -%>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when trim is incorrect' do
         let(:file) { "<% foo =%>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(7..7, "Prefer -%> instead of =%> for trimming on the right."),
-          ]
+          ]))
         end
       end
 
       context 'when no trim is present' do
         let(:file) { "<% foo %>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when a call argument is present that is not a trim' do
         let(:file) { "<% foo 1%>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
     end
 
@@ -49,26 +49,26 @@ describe ERBLint::Linters::RightTrim do
 
       context 'when trim is correct' do
         let(:file) { "<% foo =%>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when trim is incorrect' do
         let(:file) { "<% foo -%>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(7..7, "Prefer =%> instead of -%> for trimming on the right."),
-          ]
+          ]))
         end
       end
 
       context 'when no trim is present' do
         let(:file) { "<% foo %>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when a call argument is present that is not a trim' do
         let(:file) { "<% foo 1%>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
     end
   end
@@ -81,22 +81,22 @@ describe ERBLint::Linters::RightTrim do
 
       context 'when trim is correct' do
         let(:file) { "<% foo -%>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when trim is incorrect' do
         let(:file) { "<% foo =%>" }
-        it { expect(subject).to eq "<% foo -%>" }
+        it { expect(subject).to(eq("<% foo -%>")) }
       end
 
       context 'when no trim is present' do
         let(:file) { "<% foo %>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when a call argument is present that is not a trim' do
         let(:file) { "<% foo 1%>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
     end
 
@@ -105,22 +105,22 @@ describe ERBLint::Linters::RightTrim do
 
       context 'when trim is correct' do
         let(:file) { "<% foo =%>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when trim is incorrect' do
         let(:file) { "<% foo -%>" }
-        it { expect(subject).to eq "<% foo =%>" }
+        it { expect(subject).to(eq("<% foo =%>")) }
       end
 
       context 'when no trim is present' do
         let(:file) { "<% foo %>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when a call argument is present that is not a trim' do
         let(:file) { "<% foo 1%>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
     end
   end
