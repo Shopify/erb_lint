@@ -45,7 +45,13 @@ module ERBLint
 
       def autocorrect_result(offense)
         if autocorrect
-          "#{offense.message}#{offense.corrected ? rainbow.wrap(' (autocorrected)').green : rainbow.wrap(' (not autocorrected)').red}"
+          autocorrect_message =
+            if offense.corrected?
+              rainbow.wrap(' (autocorrected)').green
+            else
+              rainbow.wrap(' (not autocorrected)').red
+            end
+          "#{offense.message}#{autocorrect_message}"
         end
       end
 
