@@ -3,278 +3,159 @@
 require 'erb_lint'
 require 'active_support'
 require 'active_support/inflector'
-require 'optparse'
-require 'psych'
-require 'yaml'
 require 'rainbow'
+
 
 module ERBLint
   class CLI
-    DEFAULT_CONFIG_FILENAME = '.erb-lint.yml'
-    DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
+    STATUS_SUCCESS  = 0
+    STATUS_OFFENSES = 1
+    STATUS_ERROR    = 2
 
-    class ExitWithFailure < RuntimeError; end
-    class ExitWithSuccess < RuntimeError; end
+    attr_reader :args
 
-    class Stats
-      attr_accessor :found, :corrected
-      def initialize
-        @found = 0
-        @corrected = 0
-      end
+    def initialize(args = ARGV)
+      @args = args
+      @out = $stdout
+      @err = $stderr
     end
 
-    def initialize
-      @options = {}
-      @config = nil
-      @files = []
-      @stats = Stats.new
-    end
-
-    def run(args = ARGV)
-      load_options(args)
-      @files = args.dup
-
-      load_config
-
-      if !@files.empty? && lint_files.empty?
-        success!("no files found...\n")
-      elsif lint_files.empty?
-        success!("no files given...\n#{option_parser}")
-      end
-
-      ensure_files_exist(lint_files)
-
-      if enabled_linter_classes.empty?
-        failure!('no linter available with current configuration')
-      end
-
-      puts "Linting #{lint_files.size} files with "\
-        "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect?}linters..."
-      puts
-
-      lint_files.each do |filename|
-        begin
-          run_with_corrections(filename)
-        rescue => e
-          puts "Exception occured when processing: #{relative_filename(filename)}"
-          puts e.message
-          puts Rainbow(e.backtrace.join("\n")).red
-          puts
-        end
-      end
-
-      if @stats.corrected > 0
-        corrected_found_diff = @stats.found - @stats.corrected
-        if corrected_found_diff > 0
-          warn Rainbow(
-            "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
-          ).red
+    def run
+      files_to_lint =
+        if options[:lint_all]
+          all_files_to_lint(ConfigLoader::DEFAULT_LINT_ALL_GLOB)
         else
-          puts Rainbow("#{@stats.corrected} error(s) corrected in ERB files").green
+          listed_files_to_lint(args, ConfigLoader::DEFAULT_LINT_ALL_GLOB) do |filename|
+            !config_loader.excluded?(filename)
+          end
         end
-      elsif @stats.found > 0
-        warn Rainbow("#{@stats.found} error(s) were found in ERB files").red
-      else
-        puts Rainbow("No errors were found in ERB files").green
-      end
 
-      @stats.found == 0
-    rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
-      warn Rainbow(e.message).red
-      false
-    rescue ExitWithSuccess => e
-      puts e.message
-      true
-    rescue => e
-      warn Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red
-      false
+      ensure_files(@args, files_to_lint, parser.option_parser)
+
+      ensure_files_exists(files_to_lint)
+
+      ensure_enabled_linters(config_loader.enabled_linter_classes)
+
+      show_linting_message(formatter, files_to_lint, config_loader.enabled_linter_classes, config_loader.autocorrect?)
+
+      lint_files(Runner.new(ConfigLoader.file_loader, config_loader.runner_config), files_to_lint,
+        autocorrect: config_loader.autocorrect?)
+
+      formatter.report(stats)
+
+      if stats.offense_count.positive?
+        STATUS_OFFENSES
+      else
+        STATUS_SUCCESS
+      end
+    rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, Cli::Errors::ExitWithFailure => err
+      @err.puts Rainbow(err.message).red
+      STATUS_ERROR
+    rescue Cli::Errors::ExitWithSuccess => err
+      @out.puts err.message
+      STATUS_SUCCESS
+    rescue => err
+      @err.puts Rainbow("#{err.class}: #{err.message}\n#{err.backtrace.join("\n")}").red
+      STATUS_ERROR
     end
 
     private
 
-    def autocorrect?
-      @options[:autocorrect]
+    def parser
+      @parser ||= Cli::OptParser.new(args).parse
     end
 
-    def run_with_corrections(filename)
-      file_content = File.read(filename)
+    def options
+      @options ||= parser.options || {}
+    end
 
-      runner = ERBLint::Runner.new(file_loader, @config)
+    def formatter
+      @formatter ||= Formatters::FormatterFactory.build(options.slice(:output, :format, :autocorrect))
+    end
 
-      7.times do
-        processed_source = ERBLint::ProcessedSource.new(filename, file_content)
-        runner.run(processed_source)
-        break unless autocorrect? && runner.offenses.any?
+    def stats
+      @stats ||= Stats.new
+    end
 
-        corrector = correct(processed_source, runner.offenses)
-        break if corrector.corrections.empty?
-        break if processed_source.file_content == corrector.corrected_content
+    def config_loader
+      @config_loader ||= ConfigLoader.new(options.slice(:config, :enabled_linters, :autocorrect))
+    end
 
-        @stats.corrected += corrector.corrections.size
+    def ensure_files_exists(files)
+      files.each do |filename|
+        raise Cli::Errors::ExitWithFailure, "#{filename}: does not exist" unless File.exist?(filename)
+      end
+    end
 
-        File.open(filename, "wb") do |file|
-          file.write(corrector.corrected_content)
+    def ensure_files(args, files, option_parser)
+      if !args.empty? && files.empty?
+        raise Cli::Errors::ExitWithSuccess, "no files found...\n"
+      elsif files.empty?
+        raise Cli::Errors::ExitWithSuccess, "no files given...\n#{option_parser}"
+      end
+    end
+
+    def lint_files(runner, files, options = {})
+      files.each do |filename|
+        file_content = File.read(filename)
+        7.times do # https://github.com/Shopify/erb-lint/pull/36
+          processed_source = ProcessedSource.new(filename, file_content)
+          runner.run(processed_source)
+          break if runner.offenses.empty?
+
+          stats.add_offending_file(Utils::FileUtils.relative_filename(filename), runner.offenses)
+
+          break unless options[:autocorrect]
+
+          corrected_content = autocorrect(processed_source, runner.offenses)
+          break unless corrected_content
+
+          file_content = corrected_content
+          runner.clear_offenses
         end
-
-        file_content = corrector.corrected_content
         runner.clear_offenses
       end
+    end
 
-      @stats.found += runner.offenses.size
-      runner.offenses.each do |offense|
-        puts <<~EOF
-          #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect?}
-          In file: #{relative_filename(filename)}:#{offense.line_range.begin}
+    def autocorrect(processed_source, offenses)
+      corrector = Corrector.new(processed_source, offenses)
+      return if corrector.corrections.empty?
 
-        EOF
+      corrector.write
+      corrector.update_offenses
+      corrector.corrected_content
+    end
+
+    def all_files_to_lint(glob)
+      @all_files_to_lint ||= begin
+        pattern = File.expand_path(glob, Dir.pwd)
+        Dir[pattern].select { |filename| !config_loader.excluded?(filename) }
       end
     end
 
-    def correct(processed_source, offenses)
-      corrector = ERBLint::Corrector.new(processed_source, offenses)
-      failure!(corrector.diagnostics.join(', ')) if corrector.diagnostics.any?
-      corrector
+    def listed_files_to_lint(listed_files, glob)
+      @listed_files_to_lint ||=
+        begin
+          listed_files.dup
+            .map { |file| Dir.exist?(file) ? Dir[File.join(file, glob)] : file }
+            .map { |file| file.include?('*') ? Dir[file] : file }
+            .flatten
+            .map { |file| File.expand_path(file, Dir.pwd) }
+            .select { |filename| block_given? ? yield(filename) : filename }
+        end
     end
 
-    def config_filename
-      @config_filename ||= @options[:config] || DEFAULT_CONFIG_FILENAME
-    end
-
-    def load_config
-      if File.exist?(config_filename)
-        config = RunnerConfig.new(file_loader.yaml(config_filename), file_loader)
-        @config = RunnerConfig.default.merge(config)
-      else
-        warn Rainbow("#{config_filename} not found: using default config").yellow
-        @config = RunnerConfig.default
-      end
-      @config.merge!(runner_config_override)
-    rescue Psych::SyntaxError => e
-      failure!("error parsing config: #{e.message}")
-    end
-
-    def file_loader
-      @file_loader ||= ERBLint::FileLoader.new(Dir.pwd)
-    end
-
-    def load_options(args)
-      option_parser.parse!(args)
-    end
-
-    def lint_files
-      if @options[:lint_all]
-        pattern = File.expand_path(DEFAULT_LINT_ALL_GLOB, Dir.pwd)
-        Dir[pattern].select { |filename| !excluded?(filename) }
-      else
-        @files
-          .map { |f| Dir.exist?(f) ? Dir[File.join(f, DEFAULT_LINT_ALL_GLOB)] : f }
-          .map { |f| f.include?('*') ? Dir[f] : f }
-          .flatten
-          .map { |f| File.expand_path(f, Dir.pwd) }
-          .select { |filename| !excluded?(filename) }
+    def ensure_enabled_linters(enabled_linter_classes)
+      if enabled_linter_classes.empty?
+        raise Cli::Errors::ExitWithFailure, 'no linter available with current configuration'
       end
     end
 
-    def excluded?(filename)
-      @config.global_exclude.any? do |path|
-        File.fnmatch?(path, filename)
-      end
-    end
-
-    def failure!(msg)
-      raise ExitWithFailure, msg
-    end
-
-    def success!(msg)
-      raise ExitWithSuccess, msg
-    end
-
-    def ensure_files_exist(files)
-      files.each do |filename|
-        unless File.exist?(filename)
-          failure!("#{filename}: does not exist")
-        end
-      end
-    end
-
-    def known_linter_names
-      @known_linter_names ||= ERBLint::LinterRegistry.linters
-        .map(&:simple_name)
-        .map(&:underscore)
-    end
-
-    def enabled_linter_names
-      @enabled_linter_names ||=
-        @options[:enabled_linters] ||
-        known_linter_names
-          .select { |name| @config.for_linter(name.camelize).enabled? }
-    end
-
-    def enabled_linter_classes
-      @enabled_linter_classes ||= ERBLint::LinterRegistry.linters
-        .select { |klass| linter_can_run?(klass) && enabled_linter_names.include?(klass.simple_name.underscore) }
-    end
-
-    def linter_can_run?(klass)
-      !autocorrect? || klass.support_autocorrect?
-    end
-
-    def relative_filename(filename)
-      filename.sub("#{File.expand_path('.', Dir.pwd)}/", '')
-    end
-
-    def runner_config_override
-      RunnerConfig.new(
-        linters: {}.tap do |linters|
-          ERBLint::LinterRegistry.linters.map do |klass|
-            linters[klass.simple_name] = { 'enabled' => enabled_linter_classes.include?(klass) }
-          end
-        end
-      )
-    end
-
-    def option_parser
-      OptionParser.new do |opts|
-        opts.banner = "Usage: erblint [options] [file1, file2, ...]"
-
-        opts.on("--config FILENAME", "Config file [default: #{DEFAULT_CONFIG_FILENAME}]") do |config|
-          if File.exist?(config)
-            @options[:config] = config
-          else
-            failure!("#{config}: does not exist")
-          end
-        end
-
-        opts.on("--lint-all", "Lint all files matching #{DEFAULT_LINT_ALL_GLOB}") do |config|
-          @options[:lint_all] = config
-        end
-
-        opts.on("--enable-all-linters", "Enable all known linters") do
-          @options[:enabled_linters] = known_linter_names
-        end
-
-        opts.on("--enable-linters LINTER[,LINTER,...]", Array,
-          "Only use specified linter", "Known linters are: #{known_linter_names.join(', ')}") do |linters|
-          linters.each do |linter|
-            unless known_linter_names.include?(linter)
-              failure!("#{linter}: not a valid linter name (#{known_linter_names.join(', ')})")
-            end
-          end
-          @options[:enabled_linters] = linters
-        end
-
-        opts.on("--autocorrect", "Correct offenses that can be corrected automatically (default: false)") do |config|
-          @options[:autocorrect] = config
-        end
-
-        opts.on_tail("-h", "--help", "Show this message") do
-          success!(opts)
-        end
-
-        opts.on_tail("--version", "Show version") do
-          success!(ERBLint::VERSION)
-        end
+    def show_linting_message(formatter, files, enabled_linter_classes, autocorrect)
+      if formatter.is_a?(Formatters::DefaultFormatter)
+        @out.puts "Linting #{files.size} files with "\
+        "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect}linters..."
+        @out.puts
       end
     end
   end
