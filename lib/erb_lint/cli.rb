@@ -121,7 +121,6 @@ module ERBLint
       return if corrector.corrections.empty?
 
       corrector.write
-      corrector.update_offenses
       corrector.corrected_content
     end
 
