@@ -17,7 +17,8 @@ module ERBLint
         linters.detect { |linter| linter.simple_name == name }
       end
 
-      def load_custom_linters(directory = CUSTOM_LINTERS_DIR)
+      def load_custom_linters(directory)
+        directory ||= CUSTOM_LINTERS_DIR
         ruby_files = Dir.glob(File.expand_path(File.join(directory, '**', '*.rb')))
         ruby_files.each { |file| require file }
       end

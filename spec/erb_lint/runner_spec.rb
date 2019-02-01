@@ -24,6 +24,21 @@ describe ERBLint::Runner do
     end
   end
 
+  describe '#new' do
+    context 'with custom linters in custom directory' do
+      let(:custom_linters_directory) { File.expand_path('../fixtures/linters', __FILE__) }
+      let(:config) { ERBLint::RunnerConfig.new({
+        custom_linters_directory: custom_linters_directory
+      })}
+
+      it 'loads custom linters' do
+        expect(ERBLint::LinterRegistry).to receive(:require)
+          .with(File.join(custom_linters_directory, 'custom_linter.rb')).once
+        described_class.new(file_loader, config)
+      end
+    end
+  end
+
   describe '#run' do
     let(:file) { 'DummyFileContent' }
     let(:filename) { 'somefolder/otherfolder/dummyfile.html.erb' }
