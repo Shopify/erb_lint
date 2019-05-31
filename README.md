@@ -156,6 +156,8 @@ Runs RuboCop on all ruby statements found in ERB templates. The RuboCop configur
 the configuration that the rest of your application uses. `erb-lint` can be configured independently however, as it will often
 be necessary to disable specific RuboCop rules that do not apply to ERB files.
 
+**Note**: Each ruby statement (between ERB tags `<% ... %>`) is parsed and analyzed independently of each other. Any rule that requires a broader context can trigger false positives (e.g. `Lint/UselessAssignment` will complaint for an assignment even if used in a subsequent ERB tag).
+
 Example configuration:
 
 ```yaml
