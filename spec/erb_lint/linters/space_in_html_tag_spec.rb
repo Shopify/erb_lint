@@ -19,42 +19,42 @@ describe ERBLint::Linters::SpaceInHtmlTag do
     context 'when space is correct' do
       context 'plain opening tag' do
         let(:file) { "<div>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'self-closing tag without attributes' do
         let(:file) { "<img />" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'closing tag' do
         let(:file) { "</div>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'tag with no name' do
         let(:file) { "</>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'empty tag' do
         let(:file) { "<>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'plain tag with attribute' do
         let(:file) { '<div class="foo">' }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'self-closing tag with attribute' do
         let(:file) { '<input class="foo" />' }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'between attributes' do
         let(:file) { '<input class="foo" name="bar" />' }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'multi-line tag' do
@@ -63,14 +63,14 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             type="password"
             class="foo" />
         HTML
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'tag with erb' do
         let(:file) { <<~HTML }
           <input <%= attributes %> />
         HTML
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'multi-line tag with erb' do
@@ -80,7 +80,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             <%= attributes %>
             class="foo" />
         HTML
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
     end
 
@@ -88,63 +88,63 @@ describe ERBLint::Linters::SpaceInHtmlTag do
       context 'after name' do
         let(:file) { "<div   >" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(4..6, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'before name' do
         let(:file) { "<   div>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(1..3, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'before start solidus' do
         let(:file) { "<   /div>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(1..3, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'after start solidus' do
         let(:file) { "</   div>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(2..4, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'after end solidus' do
         let(:file) { "<div /   >" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(6..8, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'between attribute name and equal' do
         let(:file) { "<div foo  ='bar'>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(8..9, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'between attribute equal and value' do
         let(:file) { "<div foo=  'bar'>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(9..10, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
     end
@@ -153,30 +153,30 @@ describe ERBLint::Linters::SpaceInHtmlTag do
       context 'between attributes' do
         let(:file) { "<div foo='foo'bar='bar'>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(14..13, "No space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
       context 'between last attribute and solidus' do
         let(:file) { "<div foo='bar'/>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(14..13, "No space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
       context 'between name and solidus' do
         let(:file) { "<div/>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(4..3, "No space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
     end
@@ -185,59 +185,59 @@ describe ERBLint::Linters::SpaceInHtmlTag do
       context 'between name and end of tag' do
         let(:file) { "<div  >" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(4..5, "Extra space detected where there should be no space."),
-          ]
+          ]))
         end
       end
 
       context 'between name and first attribute' do
         let(:file) { '<img   class="hide">' }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(4..6, "Extra space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
       context 'between name and end solidus' do
         let(:file) { "<br   />" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(3..5, "Extra space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
       context 'between last attribute and solidus' do
         let(:file) { '<br class="hide"   />' }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(16..18, "Extra space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
       context 'between last attribute and end of tag' do
         let(:file) { '<img class="hide"    >' }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(17..20, "Extra space detected where there should be "\
               "no space."),
-          ]
+          ]))
         end
       end
 
       context 'between attributes' do
         let(:file) { "<div foo='foo'      bar='bar'>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(14..19, "Extra space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
@@ -248,10 +248,10 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             type="password" />
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(6..9, "Extra space detected where there should be "\
               "a single space or a single line break."),
-          ]
+          ]))
         end
       end
 
@@ -262,10 +262,10 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             />
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(6..9, "Extra space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
@@ -277,10 +277,10 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             class="foo" />
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(24..27, "Extra space detected where there should be "\
               "a single space or a single line break."),
-          ]
+          ]))
         end
       end
 
@@ -292,10 +292,10 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             />
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(38..40, "Extra space detected where there should be "\
               "a single space."),
-          ]
+          ]))
         end
       end
 
@@ -307,10 +307,10 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             >
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(38..40, "Extra space detected where there should be "\
               "no space."),
-          ]
+          ]))
         end
       end
 
@@ -319,9 +319,9 @@ describe ERBLint::Linters::SpaceInHtmlTag do
           <input/class="hide" />
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(6..6, 'Non-whitespace character(s) detected: "/".'),
-          ]
+          ]))
         end
       end
 
@@ -330,9 +330,9 @@ describe ERBLint::Linters::SpaceInHtmlTag do
           <input class="hide"/name="foo" />
         HTML
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(19..19, 'Non-whitespace character(s) detected: "/".'),
-          ]
+          ]))
         end
       end
     end
@@ -344,37 +344,37 @@ describe ERBLint::Linters::SpaceInHtmlTag do
     context 'when space is correct' do
       context 'plain opening tag' do
         let(:file) { "<div>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'self-closing tag without attributes' do
         let(:file) { "<img />" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'closing tag' do
         let(:file) { "</div>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'tag with no name' do
         let(:file) { "</>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'plain tag with attribute' do
         let(:file) { '<div class="foo">' }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'self-closing tag with attribute' do
         let(:file) { '<input class="foo" />' }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'between attributes' do
         let(:file) { '<input class="foo" name="bar" />' }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'multi-line tag' do
@@ -383,7 +383,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             type="password"
             class="foo" />
         HTML
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'escaped <%%= tag' do
@@ -392,98 +392,98 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             <%%= content_for :application_stylesheets, stylesheet_link_tag('application') %>
           <%- end -%>
         ERB
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
     end
 
     context 'when no space should be present' do
       context 'after name' do
         let(:file) { "<div   >" }
-        it { expect(subject).to eq "<div>" }
+        it { expect(subject).to(eq("<div>")) }
       end
 
       context 'before name' do
         let(:file) { "<   div>" }
-        it { expect(subject).to eq "<div>" }
+        it { expect(subject).to(eq("<div>")) }
       end
 
       context 'before start solidus' do
         let(:file) { "<   /div>" }
-        it { expect(subject).to eq "</div>" }
+        it { expect(subject).to(eq("</div>")) }
       end
 
       context 'after start solidus' do
         let(:file) { "</   div>" }
-        it { expect(subject).to eq "</div>" }
+        it { expect(subject).to(eq("</div>")) }
       end
 
       context 'after end solidus' do
         let(:file) { "<div/   >" }
-        it { expect(subject).to eq "<div />" }
+        it { expect(subject).to(eq("<div />")) }
       end
 
       context 'between attribute name and equal' do
         let(:file) { "<div foo  ='bar'>" }
-        it { expect(subject).to eq "<div foo='bar'>" }
+        it { expect(subject).to(eq("<div foo='bar'>")) }
       end
 
       context 'between attribute equal and value' do
         let(:file) { "<div foo=  'bar'>" }
-        it { expect(subject).to eq "<div foo='bar'>" }
+        it { expect(subject).to(eq("<div foo='bar'>")) }
       end
     end
 
     context 'when space is missing' do
       context 'between attributes' do
         let(:file) { "<div foo='foo'bar='bar'>" }
-        it { expect(subject).to eq "<div foo='foo' bar='bar'>" }
+        it { expect(subject).to(eq("<div foo='foo' bar='bar'>")) }
       end
 
       context 'between last attribute and solidus' do
         let(:file) { "<div foo='bar'/>" }
-        it { expect(subject).to eq "<div foo='bar' />" }
+        it { expect(subject).to(eq("<div foo='bar' />")) }
       end
 
       context 'between name and solidus' do
         let(:file) { "<div/>" }
-        it { expect(subject).to eq "<div />" }
+        it { expect(subject).to(eq("<div />")) }
       end
     end
 
     context 'when extra space is present' do
       context 'between name and end of tag' do
         let(:file) { "<div  >" }
-        it { expect(subject).to eq "<div>" }
+        it { expect(subject).to(eq("<div>")) }
       end
 
       context 'between name and first attribute' do
         let(:file) { "<div  >" }
-        it { expect(subject).to eq "<div>" }
+        it { expect(subject).to(eq("<div>")) }
       end
 
       context 'between name and first attribute' do
         let(:file) { '<img   class="hide">' }
-        it { expect(subject).to eq '<img class="hide">' }
+        it { expect(subject).to(eq('<img class="hide">')) }
       end
 
       context 'between name and end solidus' do
         let(:file) { "<br   />" }
-        it { expect(subject).to eq "<br />" }
+        it { expect(subject).to(eq("<br />")) }
       end
 
       context 'between last attribute and solidus' do
         let(:file) { '<br class="hide"   />' }
-        it { expect(subject).to eq '<br class="hide" />' }
+        it { expect(subject).to(eq('<br class="hide" />')) }
       end
 
       context 'between last attribute and end of tag' do
         let(:file) { '<img class="hide"    >' }
-        it { expect(subject).to eq '<img class="hide">' }
+        it { expect(subject).to(eq('<img class="hide">')) }
       end
 
       context 'between attributes' do
         let(:file) { "<div foo='foo'      bar='bar'>" }
-        it { expect(subject).to eq "<div foo='foo' bar='bar'>" }
+        it { expect(subject).to(eq("<div foo='foo' bar='bar'>")) }
       end
 
       context 'extra newline between name and first attribute' do
@@ -492,7 +492,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
 
             type="password" />
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input
             type="password" />
         HTML
@@ -504,7 +504,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
 
             />
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input />
         HTML
       end
@@ -516,7 +516,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
 
             class="foo" />
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input
             type="password"
             class="foo" />
@@ -530,7 +530,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             class="foo"
             />
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input
             type="password"
             class="foo" />
@@ -544,7 +544,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
             class="foo"
             >
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input
             type="password"
             class="foo">
@@ -555,7 +555,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { <<~HTML }
           <input/class="hide" />
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input class="hide" />
         HTML
       end
@@ -564,7 +564,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { <<~HTML }
           <input class="hide"/name="foo" />
         HTML
-        it { expect(subject).to eq <<~HTML }
+        it { expect(subject).to(eq(<<~HTML)) }
           <input class="hide" name="foo" />
         HTML
       end

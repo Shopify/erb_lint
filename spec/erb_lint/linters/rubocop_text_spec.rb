@@ -27,7 +27,7 @@ describe ERBLint::Linters::RubocopText do
       <span class="<%= auto_correct_me %>"></span>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when rubocop find offenses inside erb text node' do
@@ -35,7 +35,7 @@ describe ERBLint::Linters::RubocopText do
       <span> <%= auto_correct_me %> </span>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(11..25)] }
+    it { expect(subject).to(eq([arbitrary_error_message(11..25)])) }
   end
 
   context 'when rubocop does not find offenses inside erb text node' do
@@ -43,7 +43,7 @@ describe ERBLint::Linters::RubocopText do
       <span> <%= not_banned_method %> </span>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   private

@@ -18,7 +18,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
 
     context 'when tag is correct' do
       let(:file) { "<% foo %>" }
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when tag starts and ends with a newline' do
@@ -27,7 +27,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
           foo
         %>
       ERB
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when tag start and end are misaligned' do
@@ -37,9 +37,9 @@ describe ERBLint::Linters::ClosingErbTagIndent do
             %>
       ERB
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(9..12, "Indent `%>` on column 0 to match start of tag."),
-        ]
+        ]))
       end
     end
 
@@ -52,9 +52,9 @@ describe ERBLint::Linters::ClosingErbTagIndent do
             %>
       ERB
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(13..16, "Indent `%>` on column 2 to match start of tag."),
-        ]
+        ]))
       end
     end
 
@@ -64,9 +64,9 @@ describe ERBLint::Linters::ClosingErbTagIndent do
           foo %>
       ERB
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(8..8, "Insert newline before `%>` to match start of tag."),
-        ]
+        ]))
       end
     end
 
@@ -76,9 +76,9 @@ describe ERBLint::Linters::ClosingErbTagIndent do
         %>
       ERB
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(6..6, "Remove newline before `%>` to match start of tag."),
-        ]
+        ]))
       end
     end
   end
@@ -88,7 +88,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
 
     context 'when tag is correct' do
       let(:file) { "<% foo %>" }
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when tag starts and ends with a newline' do
@@ -97,7 +97,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
           foo
         %>
       ERB
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when tag start and end are misaligned' do
@@ -106,7 +106,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
           foo
             %>
       ERB
-      it { expect(subject).to eq <<~ERB }
+      it { expect(subject).to(eq(<<~ERB)) }
         <%
           foo
         %>
@@ -120,7 +120,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
 
                 %>
       ERB
-      it { expect(subject).to eq <<~ERB }
+      it { expect(subject).to(eq(<<~ERB)) }
         <div><%
           foo
 
@@ -133,7 +133,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
         <%
           foo %>
       ERB
-      it { expect(subject).to eq <<~ERB }
+      it { expect(subject).to(eq(<<~ERB)) }
         <%
           foo
         %>
@@ -145,7 +145,7 @@ describe ERBLint::Linters::ClosingErbTagIndent do
         <% foo
         %>
       ERB
-      it { expect(subject).to eq <<~ERB }
+      it { expect(subject).to(eq(<<~ERB)) }
         <% foo %>
       ERB
     end

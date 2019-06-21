@@ -21,39 +21,39 @@ describe ERBLint::Linters::SelfClosingTag do
 
       context 'when an element is not a void element' do
         let(:file) { "<a></a/>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when a void element is #self-closed' do
         let(:file) { "<br/>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when a void element is not #self_closing?' do
         let(:file) { "<br>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(3..2, "Tag `br` is self-closing, it must end with `/>`."),
-          ]
+          ]))
         end
       end
 
       context 'when a void element is #closing? and #self_closing?' do
         let(:file) { "</br/>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(1..1, "Tag `br` is a void element, it must not start with `</`."),
-          ]
+          ]))
         end
       end
 
       context 'when an element is #closing?' do
         let(:file) { "</br>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(1..1, "Tag `br` is a void element, it must not start with `</`."),
             build_offense(4..3, "Tag `br` is self-closing, it must end with `/>`."),
-          ]
+          ]))
         end
       end
     end
@@ -63,39 +63,39 @@ describe ERBLint::Linters::SelfClosingTag do
 
       context 'when an element is not a void element' do
         let(:file) { "<a></a/>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when a void element is #self-closed' do
         let(:file) { "<br/>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(3..3, "Tag `br` is a void element, it must end with `>` and not `/>`."),
-          ]
+          ]))
         end
       end
 
       context 'when a void element is not #self_closing?' do
         let(:file) { "<br>" }
-        it { expect(subject).to eq [] }
+        it { expect(subject).to(eq([])) }
       end
 
       context 'when a void element is #closing? and #self_closing?' do
         let(:file) { "</br/>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(1..1, "Tag `br` is a void element, it must not start with `</`."),
             build_offense(4..4, "Tag `br` is a void element, it must end with `>` and not `/>`."),
-          ]
+          ]))
         end
       end
 
       context 'when an element is #closing?' do
         let(:file) { "</br>" }
         it do
-          expect(subject).to eq [
+          expect(subject).to(eq([
             build_offense(1..1, "Tag `br` is a void element, it must not start with `</`."),
-          ]
+          ]))
         end
       end
     end
@@ -109,27 +109,27 @@ describe ERBLint::Linters::SelfClosingTag do
 
       context 'when an element is not self-closing' do
         let(:file) { "<a></a/>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when an element is self-closed' do
         let(:file) { "<br/>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when an element is not #self_closing?' do
         let(:file) { "<br>" }
-        it { expect(subject).to eq "<br/>" }
+        it { expect(subject).to(eq("<br/>")) }
       end
 
       context 'when an element is #closing? and #self_closing?' do
         let(:file) { "</br/>" }
-        it { expect(subject).to eq "<br/>" }
+        it { expect(subject).to(eq("<br/>")) }
       end
 
       context 'when an element is #closing?' do
         let(:file) { "</br>" }
-        it { expect(subject).to eq "<br/>" }
+        it { expect(subject).to(eq("<br/>")) }
       end
     end
 
@@ -138,27 +138,27 @@ describe ERBLint::Linters::SelfClosingTag do
 
       context 'when an element is not self-closing' do
         let(:file) { "<a></a/>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when an element is self-closed' do
         let(:file) { "<br/>" }
-        it { expect(subject).to eq "<br>" }
+        it { expect(subject).to(eq("<br>")) }
       end
 
       context 'when an element is not #self_closing?' do
         let(:file) { "<br>" }
-        it { expect(subject).to eq file }
+        it { expect(subject).to(eq(file)) }
       end
 
       context 'when an element is #closing? and #self_closing?' do
         let(:file) { "</br/>" }
-        it { expect(subject).to eq "<br>" }
+        it { expect(subject).to(eq("<br>")) }
       end
 
       context 'when an element is #closing?' do
         let(:file) { "</br>" }
-        it { expect(subject).to eq "<br>" }
+        it { expect(subject).to(eq("<br>")) }
       end
     end
   end

@@ -7,10 +7,10 @@ describe ERBLint::Runner do
   let(:runner) { described_class.new(file_loader, config) }
 
   before do
-    allow(ERBLint::LinterRegistry).to receive(:linters)
+    allow(ERBLint::LinterRegistry).to(receive(:linters)
       .and_return([ERBLint::Linters::FakeLinter1,
                    ERBLint::Linters::FakeLinter2,
-                   ERBLint::Linters::FinalNewline])
+                   ERBLint::Linters::FinalNewline]))
   end
 
   module ERBLint
@@ -42,11 +42,11 @@ describe ERBLint::Runner do
       end
 
       it 'returns each linter with their errors' do
-        expect(subject.size).to eq(2)
-        expect(subject[0].linter.class).to eq(ERBLint::Linters::FakeLinter1)
-        expect(subject[0].message).to eq("ERBLint::Linters::FakeLinter1 error")
-        expect(subject[1].linter.class).to eq(ERBLint::Linters::FakeLinter2)
-        expect(subject[1].message).to eq("ERBLint::Linters::FakeLinter2 error")
+        expect(subject.size).to(eq(2))
+        expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter1))
+        expect(subject[0].message).to(eq("ERBLint::Linters::FakeLinter1 error"))
+        expect(subject[1].linter.class).to(eq(ERBLint::Linters::FakeLinter2))
+        expect(subject[1].message).to(eq("ERBLint::Linters::FakeLinter2 error"))
       end
     end
 
@@ -61,9 +61,9 @@ describe ERBLint::Runner do
       end
 
       it 'returns only enabled linters with their errors' do
-        expect(subject.size).to eq(1)
-        expect(subject[0].linter.class).to eq(ERBLint::Linters::FakeLinter1)
-        expect(subject[0].message).to eq("ERBLint::Linters::FakeLinter1 error")
+        expect(subject.size).to(eq(1))
+        expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter1))
+        expect(subject[0].message).to(eq("ERBLint::Linters::FakeLinter1 error"))
       end
     end
 
@@ -78,7 +78,7 @@ describe ERBLint::Runner do
       end
 
       it 'returns no linters' do
-        expect(subject).to be_empty
+        expect(subject).to(be_empty)
       end
     end
 
@@ -93,7 +93,7 @@ describe ERBLint::Runner do
       end
 
       it 'returns no linters' do
-        expect(subject).to be_empty
+        expect(subject).to(be_empty)
       end
     end
 
@@ -101,7 +101,7 @@ describe ERBLint::Runner do
       let(:config) { ERBLint::RunnerConfig.new }
 
       it 'has all linters disabled' do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
 
@@ -109,9 +109,9 @@ describe ERBLint::Runner do
       let(:config) { nil }
 
       it 'returns default linters with their errors' do
-        expect(subject.size).to eq(1)
-        expect(subject[0].linter.class).to eq(ERBLint::Linters::FinalNewline)
-        expect(subject[0].message).to eq("Missing a trailing newline at the end of the file.")
+        expect(subject.size).to(eq(1))
+        expect(subject[0].linter.class).to(eq(ERBLint::Linters::FinalNewline))
+        expect(subject[0].message).to(eq("Missing a trailing newline at the end of the file."))
       end
     end
 
@@ -127,7 +127,7 @@ describe ERBLint::Runner do
 
       it 'clears all offenses from the offenses ivar' do
         runner.clear_offenses
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
   end

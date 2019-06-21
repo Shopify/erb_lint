@@ -18,7 +18,7 @@ describe ERBLint::Linters::HardCodedString do
       <span> Hello </span>
     FILE
 
-    it { expect(subject).to eq [untranslated_string_error(7..11, 'String not translated: Hello')] }
+    it { expect(subject).to(eq([untranslated_string_error(7..11, 'String not translated: Hello')])) }
   end
 
   context 'when file contains nested hard coded string' do
@@ -30,7 +30,7 @@ describe ERBLint::Linters::HardCodedString do
       </span>
     FILE
 
-    it { expect(subject).to eq [untranslated_string_error(61..67, 'String not translated: Example')] }
+    it { expect(subject).to(eq([untranslated_string_error(61..67, 'String not translated: Example')])) }
   end
 
   context 'when file contains a mix of hard coded string and erb' do
@@ -38,7 +38,7 @@ describe ERBLint::Linters::HardCodedString do
       <span><%= foo %> Example </span>
     FILE
 
-    it { expect(subject).to eq [untranslated_string_error(17..23, 'String not translated: Example')] }
+    it { expect(subject).to(eq([untranslated_string_error(17..23, 'String not translated: Example')])) }
   end
 
   context 'when file contains hard coded string nested inside erb' do
@@ -50,7 +50,7 @@ describe ERBLint::Linters::HardCodedString do
       </span>
     FILE
 
-    it { expect(subject).to eq [untranslated_string_error(33..39, 'String not translated: Example')] }
+    it { expect(subject).to(eq([untranslated_string_error(33..39, 'String not translated: Example')])) }
   end
 
   context 'when file contains multiple hard coded string' do
@@ -61,11 +61,11 @@ describe ERBLint::Linters::HardCodedString do
     FILE
 
     it 'find all offenses' do
-      expect(subject).to eq [
+      expect(subject).to(eq([
         untranslated_string_error(7..13, 'String not translated: Example'),
         untranslated_string_error(30..32, 'String not translated: Foo'),
         untranslated_string_error(49..52, 'String not translated: Test'),
-      ]
+      ]))
     end
   end
 
@@ -78,7 +78,7 @@ describe ERBLint::Linters::HardCodedString do
       </span>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when file contains blacklisted extraction' do
@@ -86,7 +86,7 @@ describe ERBLint::Linters::HardCodedString do
       &nbsp;
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when file contains irrelevant hard coded string' do
@@ -99,7 +99,7 @@ describe ERBLint::Linters::HardCodedString do
     FILE
 
     it 'does not add offense' do
-      expect(subject).to eq []
+      expect(subject).to(eq([]))
     end
   end
 
@@ -113,7 +113,7 @@ describe ERBLint::Linters::HardCodedString do
       </script>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when file contains hard coded string inside style' do
@@ -125,7 +125,7 @@ describe ERBLint::Linters::HardCodedString do
       </style>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   %w(xmp iframe noembed noframes listing).each do |tag|
@@ -136,7 +136,7 @@ describe ERBLint::Linters::HardCodedString do
         </#{tag}>
       FILE
 
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
   end
 
@@ -151,7 +151,7 @@ describe ERBLint::Linters::HardCodedString do
       Example
     FILE
 
-    it { expect(subject).to eq [untranslated_string_error(158..164, "String not translated: Example")] }
+    it { expect(subject).to(eq([untranslated_string_error(158..164, "String not translated: Example")])) }
   end
 
   context 'when file contains multiple chunks of hardcoded strings' do
@@ -168,7 +168,7 @@ describe ERBLint::Linters::HardCodedString do
         untranslated_string_error(38..41, "String not translated: Foo3"),
       ]
 
-      expect(subject).to eq expected
+      expect(subject).to(eq(expected))
     end
   end
 
@@ -191,7 +191,7 @@ describe ERBLint::Linters::HardCodedString do
         untranslated_string_error(30..34, "String not translated: Smith"),
       ]
 
-      expect(subject).to eq expected
+      expect(subject).to(eq(expected))
     end
   end
 
@@ -244,7 +244,7 @@ describe ERBLint::Linters::HardCodedString do
       offense = untranslated_string_error(7..11, 'String not translated: Hello')
       linter.autocorrect(processed_source, offense)
 
-      expect(defined?(I18nCorrector)).to eq('constant')
+      expect(defined?(I18nCorrector)).to(eq('constant'))
     end
 
     context 'without i18n load path' do
@@ -255,7 +255,7 @@ describe ERBLint::Linters::HardCodedString do
       it 'rescues the MissingI18nLoadPath error when no load path options is passed' do
         offense = untranslated_string_error(7..11, 'String not translated: Hello')
 
-        expect(linter.autocorrect(processed_source, offense)).to eq(nil)
+        expect(linter.autocorrect(processed_source, offense)).to(eq(nil))
       end
     end
 
@@ -265,7 +265,7 @@ describe ERBLint::Linters::HardCodedString do
       it 'rescue the MissingCorrector error when no corrector option is passed' do
         offense = untranslated_string_error(7..11, 'String not translated: Hello')
 
-        expect(linter.autocorrect(processed_source, offense)).to eq(nil)
+        expect(linter.autocorrect(processed_source, offense)).to(eq(nil))
       end
     end
 
@@ -278,7 +278,7 @@ describe ERBLint::Linters::HardCodedString do
         offense = untranslated_string_error(7..11, 'String not translated: Hello')
 
         error = ERBLint::Linters::HardCodedString::ForbiddenCorrector
-        expect { linter.autocorrect(processed_source, offense) }.to raise_error(error)
+        expect { linter.autocorrect(processed_source, offense) }.to(raise_error(error))
       end
     end
   end
