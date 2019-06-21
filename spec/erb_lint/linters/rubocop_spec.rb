@@ -237,7 +237,7 @@ describe ERBLint::Linters::Rubocop do
               checked: true %>
       FILE
 
-      it do
+      xit do
         expect(subject.size).to eq(1)
         expect(subject[0].source_range.begin_pos).to eq 25
         expect(subject[0].source_range.end_pos).to eq 38
