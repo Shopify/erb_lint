@@ -19,10 +19,10 @@ describe ERBLint::CLI do
   end
 
   before do
-    allow(ERBLint::LinterRegistry).to receive(:linters)
+    allow(ERBLint::LinterRegistry).to(receive(:linters)
       .and_return([ERBLint::Linters::LinterWithErrors,
                    ERBLint::Linters::LinterWithoutErrors,
-                   ERBLint::Linters::FinalNewline])
+                   ERBLint::Linters::FinalNewline]))
   end
 
   module ERBLint
@@ -48,33 +48,33 @@ describe ERBLint::CLI do
 
     context 'with no arguments' do
       it 'shows usage' do
-        expect { subject }.to output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout
+        expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout)
       end
 
       it 'shows all known linters' do
-        expect { subject }.to output(
+        expect { subject }.to(output(
           /Known linters are: linter_with_errors, linter_without_errors, final_newline/
-        ).to_stdout
+        ).to_stdout)
       end
 
       it 'is successful' do
-        expect(subject).to be(true)
+        expect(subject).to(be(true))
       end
     end
 
     context 'with --version' do
       let(:args) { ['--version'] }
-      it { expect { subject }.to output("#{ERBLint::VERSION}\n").to_stdout }
+      it { expect { subject }.to(output("#{ERBLint::VERSION}\n").to_stdout) }
     end
 
     context 'with --help' do
       let(:args) { ['--help'] }
 
       it 'shows usage' do
-        expect { subject }.to output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout
+        expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout)
       end
       it 'is successful' do
-        expect(subject).to be(true)
+        expect(subject).to(be(true))
       end
     end
 
@@ -82,9 +82,9 @@ describe ERBLint::CLI do
       context 'when file does not exist' do
         let(:args) { ['--config', '.somefile.yml'] }
 
-        it { expect { subject }.to output(/.somefile.yml: does not exist/).to_stderr }
+        it { expect { subject }.to(output(/.somefile.yml: does not exist/).to_stderr) }
         it 'is not successful' do
-          expect(subject).to be(false)
+          expect(subject).to(be(false))
         end
       end
     end
@@ -94,8 +94,8 @@ describe ERBLint::CLI do
         let(:linted_file) { '/path/to/myfile.html.erb' }
         let(:args) { [linted_file] }
 
-        it { expect { subject }.to output(/#{Regexp.escape(linted_file)}: does not exist/).to_stderr }
-        it { expect(subject).to be(false) }
+        it { expect { subject }.to(output(/#{Regexp.escape(linted_file)}: does not exist/).to_stderr) }
+        it { expect(subject).to(be(false)) }
       end
 
       context 'when file exists' do
@@ -110,17 +110,17 @@ describe ERBLint::CLI do
 
         context 'without --config' do
           context 'when default config does not exist' do
-            it { expect { subject }.to output(/\.erb-lint\.yml not found: using default config/).to_stderr }
+            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
           end
         end
 
         it 'shows how many files and linters are used' do
-          expect { subject }.to output(/Linting 1 files with 2 linters/).to_stdout
+          expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
         end
 
         context 'when errors are found' do
           it 'shows all error messages and line numbers' do
-            expect { subject }.to output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
               fake message from a fake linter
               In file: /app/views/template.html.erb:1
 
@@ -130,11 +130,11 @@ describe ERBLint::CLI do
           end
 
           it 'prints that errors were found to stdout' do
-            expect { subject }.to output(/2 error\(s\) were found in ERB files/).to_stderr
+            expect { subject }.to(output(/2 error\(s\) were found in ERB files/).to_stderr)
           end
 
           it 'is not successful' do
-            expect(subject).to be(false)
+            expect(subject).to(be(false))
           end
         end
 
@@ -142,11 +142,11 @@ describe ERBLint::CLI do
           let(:args) { ['--enable-linter', 'linter_without_errors', linted_file] }
 
           it 'shows no that errors were found to stderr' do
-            expect { subject }.to output(/No errors were found in ERB files/).to_stdout
+            expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
           end
 
           it 'is successful' do
-            expect(subject).to be(true)
+            expect(subject).to(be(true))
           end
         end
       end
@@ -157,8 +157,8 @@ describe ERBLint::CLI do
         let(:linted_dir) { '/path/to' }
         let(:args) { [linted_dir] }
 
-        it { expect { subject }.to output(/#{Regexp.escape(linted_dir)}: does not exist/).to_stderr }
-        it { expect(subject).to be(false) }
+        it { expect { subject }.to(output(/#{Regexp.escape(linted_dir)}: does not exist/).to_stderr) }
+        it { expect(subject).to(be(false)) }
       end
 
       context 'when dir exists' do
@@ -171,7 +171,7 @@ describe ERBLint::CLI do
             FileUtils.mkdir_p(linted_dir)
           end
 
-          it { expect { subject }.to output(/no files found/).to_stdout }
+          it { expect { subject }.to(output(/no files found/).to_stdout) }
         end
 
         context 'with descendant files that match default glob' do
@@ -186,17 +186,17 @@ describe ERBLint::CLI do
 
           context 'without --config' do
             context 'when default config does not exist' do
-              it { expect { subject }.to output(/\.erb-lint\.yml not found: using default config/).to_stderr }
+              it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
             end
           end
 
           it 'shows how many files and linters are used' do
-            expect { subject }.to output(/Linting 1 files with 2 linters/).to_stdout
+            expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
           end
 
           context 'when errors are found' do
             it 'shows all error messages and line numbers' do
-              expect { subject }.to output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout
+              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
                 fake message from a fake linter
                 In file: /app/views/template.html.erb:1
 
@@ -206,11 +206,11 @@ describe ERBLint::CLI do
             end
 
             it 'prints that errors were found to stdout' do
-              expect { subject }.to output(/2 error\(s\) were found in ERB files/).to_stderr
+              expect { subject }.to(output(/2 error\(s\) were found in ERB files/).to_stderr)
             end
 
             it 'is not successful' do
-              expect(subject).to be(false)
+              expect(subject).to(be(false))
             end
           end
 
@@ -218,11 +218,11 @@ describe ERBLint::CLI do
             let(:args) { ['--enable-linter', 'linter_without_errors', linted_dir] }
 
             it 'shows no that errors were found to stderr' do
-              expect { subject }.to output(/No errors were found in ERB files/).to_stdout
+              expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
             end
 
             it 'is successful' do
-              expect(subject).to be(true)
+              expect(subject).to(be(true))
             end
           end
         end
@@ -232,10 +232,10 @@ describe ERBLint::CLI do
     context 'with unknown argument' do
       let(:args) { ['--foo'] }
 
-      it { expect { subject }.to output(/invalid option: --foo/).to_stderr }
+      it { expect { subject }.to(output(/invalid option: --foo/).to_stderr) }
 
       it 'is not successful' do
-        expect(subject).to be(false)
+        expect(subject).to(be(false))
       end
     end
 
@@ -243,13 +243,13 @@ describe ERBLint::CLI do
       let(:args) { ['--enable-linter', 'foo'] }
 
       it do
-        expect { subject }.to output(
+        expect { subject }.to(output(
           /foo: not a valid linter name \(linter_with_errors, linter_without_errors, final_newline\)/
-        ).to_stderr
+        ).to_stderr)
       end
 
       it 'is not successful' do
-        expect(subject).to be(false)
+        expect(subject).to(be(false))
       end
     end
   end

@@ -41,7 +41,7 @@ module ERBLint
         hash['inherit_from'] = Array(hash['inherit_from'])
         Array(config_path).reverse_each do |path|
           # Put gem configuration first so local configuration overrides it.
-          hash['inherit_from'].unshift gem_config_path(gem_name, path)
+          hash['inherit_from'].unshift(gem_config_path(gem_name, path))
         end
       end
     end

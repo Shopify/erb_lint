@@ -22,7 +22,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       let(:file) { '' }
 
       it 'does not report any offense' do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
 
@@ -34,7 +34,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       FILE
 
       it 'does not report any offenses' do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
   end
@@ -62,7 +62,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       let(:file) { '' }
 
       it 'does not report any offenses' do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
 
@@ -74,7 +74,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       FILE
 
       it 'does not report any offenses' do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
 
@@ -86,11 +86,11 @@ describe ERBLint::Linters::DeprecatedClasses do
       FILE
 
       it 'reports 1 offense' do
-        expect(subject.size).to eq 1
+        expect(subject.size).to(eq(1))
       end
 
       it 'reports an offense with message containing suggestion 1' do
-        expect(subject.first.message).to include suggestion_1
+        expect(subject.first.message).to(include(suggestion_1))
       end
     end
 
@@ -104,17 +104,17 @@ describe ERBLint::Linters::DeprecatedClasses do
       FILE
 
       it 'reports 1 offense' do
-        expect(subject.size).to eq 1
+        expect(subject.size).to(eq(1))
       end
 
       it 'reports an offense with message containing suggestion 1' do
-        expect(subject.first.message).to include suggestion_1
+        expect(subject.first.message).to(include(suggestion_1))
       end
 
       it 'reports an offense with position range that is adjusted in the nested context' do
-        expect(subject.first.source_range.begin_pos).to eq 28
-        expect(subject.first.source_range.end_pos).to eq 45
-        expect(subject.first.source_range.source).to eq "<div class=\"abc\">"
+        expect(subject.first.source_range.begin_pos).to(eq(28))
+        expect(subject.first.source_range.end_pos).to(eq(45))
+        expect(subject.first.source_range.source).to(eq("<div class=\"abc\">"))
       end
     end
 
@@ -127,12 +127,12 @@ describe ERBLint::Linters::DeprecatedClasses do
         FILE
 
         it 'reports 2 offenses' do
-          expect(subject.size).to eq 2
+          expect(subject.size).to(eq(2))
         end
 
         it 'reports offenses with messages containing suggestion 1' do
-          expect(subject[0].message).to include suggestion_1
-          expect(subject[1].message).to include suggestion_1
+          expect(subject[0].message).to(include(suggestion_1))
+          expect(subject[1].message).to(include(suggestion_1))
         end
       end
 
@@ -144,12 +144,12 @@ describe ERBLint::Linters::DeprecatedClasses do
         FILE
 
         it 'reports 2 offenses' do
-          expect(subject.size).to eq 2
+          expect(subject.size).to(eq(2))
         end
 
         it 'reports offenses with messages containing suggestion 1' do
-          expect(subject[0].message).to include suggestion_1
-          expect(subject[1].message).to include suggestion_1
+          expect(subject[0].message).to(include(suggestion_1))
+          expect(subject[1].message).to(include(suggestion_1))
         end
       end
     end
@@ -162,12 +162,12 @@ describe ERBLint::Linters::DeprecatedClasses do
       FILE
 
       it 'reports 2 offenses' do
-        expect(subject.size).to eq 2
+        expect(subject.size).to(eq(2))
       end
 
       it 'reports offenses with messages containing suggestion 2' do
-        expect(subject[0].message).to include suggestion_2
-        expect(subject[1].message).to include suggestion_2
+        expect(subject[0].message).to(include(suggestion_2))
+        expect(subject[1].message).to(include(suggestion_2))
       end
     end
 
@@ -184,7 +184,7 @@ describe ERBLint::Linters::DeprecatedClasses do
         let(:file) { '' }
 
         it 'does not report any offenses' do
-          expect(subject).to eq []
+          expect(subject).to(eq([]))
         end
       end
 
@@ -196,11 +196,11 @@ describe ERBLint::Linters::DeprecatedClasses do
         FILE
 
         it 'reports 1 offense' do
-          expect(subject.size).to eq 1
+          expect(subject.size).to(eq(1))
         end
 
         it 'reports an offense with its message ending with the addendum' do
-          expect(subject.first.message).to end_with addendum
+          expect(subject.first.message).to(end_with(addendum))
         end
       end
     end
@@ -216,7 +216,7 @@ describe ERBLint::Linters::DeprecatedClasses do
         let(:file) { '' }
 
         it 'does not report any offenses' do
-          expect(subject).to eq []
+          expect(subject).to(eq([]))
         end
       end
 
@@ -228,11 +228,11 @@ describe ERBLint::Linters::DeprecatedClasses do
         FILE
 
         it 'reports 1 offense' do
-          expect(subject.size).to eq 1
+          expect(subject.size).to(eq(1))
         end
 
         it 'reports an offense with its message ending with the suggestion' do
-          expect(subject.first.message).to end_with suggestion_1
+          expect(subject.first.message).to(end_with(suggestion_1))
         end
       end
     end
@@ -243,7 +243,7 @@ describe ERBLint::Linters::DeprecatedClasses do
       FILE
 
       it 'does not report any offenses' do
-        expect(subject).to eq []
+        expect(subject).to(eq([]))
       end
     end
   end

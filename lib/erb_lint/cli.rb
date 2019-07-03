@@ -67,27 +67,27 @@ module ERBLint
       if @stats.corrected > 0
         corrected_found_diff = @stats.found - @stats.corrected
         if corrected_found_diff > 0
-          warn Rainbow(
+          warn(Rainbow(
             "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
-          ).red
+          ).red)
         else
           puts Rainbow("#{@stats.corrected} error(s) corrected in ERB files").green
         end
       elsif @stats.found > 0
-        warn Rainbow("#{@stats.found} error(s) were found in ERB files").red
+        warn(Rainbow("#{@stats.found} error(s) were found in ERB files").red)
       else
         puts Rainbow("No errors were found in ERB files").green
       end
 
       @stats.found == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
-      warn Rainbow(e.message).red
+      warn(Rainbow(e.message).red)
       false
     rescue ExitWithSuccess => e
       puts e.message
       true
     rescue => e
-      warn Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red
+      warn(Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red)
       false
     end
 
@@ -146,7 +146,7 @@ module ERBLint
         config = RunnerConfig.new(file_loader.yaml(config_filename), file_loader)
         @config = RunnerConfig.default.merge(config)
       else
-        warn Rainbow("#{config_filename} not found: using default config").yellow
+        warn(Rainbow("#{config_filename} not found: using default config").yellow)
         @config = RunnerConfig.default
       end
       @config.merge!(runner_config_override)

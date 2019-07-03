@@ -18,42 +18,42 @@ describe ERBLint::Linters::TrailingWhitespace do
 
     context 'when no trailing space is present' do
       let(:file) { "a perfect line\n" }
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when a trailing space is present at end of file' do
       let(:file) { "a not so perfect line    " }
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(21..24, "Extra whitespace detected at end of line."),
-        ]
+        ]))
       end
     end
 
     context 'when a trailing space before newline' do
       let(:file) { "a not so perfect line    \n" }
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(21..24, "Extra whitespace detected at end of line."),
-        ]
+        ]))
       end
     end
 
     context 'when tabs are present' do
       let(:file) { "a not so perfect line  \t\r\t  \n" }
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(21..27, "Extra whitespace detected at end of line."),
-        ]
+        ]))
       end
     end
 
     context 'when spaces are alone on a line' do
       let(:file) { "a line\n       \nanother line\n" }
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(7..13, "Extra whitespace detected at end of line."),
-        ]
+        ]))
       end
     end
   end
@@ -63,27 +63,27 @@ describe ERBLint::Linters::TrailingWhitespace do
 
     context 'when no trailing space is present' do
       let(:file) { "a perfect line\n" }
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when a trailing space is present at end of file' do
       let(:file) { "a not so perfect line    " }
-      it { expect(subject).to eq "a not so perfect line" }
+      it { expect(subject).to(eq("a not so perfect line")) }
     end
 
     context 'when a trailing space before newline' do
       let(:file) { "a not so perfect line    \n" }
-      it { expect(subject).to eq "a not so perfect line\n" }
+      it { expect(subject).to(eq("a not so perfect line\n")) }
     end
 
     context 'when tabs are present' do
       let(:file) { "a not so perfect line  \t\r\t  \n" }
-      it { expect(subject).to eq "a not so perfect line\n" }
+      it { expect(subject).to(eq("a not so perfect line\n")) }
     end
 
     context 'when spaces are alone on a line' do
       let(:file) { "a line\n\nanother line\n" }
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
   end
 

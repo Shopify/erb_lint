@@ -20,7 +20,7 @@ describe ERBLint::Linter do
 
     describe '.simple_name' do
       it 'returns the name of the class with the ERBLint::Linter prefix removed' do
-        expect(subject.class.simple_name).to eq 'Fake'
+        expect(subject.class.simple_name).to(eq('Fake'))
       end
     end
 
@@ -28,7 +28,7 @@ describe ERBLint::Linter do
       it 'clears all offenses from the offenses ivar' do
         linter.offenses = %w(someoffense)
         linter.clear_offenses
-        expect(linter.offenses).to eq []
+        expect(linter.offenses).to(eq([]))
       end
     end
   end
