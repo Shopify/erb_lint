@@ -12,12 +12,12 @@ module ERBLint
       class RuleSet
         include SmartProperties
         property :suggestion, accepts: String, default: ''
-        property :deprecated, accepts: LinterConfig.array_of?(String), default: []
+        property :deprecated, accepts: LinterConfig.array_of?(String), default: -> { [] }
       end
 
       class ConfigSchema < LinterConfig
         property :rule_set,
-          default: [],
+          default: -> { [] },
           accepts: array_of?(RuleSet),
           converts: to_array_of(RuleSet)
         property :addendum, accepts: String
