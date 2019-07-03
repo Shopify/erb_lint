@@ -22,7 +22,7 @@ module ERBLint
       BLACK_LISTED_TEXT = Set.new(%w(&nbsp; &ensp; &emsp; &thinsp;))
 
       class ConfigSchema < LinterConfig
-        property :corrector, accepts: Hash, required: false, default: {}
+        property :corrector, accepts: Hash, required: false, default: -> { {} }
         property :i18n_load_path, accepts: String, required: false, default: ''
       end
       self.config_schema = ConfigSchema

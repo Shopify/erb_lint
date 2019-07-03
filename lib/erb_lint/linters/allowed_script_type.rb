@@ -13,7 +13,7 @@ module ERBLint
 
       class ConfigSchema < LinterConfig
         property :allowed_types, accepts: array_of?(String),
-          default: ['text/javascript']
+          default: -> { ['text/javascript'] }
         property :allow_blank, accepts: [true, false], default: true, reader: :allow_blank?
         property :disallow_inline_scripts, accepts: [true, false], default: false, reader: :disallow_inline_scripts?
       end
