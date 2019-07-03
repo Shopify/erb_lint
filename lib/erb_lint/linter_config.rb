@@ -20,7 +20,7 @@ module ERBLint
     end
 
     property :enabled, accepts: [true, false], default: false, reader: :enabled?
-    property :exclude, accepts: array_of?(String), default: []
+    property :exclude, accepts: array_of?(String), default: -> { [] }
 
     def initialize(config = {})
       config = config.dup.deep_stringify_keys
