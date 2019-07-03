@@ -3,9 +3,9 @@ before_install:
   - rm ./Gemfile.lock
 cache: bundler
 rvm:
-  - 2.3.4
   - 2.4.1
   - 2.5
+  - 2.6
 script:
   - bundle exec rspec spec
   - bundle exec rubocop
