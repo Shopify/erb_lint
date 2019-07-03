@@ -96,6 +96,7 @@ DEPENDENCIES
   rake
   rspec
   rubocop
+  smart_properties (~> 1.13.1)
 
 BUNDLED WITH
    1.17.3
