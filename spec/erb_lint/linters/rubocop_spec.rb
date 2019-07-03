@@ -207,12 +207,12 @@ describe ERBLint::Linters::Rubocop do
   context 'code is aligned to the column matching start of ruby code' do
     let(:linter_config) do
       described_class.config_schema.new(
-        only: ['Layout/AlignParameters'],
+        only: ['Layout/AlignArguments'],
         rubocop_config: {
           AllCops: {
             TargetRubyVersion: '2.4',
           },
-          'Layout/AlignParameters': {
+          'Layout/AlignArguments': {
             Enabled: true,
             EnforcedStyle: 'with_fixed_indentation',
             SupportedStyles: %w(with_first_parameter with_fixed_indentation),
@@ -244,8 +244,8 @@ describe ERBLint::Linters::Rubocop do
         expect(subject[0].source_range.source).to(eq("checked: true"))
         expect(subject[0].line_range).to(eq(2..2))
         expect(subject[0].message).to(\
-          eq("Layout/AlignParameters: Use one level of indentation for "\
-             "parameters following the first line of a multi-line method call.")
+          eq("Layout/AlignArguments: Use one level of indentation for "\
+             "arguments following the first line of a multi-line method call.")
         )
       end
     end
