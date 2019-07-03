@@ -61,7 +61,7 @@ module ERBLint
 
       def autocorrect(processed_source, offense)
         string = offense.source_range.source
-        return unless klass = load_corrector
+        return unless (klass = load_corrector)
         return unless string.strip.length > 1
         node = RuboCop::AST::StrNode.new(:str, [string])
         corrector = klass.new(node, processed_source.filename, corrector_i18n_load_path, offense.source_range)

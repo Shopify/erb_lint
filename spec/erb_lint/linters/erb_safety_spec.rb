@@ -31,7 +31,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="alert('<%= foo %>')">
     FILE
 
-    it { expect(subject).to eq [unsafe_interpolate(23..25)] }
+    it { expect(subject).to(eq([unsafe_interpolate(23..25)])) }
   end
 
   context 'interpolate a variable in js attribute calling safe method' do
@@ -39,7 +39,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="alert(<%= foo.to_json %>)">
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'interpolate a variable in js attribute calling safe method inside string interpolation' do
@@ -47,7 +47,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="alert(<%= "hello \#{foo.to_json}" %>)">
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'html_safe in any attribute is unsafe' do
@@ -55,7 +55,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%= foo.html_safe %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_html_safe(16..28)] }
+    it { expect(subject).to(eq([unsafe_html_safe(16..28)])) }
   end
 
   context 'html_safe in any attribute is unsafe despite having to_json' do
@@ -63,7 +63,7 @@ describe ERBLint::Linters::ErbSafety do
       <a onclick="<%= foo.to_json.html_safe %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_html_safe(16..36), unsafe_interpolate(16..36)] }
+    it { expect(subject).to(eq([unsafe_html_safe(16..36), unsafe_interpolate(16..36)])) }
   end
 
   context '<== in any attribute is unsafe' do
@@ -71,7 +71,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%== foo %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_erb_interpolate(12..22)] }
+    it { expect(subject).to(eq([unsafe_erb_interpolate(12..22)])) }
   end
 
   context '<== in any attribute is unsafe despite having to_json' do
@@ -79,7 +79,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%== foo.to_json %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_erb_interpolate(12..30)] }
+    it { expect(subject).to(eq([unsafe_erb_interpolate(12..30)])) }
   end
 
   context 'raw in any attribute is unsafe' do
@@ -87,7 +87,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%= raw foo %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_raw(16..22)] }
+    it { expect(subject).to(eq([unsafe_raw(16..22)])) }
   end
 
   context 'raw in any attribute is unsafe despite having to_json' do
@@ -95,7 +95,7 @@ describe ERBLint::Linters::ErbSafety do
       <div title="<%= raw foo.to_json %>">
     FILE
 
-    it { expect(subject).to eq [unsafe_raw(16..30)] }
+    it { expect(subject).to(eq([unsafe_raw(16..30)])) }
   end
 
   context 'unsafe erb in <script>' do
@@ -103,7 +103,7 @@ describe ERBLint::Linters::ErbSafety do
       <script>var foo = <%= unsafe %>;</script>
     FILE
 
-    it { expect(subject).to eq [unsafe_javascript_tag_interpolate(18..30)] }
+    it { expect(subject).to(eq([unsafe_javascript_tag_interpolate(18..30)])) }
   end
 
   context 'safe erb in <script>' do
@@ -111,7 +111,7 @@ describe ERBLint::Linters::ErbSafety do
       <script>var foo = <%= unsafe.to_json %>;</script>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'safe erb in <script> when raw is present' do
@@ -119,7 +119,7 @@ describe ERBLint::Linters::ErbSafety do
       <script>var foo = <%= raw unsafe.to_json %>;</script>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'statements not allowed in <script> tags' do
@@ -127,7 +127,7 @@ describe ERBLint::Linters::ErbSafety do
       <script><% if foo? %>var foo = 1;<% end %></script>
     FILE
 
-    it { expect(subject).to eq [erb_statements_not_allowed(8..20)] }
+    it { expect(subject).to(eq([erb_statements_not_allowed(8..20)])) }
   end
 
   context 'changing better-html config file works' do
@@ -142,17 +142,17 @@ describe ERBLint::Linters::ErbSafety do
 
     context 'with default config' do
       let(:better_html_config) { {} }
-      it { expect(subject).to eq [unsafe_javascript_tag_interpolate(8..20)] }
+      it { expect(subject).to(eq([unsafe_javascript_tag_interpolate(8..20)])) }
     end
 
     context 'with non-default config' do
       let(:better_html_config) { { javascript_safe_methods: %w(foobar) } }
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'with string keys in config' do
       let(:better_html_config) { { 'javascript_safe_methods' => %w(foobar) } }
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
   end
 

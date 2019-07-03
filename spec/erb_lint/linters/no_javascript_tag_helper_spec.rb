@@ -22,7 +22,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= javascript_tag do %>
       FILE
 
-      it { expect(subject).to eq [build_offense(7..30)] }
+      it { expect(subject).to(eq([build_offense(7..30)])) }
     end
 
     context 'regression with <%%= syntax does not raise an exception' do
@@ -33,7 +33,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <% end %>
       FILE
 
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'no method calls in erb tag' do
@@ -41,7 +41,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= true %>
       FILE
 
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
   end
 
@@ -53,7 +53,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= javascript_tag("var myData = 1;") %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script>
         //<![CDATA[
         var myData = 1;
@@ -68,7 +68,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= javascript_tag("var myData = 1;") %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script>var myData = 1;</script>
       HTML
     end
@@ -78,7 +78,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= javascript_tag('var myData = 1;', defer: true) %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script defer="true">
         //<![CDATA[
         var myData = 1;
@@ -92,7 +92,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= javascript_tag("var myData = \#{myData.to_json};", custom_attribute: "foo-\#{my_attribute}") %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script custom-attribute="foo-<%= my_attribute %>">
         //<![CDATA[
         var myData = <%== myData.to_json %>;
@@ -106,7 +106,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <%= javascript_tag(data) %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script>
         //<![CDATA[
         <%== data %>
@@ -122,7 +122,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <% end %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script>
         //<![CDATA[
 
@@ -141,7 +141,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <% end %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script>
           foo
         </script>
@@ -155,7 +155,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <% end %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script defer="true" async="true">
         //<![CDATA[
 
@@ -173,7 +173,7 @@ describe ERBLint::Linters::NoJavascriptTagHelper do
         <% end %>
       HTML
 
-      it { expect(subject).to eq <<~HTML }
+      it { expect(subject).to(eq(<<~HTML)) }
         <script defer="true" async="true">
         //<![CDATA[
 

@@ -25,7 +25,7 @@ describe ERBLint::Linters::Rubocop do
   let(:inherit_from_filename) { 'custom_rubocop.yml' }
   subject { offenses }
   before do
-    allow(file_loader).to receive(:yaml).with(inherit_from_filename).and_return(nested_config)
+    allow(file_loader).to(receive(:yaml).with(inherit_from_filename).and_return(nested_config))
   end
   before { linter.run(processed_source) }
 
@@ -36,7 +36,7 @@ describe ERBLint::Linters::Rubocop do
     let(:file) { <<~FILE }
       <% not_banned_method %>
     FILE
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when rubocop finds no offenses' do
@@ -44,7 +44,7 @@ describe ERBLint::Linters::Rubocop do
       <% not_banned_method %>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when rubocop encounters a erb comment' do
@@ -54,7 +54,7 @@ describe ERBLint::Linters::Rubocop do
       %>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'when rubocop encounters a ruby comment' do
@@ -65,8 +65,8 @@ describe ERBLint::Linters::Rubocop do
       %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(37..51)] }
-    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
+    it { expect(subject).to(eq([arbitrary_error_message(37..51)])) }
+    it { expect(subject.first.source_range.source).to(eq("auto_correct_me")) }
   end
 
   context 'when rubocop finds offenses in ruby statements' do
@@ -74,13 +74,13 @@ describe ERBLint::Linters::Rubocop do
       <% auto_correct_me %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(3..17)] }
-    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
+    it { expect(subject).to(eq([arbitrary_error_message(3..17)])) }
+    it { expect(subject.first.source_range.source).to(eq("auto_correct_me")) }
 
     context 'when autocorrecting' do
       subject { corrected_content }
 
-      it { expect(subject).to eq "<% safe_method %>\n" }
+      it { expect(subject).to(eq("<% safe_method %>\n")) }
     end
   end
 
@@ -89,12 +89,12 @@ describe ERBLint::Linters::Rubocop do
       <%= auto_correct_me %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(4..18)] }
+    it { expect(subject).to(eq([arbitrary_error_message(4..18)])) }
 
     context 'when autocorrecting' do
       subject { corrected_content }
 
-      it { expect(subject).to eq "<%= safe_method %>\n" }
+      it { expect(subject).to(eq("<%= safe_method %>\n")) }
     end
   end
 
@@ -108,18 +108,18 @@ describe ERBLint::Linters::Rubocop do
     FILE
 
     it 'finds offenses' do
-      expect(subject).to eq [
+      expect(subject).to(eq([
         arbitrary_error_message(3..17),
         arbitrary_error_message(25..39),
         arbitrary_error_message(47..61),
-      ]
+      ]))
     end
 
     context 'can autocorrect individual offenses' do
       let(:corrector) { ERBLint::Corrector.new(processed_source, [offenses.first]) }
       subject { corrected_content }
 
-      it { expect(subject).to eq <<~FILE }
+      it { expect(subject).to(eq(<<~FILE)) }
         <%
         safe_method(:foo)
         auto_correct_me(:bar)
@@ -136,7 +136,7 @@ describe ERBLint::Linters::Rubocop do
       <% end %>
     FILE
 
-    it { expect(subject).to eq [] }
+    it { expect(subject).to(eq([])) }
   end
 
   context 'statements with partial block expression is processed' do
@@ -146,12 +146,12 @@ describe ERBLint::Linters::Rubocop do
       <% end %>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(3..17)] }
+    it { expect(subject).to(eq([arbitrary_error_message(3..17)])) }
 
     context 'when autocorrecting' do
       subject { corrected_content }
 
-      it { expect(subject).to eq <<~FILE }
+      it { expect(subject).to(eq(<<~FILE)) }
         <% safe_method.each do %>
           foo
         <% end %>
@@ -170,8 +170,8 @@ describe ERBLint::Linters::Rubocop do
       </div>
     FILE
 
-    it { expect(subject).to eq [arbitrary_error_message(29..43)] }
-    it { expect(subject.first.source_range.source).to eq "auto_correct_me" }
+    it { expect(subject).to(eq([arbitrary_error_message(29..43)])) }
+    it { expect(subject.first.source_range.source).to(eq("auto_correct_me")) }
   end
 
   context 'supports loading nested config' do
@@ -200,19 +200,19 @@ describe ERBLint::Linters::Rubocop do
         <% auto_correct_me %>
       FILE
 
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
   end
 
   context 'code is aligned to the column matching start of ruby code' do
     let(:linter_config) do
       described_class.config_schema.new(
-        only: ['Layout/AlignParameters'],
+        only: ['Layout/AlignArguments'],
         rubocop_config: {
           AllCops: {
             TargetRubyVersion: '2.4',
           },
-          'Layout/AlignParameters': {
+          'Layout/AlignArguments': {
             Enabled: true,
             EnforcedStyle: 'with_fixed_indentation',
             SupportedStyles: %w(with_first_parameter with_fixed_indentation),
@@ -228,7 +228,7 @@ describe ERBLint::Linters::Rubocop do
              checked: true %>
       FILE
 
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when alignment is incorrect' do
@@ -238,14 +238,15 @@ describe ERBLint::Linters::Rubocop do
       FILE
 
       it do
-        expect(subject.size).to eq(1)
-        expect(subject[0].source_range.begin_pos).to eq 25
-        expect(subject[0].source_range.end_pos).to eq 38
-        expect(subject[0].source_range.source).to eq "checked: true"
-        expect(subject[0].line_range).to eq 2..2
-        expect(subject[0].message).to \
-          eq "Layout/AlignParameters: Use one level of indentation for "\
-             "parameters following the first line of a multi-line method call."
+        expect(subject.size).to(eq(1))
+        expect(subject[0].source_range.begin_pos).to(eq(25))
+        expect(subject[0].source_range.end_pos).to(eq(38))
+        expect(subject[0].source_range.source).to(eq("checked: true"))
+        expect(subject[0].line_range).to(eq(2..2))
+        expect(subject[0].message).to(\
+          eq("Layout/AlignArguments: Use one level of indentation for "\
+             "arguments following the first line of a multi-line method call.")
+        )
       end
     end
 
@@ -255,7 +256,7 @@ describe ERBLint::Linters::Rubocop do
                          checked: true %>
       FILE
 
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
   end
 
@@ -264,7 +265,7 @@ describe ERBLint::Linters::Rubocop do
       <% dont_auto_correct_me(auto_correct_me(dont_auto_correct_me)) %>
     FILE
 
-    it { expect(corrected_content).to eq "<% dont_auto_correct_me(safe_method(dont_auto_correct_me)) %>\n" }
+    it { expect(corrected_content).to(eq("<% dont_auto_correct_me(safe_method(dont_auto_correct_me)) %>\n")) }
   end
 
   private

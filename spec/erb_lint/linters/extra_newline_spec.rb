@@ -18,7 +18,7 @@ describe ERBLint::Linters::ExtraNewline do
 
     context 'when no new line is present' do
       let(:file) { "this is a line" }
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when no blank lines are present' do
@@ -27,7 +27,7 @@ describe ERBLint::Linters::ExtraNewline do
         line 2
         line 3
       FILE
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when a single blank line is present' do
@@ -36,7 +36,7 @@ describe ERBLint::Linters::ExtraNewline do
 
         line 3
       FILE
-      it { expect(subject).to eq [] }
+      it { expect(subject).to(eq([])) }
     end
 
     context 'when two blank lines follow each other' do
@@ -47,9 +47,9 @@ describe ERBLint::Linters::ExtraNewline do
         line 3
       FILE
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(8..8, "Extra blank line detected."),
-        ]
+        ]))
       end
     end
 
@@ -63,9 +63,9 @@ describe ERBLint::Linters::ExtraNewline do
         line 3
       FILE
       it do
-        expect(subject).to eq [
+        expect(subject).to(eq([
           build_offense(8..10, "Extra blank line detected."),
-        ]
+        ]))
       end
     end
   end
@@ -75,17 +75,17 @@ describe ERBLint::Linters::ExtraNewline do
 
     context 'when no new line is present' do
       let(:file) { "this is a line" }
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when single blank line present at end of file' do
       let(:file) { "this is a line\n\n" }
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when multiple blank lines present at end of file' do
       let(:file) { "this is a line\n\n\n\n" }
-      it { expect(subject).to eq "this is a line\n\n" }
+      it { expect(subject).to(eq("this is a line\n\n")) }
     end
 
     context 'when no blank lines are present' do
@@ -94,7 +94,7 @@ describe ERBLint::Linters::ExtraNewline do
         line 2
         line 3
       FILE
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when a single blank line is present' do
@@ -103,7 +103,7 @@ describe ERBLint::Linters::ExtraNewline do
 
         line 3
       FILE
-      it { expect(subject).to eq file }
+      it { expect(subject).to(eq(file)) }
     end
 
     context 'when two blank lines follow each other' do
@@ -114,7 +114,7 @@ describe ERBLint::Linters::ExtraNewline do
         line 3
       FILE
       it do
-        expect(subject).to eq <<~FILE
+        expect(subject).to(eq(<<~FILE))
           line 1
 
           line 3
@@ -132,7 +132,7 @@ describe ERBLint::Linters::ExtraNewline do
         line 3
       FILE
       it do
-        expect(subject).to eq <<~FILE
+        expect(subject).to(eq(<<~FILE))
           line 1
 
           line 3
