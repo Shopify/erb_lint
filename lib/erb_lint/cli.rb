@@ -98,7 +98,7 @@ module ERBLint
     end
 
     def run_with_corrections(filename)
-      file_content = File.read(filename)
+      file_content = File.read(filename, encoding: Encoding::UTF_8)
 
       runner = ERBLint::Runner.new(file_loader, @config)
 
