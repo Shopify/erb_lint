@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.bindir = 'exe'
   s.executables = s.files.grep(%r{^exe/}) { |file| File.basename(file) }
 
-  s.required_ruby_version = '>= 2.3.0'
+  s.required_ruby_version = '>= 2.4.0'
 
   s.add_dependency('better_html', '~> 1.0.7')
   s.add_dependency('html_tokenizer')
