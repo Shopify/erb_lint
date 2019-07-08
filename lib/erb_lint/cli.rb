@@ -269,7 +269,7 @@ module ERBLint
           @options[:enabled_linters] = linters
         end
 
-        opts.on("--autocorrect", "Correct offenses that can be corrected automatically (default: false)") do |config|
+        opts.on("-a", "--autocorrect", "Correct offenses automatically if possible (default: false)") do |config|
           @options[:autocorrect] = config
         end
 
