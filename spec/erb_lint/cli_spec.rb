@@ -149,6 +149,21 @@ describe ERBLint::CLI do
             expect(subject).to(be(true))
           end
         end
+
+        context 'with excluded relative file in config file' do
+          let(:config_file) { '.exclude.yml' }
+          let(:config_file_content) { "exclude:\n  - app/views/template.html.erb" }
+          let(:args) { ['--config', config_file, '--enable-linter', 'linter_with_errors,final_newline', linted_file] }
+
+          before do
+            FileUtils.mkdir_p(File.dirname(config_file))
+            File.write(config_file, config_file_content)
+          end
+
+          it 'is successful' do
+            expect(subject).to(be(true))
+          end
+        end
       end
     end
 

@@ -178,7 +178,8 @@ module ERBLint
 
     def excluded?(filename)
       @config.global_exclude.any? do |path|
-        File.fnmatch?(path, filename)
+        expanded_path = File.expand_path(path, Dir.pwd)
+        File.fnmatch?(expanded_path, filename)
       end
     end
 
