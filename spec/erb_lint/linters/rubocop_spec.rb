@@ -244,8 +244,8 @@ describe ERBLint::Linters::Rubocop do
         expect(subject[0].source_range.source).to(eq("checked: true"))
         expect(subject[0].line_range).to(eq(2..2))
         expect(subject[0].message).to(\
-          eq("Layout/AlignParameters: Use one level of indentation for "\
-             "parameters following the first line of a multi-line method call.")
+          eq("Layout/AlignArguments: Use one level of indentation for "\
+             "arguments following the first line of a multi-line method call.")
         )
       end
     end
