@@ -207,12 +207,12 @@ describe ERBLint::Linters::Rubocop do
   context 'code is aligned to the column matching start of ruby code' do
     let(:linter_config) do
       described_class.config_schema.new(
-        only: ['Layout/AlignParameters'],
+        only: ['Layout/AlignArguments'],
         rubocop_config: {
           AllCops: {
             TargetRubyVersion: '2.4',
           },
-          'Layout/AlignParameters': {
+          'Layout/AlignArguments': {
             Enabled: true,
             EnforcedStyle: 'with_fixed_indentation',
             SupportedStyles: %w(with_first_parameter with_fixed_indentation),
