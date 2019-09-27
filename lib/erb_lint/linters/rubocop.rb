@@ -108,10 +108,8 @@ module ERBLint
         if @only_cops.present?
           selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
           RuboCop::Cop::Registry.new(selected_cops)
-        elsif @rubocop_config['Rails']['Enabled']
-          RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
         else
-          RuboCop::Cop::Cop.non_rails
+          RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
         end
       end
 
