@@ -155,7 +155,7 @@ describe ERBLint::RunnerConfig do
       end
     end
 
-    context "inheritance" do
+    skip "inheritance" do
       let(:tmp_root) { 'tmp' }
       let(:gem_root) { "#{tmp_root}/gems" }
 

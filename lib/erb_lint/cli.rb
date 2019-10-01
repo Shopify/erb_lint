@@ -17,10 +17,11 @@ module ERBLint
     class ExitWithSuccess < RuntimeError; end
 
     class Stats
-      attr_accessor :found, :corrected
+      attr_accessor :found, :corrected, :exceptions
       def initialize
         @found = 0
         @corrected = 0
+        @exceptions = 0
       end
     end
 
@@ -57,7 +58,10 @@ module ERBLint
         begin
           run_with_corrections(filename)
         rescue => e
+          @stats.exceptions += 1
           puts "Exception occured when processing: #{relative_filename(filename)}"
+          puts "If this file cannot be processed by erb-lint, "\
+            "you can exclude it in your configuration file."
           puts e.message
           puts Rainbow(e.backtrace.join("\n")).red
           puts
@@ -79,7 +83,7 @@ module ERBLint
         puts Rainbow("No errors were found in ERB files").green
       end
 
-      @stats.found == 0
+      @stats.found == 0 && @stats.exceptions == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
       warn(Rainbow(e.message).red)
       false
@@ -98,7 +102,7 @@ module ERBLint
     end
 
     def run_with_corrections(filename)
-      file_content = File.read(filename)
+      file_content = File.read(filename, encoding: Encoding::UTF_8)
 
       runner = ERBLint::Runner.new(file_loader, @config)
 
