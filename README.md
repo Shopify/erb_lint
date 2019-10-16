@@ -49,6 +49,22 @@ This gem provides a command-line interface which can be run like so:
 For example, `erblint --lint-all --enable-all-linters` will run all available
 linters on all ERB files in the current directory or its descendants (`**/*.html{+*,}.erb`).
 
+If you want to change the glob that is used, you can configure it by adding it to your config file as follows:
+
+```yaml
+---
+glob: **/*.{html,text,js}{+*,}.erb
+linters:
+  ErbSafety:
+    enabled: true
+    better_html_config: .better-html.yml
+  Rubocop:
+    enabled: true
+    rubocop_config:
+      inherit_from:
+        - .rubocop.yml
+```
+
 ## Available linters
 
 `erb-lint` comes with linters on-board:
