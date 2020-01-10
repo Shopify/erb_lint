@@ -48,17 +48,17 @@ describe ERBLint::CLI do
 
     context 'with no arguments' do
       it 'shows usage' do
-        expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout)
+        expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stderr)
       end
 
-      it 'shows all known linters' do
+      it 'shows all known linters in stderr' do
         expect { subject }.to(output(
           /Known linters are: linter_with_errors, linter_without_errors, final_newline/
-        ).to_stdout)
+        ).to_stderr)
       end
 
-      it 'is successful' do
-        expect(subject).to(be(true))
+      it 'fails' do
+        expect(subject).to(be(false))
       end
     end
 
@@ -129,7 +129,7 @@ describe ERBLint::CLI do
             EOF
           end
 
-          it 'prints that errors were found to stdout' do
+          it 'prints that errors were found to stderr' do
             expect { subject }.to(output(/2 error\(s\) were found in ERB files/).to_stderr)
           end
 
@@ -141,7 +141,7 @@ describe ERBLint::CLI do
         context 'when no errors are found' do
           let(:args) { ['--enable-linter', 'linter_without_errors', linted_file] }
 
-          it 'shows no that errors were found to stderr' do
+          it 'shows that no errors were found to stdout' do
             expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
           end
 
@@ -171,7 +171,13 @@ describe ERBLint::CLI do
             FileUtils.mkdir_p(linted_dir)
           end
 
-          it { expect { subject }.to(output(/no files found/).to_stdout) }
+          it 'fails' do
+            expect(subject).to(be(false))
+          end
+
+          it 'shows no files were found to stderr' do
+            expect { subject }.to(output(/no files found/).to_stderr)
+          end
         end
 
         context 'with descendant files that match default glob' do
@@ -217,7 +223,7 @@ describe ERBLint::CLI do
           context 'when no errors are found' do
             let(:args) { ['--enable-linter', 'linter_without_errors', linted_dir] }
 
-            it 'shows no that errors were found to stderr' do
+            it 'shows that no errors were found to stdout' do
               expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
             end
 
