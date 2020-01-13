@@ -167,17 +167,18 @@ module ERBLint
     end
 
     def lint_files
-      if @options[:lint_all]
-        pattern = File.expand_path(DEFAULT_LINT_ALL_GLOB, Dir.pwd)
-        Dir[pattern].select { |filename| !excluded?(filename) }
-      else
-        @files
-          .map { |f| Dir.exist?(f) ? Dir[File.join(f, DEFAULT_LINT_ALL_GLOB)] : f }
-          .map { |f| f.include?('*') ? Dir[f] : f }
-          .flatten
-          .map { |f| File.expand_path(f, Dir.pwd) }
-          .select { |filename| !excluded?(filename) }
-      end
+      @lint_files ||=
+        if @options[:lint_all]
+          pattern = File.expand_path(DEFAULT_LINT_ALL_GLOB, Dir.pwd)
+          Dir[pattern].select { |filename| !excluded?(filename) }
+        else
+          @files
+            .map { |f| Dir.exist?(f) ? Dir[File.join(f, DEFAULT_LINT_ALL_GLOB)] : f }
+            .map { |f| f.include?('*') ? Dir[f] : f }
+            .flatten
+            .map { |f| File.expand_path(f, Dir.pwd) }
+            .select { |filename| !excluded?(filename) }
+        end
     end
 
     def excluded?(filename)
