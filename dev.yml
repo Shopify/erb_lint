@@ -1,9 +1,6 @@
 name: erb-lint
 
 up:
-  - homebrew:
-    - openssl
-    # - another_package
   - ruby: 2.5.3
   - bundler
 
