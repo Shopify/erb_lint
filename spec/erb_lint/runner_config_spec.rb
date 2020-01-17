@@ -4,14 +4,63 @@ require 'spec_helper'
 
 describe ERBLint::RunnerConfig do
   describe '.default' do
-    subject(:runner_config) { described_class.default }
-
     it 'returns expected class' do
-      expect(subject.class).to(be(described_class))
+      expect(described_class.default.class).to(be(described_class))
     end
 
-    it 'has FinalNewline enabled' do
-      expect(subject.for_linter('FinalNewline').enabled?).to(be(true))
+    it 'has default linters enabled' do
+      expect(described_class.default.for_linter('FinalNewline').enabled?).to(be(true))
+    end
+
+    it 'disables default linters if asked to do so' do
+      expect(
+        described_class
+          .default(default_enabled: false)
+          .for_linter('FinalNewline').enabled?
+      ).to(be(false))
+    end
+  end
+
+  describe '.default_for' do
+    let(:enabled_default_linters) do
+      described_class.default(default_enabled: true)
+    end
+
+    let(:disabled_default_linters) do
+      described_class.default(default_enabled: false)
+    end
+
+    context 'without EnableDefaultLinters option' do
+      let(:config_hash) do
+        { foo: true }.deep_stringify_keys
+      end
+
+      subject { described_class.default_for(config_hash) }
+      it 'enables the default linters' do
+        expect(subject.to_hash["linters"].to_json).to(eq(enabled_default_linters.to_hash["linters"].to_json))
+      end
+    end
+
+    context 'with EnableDefaultLinters option set to true' do
+      let(:config_hash) do
+        { "EnableDefaultLinters" => true }
+      end
+
+      subject { described_class.default_for(config_hash) }
+      it 'enables the default linters' do
+        expect(subject.to_hash["linters"].to_json).to(eq(enabled_default_linters.to_hash["linters"].to_json))
+      end
+    end
+
+    context 'with EnableDefaultLinters set to false' do
+      let(:config_hash) do
+        { "EnableDefaultLinters" => false }
+      end
+
+      subject { described_class.default_for(config_hash) }
+      it 'disables the default linters' do
+        expect(subject.to_hash["linters"].to_json).to(eq(disabled_default_linters.to_hash["linters"].to_json))
+      end
     end
   end
 

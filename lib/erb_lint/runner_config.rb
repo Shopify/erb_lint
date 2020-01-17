@@ -45,23 +45,29 @@ module ERBLint
     end
 
     class << self
-      def default
+      def default(default_enabled: nil)
+        default_enabled = default_enabled.nil? ? true : default_enabled
         new(
           linters: {
-            AllowedScriptType: { enabled: true },
-            ClosingErbTagIndent: { enabled: true },
-            ExtraNewline: { enabled: true },
-            FinalNewline: { enabled: true },
-            NoJavascriptTagHelper: { enabled: true },
-            ParserErrors: { enabled: true },
-            RightTrim: { enabled: true },
-            SelfClosingTag: { enabled: true },
-            SpaceAroundErbTag: { enabled: true },
-            SpaceIndentation: { enabled: true },
-            SpaceInHtmlTag: { enabled: true },
-            TrailingWhitespace: { enabled: true },
+            AllowedScriptType: { enabled: default_enabled },
+            ClosingErbTagIndent: { enabled: default_enabled },
+            ExtraNewline: { enabled: default_enabled },
+            FinalNewline: { enabled: default_enabled },
+            NoJavascriptTagHelper: { enabled: default_enabled },
+            ParserErrors: { enabled: default_enabled },
+            RightTrim: { enabled: default_enabled },
+            SelfClosingTag: { enabled: default_enabled },
+            SpaceAroundErbTag: { enabled: default_enabled },
+            SpaceIndentation: { enabled: default_enabled },
+            SpaceInHtmlTag: { enabled: default_enabled },
+            TrailingWhitespace: { enabled: default_enabled },
           },
         )
+      end
+
+      def default_for(config)
+        default_linters_enabled = config.to_hash.dig("EnableDefaultLinters")
+        default(default_enabled: default_linters_enabled).merge(config)
       end
     end
 
