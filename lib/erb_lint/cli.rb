@@ -39,9 +39,9 @@ module ERBLint
       load_config
 
       if !@files.empty? && lint_files.empty?
-        success!("no files found...\n")
+        failure!("no files found...\n")
       elsif lint_files.empty?
-        success!("no files given...\n#{option_parser}")
+        failure!("no files found or given, specify files or config...\n#{option_parser}")
       end
 
       ensure_files_exist(lint_files)
