@@ -26,6 +26,7 @@ Create a `.erb-lint.yml` file in your project, with the following structure:
 
 ```yaml
 ---
+EnableDefaultLinters: true
 linters:
   ErbSafety:
     enabled: true
@@ -49,13 +50,29 @@ This gem provides a command-line interface which can be run like so:
 For example, `erblint --lint-all --enable-all-linters` will run all available
 linters on all ERB files in the current directory or its descendants (`**/*.html{+*,}.erb`).
 
-## Available linters
+## Enable or disable default linters
+`EnableDefaultLinters`: enables or disables default linters. [Default linters](#Linters) are enabled by default.
 
-`erb-lint` comes with linters on-board:
-* `DeprecatedClasses`: warn about deprecated css classes.
-* `FinalNewline`: warn about missing newline at the end of a ERB template.
-* `ErbSafety`: detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. See [better-html's readme](https://github.com/Shopify/better-html#testing-for-valid-html-and-erb) for more information.
-* `Rubocop`: runs RuboCop rules on ruby statements found in ERB templates.
+## Linters
+
+| Available Linters                                | Default  | Description |
+| ------------------------------------------------ |:--------:|-------------|
+| [AllowedScriptType](#AllowedScriptType)          | Yes      | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values |
+| ClosingErbTagIndent                              | Yes      |             |
+| ExtraNewline                                     | Yes      |             |
+| [FinalNewline](#FinalNewline)                    | Yes      | warns about missing newline at the end of a ERB template |
+| [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
+| ParserErrors                                     | Yes      |             |
+| [RightTrim](#RightTrim)                          | Yes      | enforces trimming at the right of an ERB tag |
+| [SelfClosingTag](#SelfClosingTag)                | Yes      | enforces self closing tag styles for void elements |
+| [SpaceAroundErbTag](#SpaceAroundErbTag)          | Yes      | enforces a single space after `<%` and before `%>`|
+| SpaceIndentation                                 | Yes      |             |
+| SpaceInHtmlTag                                   | Yes      |             |
+| TrailingWhitespace                               | Yes      |             |
+| [DeprecatedClasses](#DeprecatedClasses)          | No       | warns about deprecated css classes |
+| [ErbSafety](#ErbSafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
+| [Rubocop](#Rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
+
 
 ### DeprecatedClasses
 
@@ -117,6 +134,8 @@ Runs the checks provided by
 [better-html's erb safety test helper](https://github.com/Shopify/better-html#testing-for-valid-html-and-erb).
 
 When using ERB interpolations in javascript contexts, this linter enforces the usage of safe helpers such as `.to_json`.
+See [better-html's readme](https://github.com/Shopify/better-html#testing-for-valid-html-and-erb) for more information.
+
 Any ERB statement that does not call a safe helper is deemed unsafe and a violation is shown.
 
 For example:
