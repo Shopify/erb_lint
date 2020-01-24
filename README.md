@@ -26,6 +26,7 @@ Create a `.erb-lint.yml` file in your project, with the following structure:
 
 ```yaml
 ---
+custom_linters_directory: '.custom-erb-linters'
 linters:
   ErbSafety:
     enabled: true
