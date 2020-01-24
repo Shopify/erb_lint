@@ -149,7 +149,7 @@ module ERBLint
     def load_config
       if File.exist?(config_filename)
         config = RunnerConfig.new(file_loader.yaml(config_filename), file_loader)
-        @config = RunnerConfig.default.merge(config)
+        @config = RunnerConfig.default_for(config)
       else
         warn(Rainbow("#{config_filename} not found: using default config").yellow)
         @config = RunnerConfig.default
