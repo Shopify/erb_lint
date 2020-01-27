@@ -33,8 +33,9 @@ module ERBLint
     end
 
     def run(args = ARGV)
-      load_options(args)
-      @files = args.dup
+      dupped_args = args.dup
+      load_options(dupped_args)
+      @files = dupped_args
 
       load_config
 
