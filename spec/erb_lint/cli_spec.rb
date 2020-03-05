@@ -152,6 +152,33 @@ describe ERBLint::CLI do
       end
     end
 
+    context 'with --lint-all as argument' do
+      let(:args) { ['--lint-all', '--enable-linter', 'linter_with_errors,final_newline'] }
+      context 'when a file exists' do
+        let(:linted_file) { 'app/views/template.html.erb' }
+        let(:file_content) { "this is a fine file" }
+
+        before do
+          FileUtils.mkdir_p(File.dirname(linted_file))
+          File.write(linted_file, file_content)
+        end
+
+        context "with the default glob" do
+          it 'shows how many files and linters are used' do
+            allow(cli).to(receive(:glob).and_return(cli.class::DEFAULT_LINT_ALL_GLOB))
+            expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
+          end
+        end
+
+        context "with a custom glob that does not match any files" do
+          it 'shows no files or linters' do
+            allow(cli).to(receive(:glob).and_return("no/file/glob"))
+            expect { subject }.to(output(/no files found/).to_stderr)
+          end
+        end
+      end
+    end
+
     context 'with dir as argument' do
       context 'when dir does not exist' do
         let(:linted_dir) { '/path/to' }

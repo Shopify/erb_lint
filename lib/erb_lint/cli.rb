@@ -33,11 +33,12 @@ module ERBLint
     end
 
     def run(args = ARGV)
+      load_config
       dupped_args = args.dup
       load_options(dupped_args)
       @files = dupped_args
 
-      load_config
+      merge_config
 
       if !@files.empty? && lint_files.empty?
         failure!("no files found...\n")
@@ -155,9 +156,12 @@ module ERBLint
         warn(Rainbow("#{config_filename} not found: using default config").yellow)
         @config = RunnerConfig.default
       end
-      @config.merge!(runner_config_override)
     rescue Psych::SyntaxError => e
       failure!("error parsing config: #{e.message}")
+    end
+
+    def merge_config
+      @config.merge!(runner_config_override)
     end
 
     def file_loader
@@ -171,16 +175,20 @@ module ERBLint
     def lint_files
       @lint_files ||=
         if @options[:lint_all]
-          pattern = File.expand_path(DEFAULT_LINT_ALL_GLOB, Dir.pwd)
+          pattern = File.expand_path(glob, Dir.pwd)
           Dir[pattern].select { |filename| !excluded?(filename) }
         else
           @files
-            .map { |f| Dir.exist?(f) ? Dir[File.join(f, DEFAULT_LINT_ALL_GLOB)] : f }
+            .map { |f| Dir.exist?(f) ? Dir[File.join(f, glob)] : f }
             .map { |f| f.include?('*') ? Dir[f] : f }
             .flatten
             .map { |f| File.expand_path(f, Dir.pwd) }
             .select { |filename| !excluded?(filename) }
         end
+    end
+
+    def glob
+      @config.to_hash["glob"] || DEFAULT_LINT_ALL_GLOB
     end
 
     def excluded?(filename)
@@ -253,7 +261,7 @@ module ERBLint
           end
         end
 
-        opts.on("--lint-all", "Lint all files matching #{DEFAULT_LINT_ALL_GLOB}") do |config|
+        opts.on("--lint-all", "Lint all files matching #{glob}") do |config|
           @options[:lint_all] = config
         end
 
