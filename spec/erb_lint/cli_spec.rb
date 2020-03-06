@@ -87,6 +87,17 @@ describe ERBLint::CLI do
           expect(subject).to(be(false))
         end
       end
+
+      context 'when file does exist' do
+        before { FakeFS::FileSystem.clone(File.join(__dir__, '../fixtures'), '/') }
+
+        let(:args) { ['--config', 'config.yml', '--lint-all'] }
+
+        it { expect { subject }.to_not(output("config.yml: does not exist").to_stderr) }
+        it 'is successful' do
+          expect(subject).to(be(true))
+        end
+      end
     end
 
     context 'with file as argument' do
