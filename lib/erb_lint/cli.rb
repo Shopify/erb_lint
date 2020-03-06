@@ -33,12 +33,11 @@ module ERBLint
     end
 
     def run(args = ARGV)
-      load_config
       dupped_args = args.dup
       load_options(dupped_args)
       @files = dupped_args
 
-      merge_config
+      load_config
 
       if !@files.empty? && lint_files.empty?
         failure!("no files found...\n")
@@ -158,9 +157,7 @@ module ERBLint
       end
     rescue Psych::SyntaxError => e
       failure!("error parsing config: #{e.message}")
-    end
-
-    def merge_config
+    ensure
       @config.merge!(runner_config_override)
     end
 
@@ -261,7 +258,7 @@ module ERBLint
           end
         end
 
-        opts.on("--lint-all", "Lint all files matching #{glob}") do |config|
+        opts.on("--lint-all", "Lint all files matching configured glob [default: #{DEFAULT_LINT_ALL_GLOB}]") do |config|
           @options[:lint_all] = config
         end
 
