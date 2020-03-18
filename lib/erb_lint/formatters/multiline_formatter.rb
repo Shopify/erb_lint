@@ -2,7 +2,7 @@
 
 module ERBLint
   module Formatters
-    class DefaultFormatter < Formatter
+    class MultilineFormatter < Formatter
       private
 
       def format_offense(offense)

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ERBLint::Formatters::DefaultFormatter do
+describe ERBLint::Formatters::MultilineFormatter do
   describe '.format' do
     subject { described_class.new(offenses, filename, autocorrect).format }
 
