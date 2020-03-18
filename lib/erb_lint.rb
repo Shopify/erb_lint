@@ -10,8 +10,14 @@ require 'erb_lint/processed_source'
 require 'erb_lint/runner_config'
 require 'erb_lint/runner'
 require 'erb_lint/version'
+require 'erb_lint/formatter'
 
 # Load linters
 Dir[File.expand_path('erb_lint/linters/**/*.rb', File.dirname(__FILE__))].each do |file|
+  require file
+end
+
+# Load formatters
+Dir[File.expand_path('erb_lint/formatters/**/*.rb', File.dirname(__FILE__))].each do |file|
   require file
 end
