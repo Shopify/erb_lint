@@ -6,7 +6,7 @@ module ERBLint
       @descendants ||= []
       @descendants << klass
     end
-  
+
     def self.descendants
       @descendants || []
     end
