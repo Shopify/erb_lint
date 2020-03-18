@@ -31,5 +31,13 @@ module ERBLint
     def line_range
       Range.new(source_range.line, source_range.last_line)
     end
+
+    def line_number
+      line_range.begin
+    end
+
+    def column
+      source_range.column
+    end
   end
 end
