@@ -2,6 +2,15 @@
 
 module ERBLint
   class Formatter
+    def self.inherited(klass)
+      @descendants ||= []
+      @descendants << klass
+    end
+  
+    def self.descendants
+      @descendants || []
+    end
+
     def initialize(filename, autocorrect)
       @filename = filename
       @autocorrect = autocorrect

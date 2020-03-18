@@ -305,10 +305,10 @@ module ERBLint
     end
 
     def available_formatters
-      Formatters
-        .constants
-        .select { |constant| Formatters.const_get(constant).is_a?(Class) }
+      Formatter
+        .descendants
         .map(&:to_s)
+        .map(&:demodulize)
         .map(&:underscore)
         .map { |klass_name| klass_name.sub("_formatter", "") }
         .sort
