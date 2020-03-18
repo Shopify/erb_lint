@@ -130,10 +130,10 @@ module ERBLint
       offenses = runner.offenses
       @stats.found += offenses.size
 
-      formatter = @formatter_klass.new(offenses, filename, autocorrect?)
+      formatter = @formatter_klass.new(filename, autocorrect?)
       formatter
-        .format
-        .each { |formatted_offense| puts formatted_offense }
+        .format(offenses)
+        .each { |offense| puts offense }
     end
 
     def correct(processed_source, offenses)

@@ -2,18 +2,17 @@
 
 module ERBLint
   class Formatter
-    def initialize(offenses, filename, autocorrect)
-      @offenses = offenses
+    def initialize(filename, autocorrect)
       @filename = filename
       @autocorrect = autocorrect
     end
 
-    def format
+    def format(offenses)
       offenses.map { |offense| format_offense(offense) }
     end
 
     private
 
-    attr_reader :offenses, :filename, :autocorrect
+    attr_reader :filename, :autocorrect
   end
 end

@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ERBLint::Formatters::CompactFormatter do
   describe '.format' do
-    subject { described_class.new(offenses, filename, false).format }
+    subject { described_class.new(filename, false).format(offenses) }
 
     let(:filename) { 'app/views/users/show.html.erb' }
     let(:offenses) do

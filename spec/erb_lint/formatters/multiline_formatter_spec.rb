@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ERBLint::Formatters::MultilineFormatter do
   describe '.format' do
-    subject { described_class.new(offenses, filename, autocorrect).format }
+    subject { described_class.new(filename, autocorrect).format(offenses) }
 
     let(:filename) { 'app/views/subscriptions/_loader.html.erb' }
     let(:offenses) do
