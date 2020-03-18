@@ -30,6 +30,7 @@ module ERBLint
       @config = nil
       @files = []
       @stats = Stats.new
+      @formatter_klass = Formatters::MultilineFormatter
     end
 
     def run(args = ARGV)
@@ -126,15 +127,13 @@ module ERBLint
         file_content = corrector.corrected_content
         runner.clear_offenses
       end
+      offenses = runner.offenses
+      @stats.found += offenses.size
 
-      @stats.found += runner.offenses.size
-      runner.offenses.each do |offense|
-        puts <<~EOF
-          #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect?}
-          In file: #{relative_filename(filename)}:#{offense.line_range.begin}
-
-        EOF
-      end
+      formatter = @formatter_klass.new(offenses, filename, autocorrect?)
+      formatter
+        .format
+        .each { |formatted_offense| puts formatted_offense }
     end
 
     def correct(processed_source, offenses)
@@ -258,6 +257,11 @@ module ERBLint
           end
         end
 
+        opts.on("--format FORMAT", format_options_help) do |format|
+          @formatter_klass = "#{ERBLint::Formatters}::#{format.camelize}Formatter".safe_constantize
+          failure!(invalid_format_error_message(format)) if @formatter_klass.nil?
+        end
+
         opts.on("--lint-all", "Lint all files matching configured glob [default: #{DEFAULT_LINT_ALL_GLOB}]") do |config|
           @options[:lint_all] = config
         end
@@ -288,6 +292,26 @@ module ERBLint
           success!(ERBLint::VERSION)
         end
       end
+    end
+
+    def format_options_help
+      "Report offenses in the given format: "\
+      "(#{available_formatters.join(', ')}) (default: multiline)"
+    end
+
+    def invalid_format_error_message(given_format)
+      formats = available_formatters.map { |format| "  - #{format}\n" }
+      "#{given_format}: is not a valid format. Available formats:\n#{formats.join}"
+    end
+
+    def available_formatters
+      Formatters
+        .constants
+        .select { |constant| Formatters.const_get(constant).is_a?(Class) }
+        .map(&:to_s)
+        .map(&:underscore)
+        .map { |klass_name| klass_name.sub("_formatter", "") }
+        .sort
     end
   end
 end
