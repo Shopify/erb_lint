@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module ERBLint
-  module Formatters
-    class MultilineFormatter < CompactFormatter
+  module Reporters
+    class MultilineReporter < CompactReporter
       private
 
       def format_offense(filename, offense)

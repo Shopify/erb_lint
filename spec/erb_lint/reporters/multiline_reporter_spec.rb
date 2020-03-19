@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe ERBLint::Formatters::MultilineFormatter do
-  describe '.format' do
-    subject { described_class.new(stats, autocorrect).format }
+describe ERBLint::Reporters::MultilineReporter do
+  describe '.show' do
+    subject { described_class.new(stats, autocorrect).show }
 
     let(:stats) do
       ERBLint::Stats.new(
@@ -31,7 +31,7 @@ describe ERBLint::Formatters::MultilineFormatter do
     context 'when autocorrect is false' do
       let(:autocorrect) { false }
 
-      it "generates formatted offenses without no corrected warning" do
+      it 'displays formatted offenses output' do
         expect { subject }.to(output(<<~MESSAGE).to_stdout)
           Extra space detected where there should be no space.
           In file: app/views/subscriptions/_loader.html.erb:1
@@ -46,7 +46,7 @@ describe ERBLint::Formatters::MultilineFormatter do
     context 'when autocorrect is true' do
       let(:autocorrect) { true }
 
-      it 'generates formatted offenses with not autocorrected warning' do
+      it 'displays not autocorrected warning' do
         expect { subject }.to(output(/(not autocorrected)/).to_stdout)
       end
     end

@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe ERBLint::Formatters::CompactFormatter do
-  describe '.format' do
-    subject { described_class.new(stats, false).format }
+describe ERBLint::Reporters::CompactReporter do
+  describe '.show' do
+    subject { described_class.new(stats, false).show }
 
     let(:stats) do
       ERBLint::Stats.new(
@@ -42,7 +42,7 @@ describe ERBLint::Formatters::CompactFormatter do
       ]
     end
 
-    it "generates formatted offenses" do
+    it "displays formatted offenses output" do
       expect { subject }.to(output(<<~MESSAGE).to_stdout)
         app/views/users/show.html.erb:61:10: Extra space detected where there should be no space.
         app/views/users/show.html.erb:125:1: Remove multiple trailing newline at the end of the file.

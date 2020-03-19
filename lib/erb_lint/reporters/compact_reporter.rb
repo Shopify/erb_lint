@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module ERBLint
-  module Formatters
-    class CompactFormatter < Formatter
-      def format
+  module Reporters
+    class CompactReporter < Reporter
+      def show
         files.each do |filename, offenses|
           offenses.each do |offense|
             puts format_offense(filename, offense)

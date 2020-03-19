@@ -21,7 +21,6 @@ module ERBLint
       @config = nil
       @files = []
       @stats = Stats.new
-      @formatter_klass = Formatters::MultilineFormatter
     end
 
     def run(args = ARGV)
@@ -64,7 +63,9 @@ module ERBLint
         end
       end
 
-      @formatter_klass.new(@stats, autocorrect?).format
+      @options[:format] ||= :multiline
+      reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
+      reporter.show
 
       @stats.found == 0 && @stats.exceptions == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
@@ -235,8 +236,12 @@ module ERBLint
         end
 
         opts.on("--format FORMAT", format_options_help) do |format|
-          @formatter_klass = "#{ERBLint::Formatters}::#{format.camelize}Formatter".safe_constantize
-          failure!(invalid_format_error_message(format)) if @formatter_klass.nil?
+          unless Reporter.available_format?(format)
+            error_message = invalid_format_error_message(format)
+            failure!(error_message)
+          end
+
+          @options[:format] = format
         end
 
         opts.on("--lint-all", "Lint all files matching configured glob [default: #{DEFAULT_LINT_ALL_GLOB}]") do |config|
@@ -273,22 +278,12 @@ module ERBLint
 
     def format_options_help
       "Report offenses in the given format: "\
-      "(#{available_formatters.join(', ')}) (default: multiline)"
+      "(#{Reporter.available_formats.join(', ')}) (default: multiline)"
     end
 
     def invalid_format_error_message(given_format)
-      formats = available_formatters.map { |format| "  - #{format}\n" }
+      formats = Reporter.available_formats.map { |format| "  - #{format}\n" }
       "#{given_format}: is not a valid format. Available formats:\n#{formats.join}"
-    end
-
-    def available_formatters
-      Formatter
-        .descendants
-        .map(&:to_s)
-        .map(&:demodulize)
-        .map(&:underscore)
-        .map { |klass_name| klass_name.sub("_formatter", "") }
-        .sort
     end
   end
 end
