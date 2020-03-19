@@ -16,16 +16,6 @@ module ERBLint
     class ExitWithFailure < RuntimeError; end
     class ExitWithSuccess < RuntimeError; end
 
-    class Stats
-      attr_accessor :found, :corrected, :exceptions, :files
-      def initialize
-        @found = 0
-        @corrected = 0
-        @exceptions = 0
-        @files = {}
-      end
-    end
-
     def initialize
       @options = {}
       @config = nil

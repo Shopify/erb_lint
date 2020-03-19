@@ -4,9 +4,17 @@ require 'spec_helper'
 
 describe ERBLint::Formatters::MultilineFormatter do
   describe '.format' do
-    subject { described_class.new(filename, autocorrect).format(offenses) }
+    subject { described_class.new(stats, autocorrect).format }
 
-    let(:filename) { 'app/views/subscriptions/_loader.html.erb' }
+    let(:stats) do
+      ERBLint::Stats.new(
+        found: 2,
+        files: {
+          'app/views/subscriptions/_loader.html.erb' => offenses,
+        }
+      )
+    end
+
     let(:offenses) do
       [
         instance_double(ERBLint::Offense,
@@ -24,21 +32,14 @@ describe ERBLint::Formatters::MultilineFormatter do
       let(:autocorrect) { false }
 
       it "generates formatted offenses without no corrected warning" do
-        result = subject
-
-        expect(result.size).to(eq(2))
-
-        expect(result[0]).to(eq(<<~OUT))
+        expect { subject }.to(output(<<~MESSAGE).to_stdout)
           Extra space detected where there should be no space.
           In file: app/views/subscriptions/_loader.html.erb:1
 
-        OUT
-
-        expect(result[1]).to(eq(<<~OUT))
           Remove newline before `%>` to match start of tag.
           In file: app/views/subscriptions/_loader.html.erb:52
 
-        OUT
+        MESSAGE
       end
     end
 
@@ -46,21 +47,14 @@ describe ERBLint::Formatters::MultilineFormatter do
       let(:autocorrect) { true }
 
       it 'generates formatted offenses with no corrected warning' do
-        result = subject
-
-        expect(result.size).to(eq(2))
-
-        expect(result[0]).to(eq(<<~OUT))
+        expect { subject }.to(output(<<~MESSAGE).to_stdout)
           Extra space detected where there should be no space.\e[31m (not autocorrected)\e[0m
           In file: app/views/subscriptions/_loader.html.erb:1
 
-        OUT
-
-        expect(result[1]).to(eq(<<~OUT))
           Remove newline before `%>` to match start of tag.\e[31m (not autocorrected)\e[0m
           In file: app/views/subscriptions/_loader.html.erb:52
-
-        OUT
+  
+        MESSAGE
       end
     end
   end
