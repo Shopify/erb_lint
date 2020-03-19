@@ -46,15 +46,8 @@ describe ERBLint::Formatters::MultilineFormatter do
     context 'when autocorrect is true' do
       let(:autocorrect) { true }
 
-      it 'generates formatted offenses with no corrected warning' do
-        expect { subject }.to(output(<<~MESSAGE).to_stdout)
-          Extra space detected where there should be no space.\e[31m (not autocorrected)\e[0m
-          In file: app/views/subscriptions/_loader.html.erb:1
-
-          Remove newline before `%>` to match start of tag.\e[31m (not autocorrected)\e[0m
-          In file: app/views/subscriptions/_loader.html.erb:52
-  
-        MESSAGE
+      it 'generates formatted offenses with not autocorrected warning' do
+        expect { subject }.to(output(/(not autocorrected)/).to_stdout)
       end
     end
   end

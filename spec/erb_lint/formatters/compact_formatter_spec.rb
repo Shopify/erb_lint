@@ -11,7 +11,7 @@ describe ERBLint::Formatters::CompactFormatter do
         found: 4,
         files: {
           'app/views/users/show.html.erb' => show_file_offenses,
-          'app/views/shared/_notifications.html.erb' => notification_file_offenses
+          'app/views/shared/_notifications.html.erb' => notification_file_offenses,
         }
       )
     end
