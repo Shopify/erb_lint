@@ -1,27 +1,19 @@
 # frozen_string_literal: true
+require 'active_support/core_ext/class'
 
 module ERBLint
   class Formatter
-    def self.inherited(klass)
-      @descendants ||= []
-      @descendants << klass
-    end
+    delegate :files, to: :stats
 
-    def self.descendants
-      @descendants || []
-    end
-
-    def initialize(filename, autocorrect)
-      @filename = filename
+    def initialize(stats, autocorrect)
       @autocorrect = autocorrect
+      @stats = stats
     end
 
-    def format(offenses)
-      offenses.map { |offense| format_offense(offense) }
-    end
+    def format; end
 
     private
 
-    attr_reader :filename, :autocorrect
+    attr_reader :stats, :autocorrect
   end
 end
