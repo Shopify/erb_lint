@@ -3,8 +3,6 @@ require 'active_support/core_ext/class'
 
 module ERBLint
   class Reporter
-    delegate :files, to: :stats
-
     def self.create_reporter(format, *args)
       reporter_klass = "#{ERBLint::Reporters}::#{format.to_s.camelize}Reporter".constantize
       reporter_klass.new(*args)
@@ -33,5 +31,6 @@ module ERBLint
     private
 
     attr_reader :stats, :autocorrect
+    delegate :files, to: :stats
   end
 end
