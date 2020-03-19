@@ -2,10 +2,10 @@
 
 module ERBLint
   module Formatters
-    class MultilineFormatter < Formatter
+    class MultilineFormatter < CompactFormatter
       private
 
-      def format_offense(offense)
+      def format_offense(filename, offense)
         <<~EOF
           #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect}
           In file: #{filename}:#{offense.line_number}

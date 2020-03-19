@@ -17,11 +17,12 @@ module ERBLint
     class ExitWithSuccess < RuntimeError; end
 
     class Stats
-      attr_accessor :found, :corrected, :exceptions
+      attr_accessor :found, :corrected, :exceptions, :files
       def initialize
         @found = 0
         @corrected = 0
         @exceptions = 0
+        @files = {}
       end
     end
 
@@ -73,20 +74,7 @@ module ERBLint
         end
       end
 
-      if @stats.corrected > 0
-        corrected_found_diff = @stats.found - @stats.corrected
-        if corrected_found_diff > 0
-          warn(Rainbow(
-            "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
-          ).red)
-        else
-          puts Rainbow("#{@stats.corrected} error(s) corrected in ERB files").green
-        end
-      elsif @stats.found > 0
-        warn(Rainbow("#{@stats.found} error(s) were found in ERB files").red)
-      else
-        puts Rainbow("No errors were found in ERB files").green
-      end
+      @formatter_klass.new(@stats, autocorrect?).format
 
       @stats.found == 0 && @stats.exceptions == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
@@ -127,13 +115,12 @@ module ERBLint
         file_content = corrector.corrected_content
         runner.clear_offenses
       end
-      offenses = runner.offenses
-      @stats.found += offenses.size
+      offenses_filename = relative_filename(filename)
+      offenses = runner.offenses || []
 
-      formatter = @formatter_klass.new(filename, autocorrect?)
-      formatter
-        .format(offenses)
-        .each { |offense| puts offense }
+      @stats.found += offenses.size
+      @stats.files[offenses_filename] ||= []
+      @stats.files[offenses_filename] |= offenses
     end
 
     def correct(processed_source, offenses)
