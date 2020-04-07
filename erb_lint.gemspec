@@ -20,6 +20,10 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.4.0'
 
+  s.metadata = {
+    "allowed_push_host" => "https://rubygems.org",
+  }
+
   s.add_dependency('better_html', '~> 1.0.7')
   s.add_dependency('html_tokenizer')
   s.add_dependency('rubocop', '~> 0.79')
