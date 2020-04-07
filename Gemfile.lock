@@ -6,7 +6,7 @@ PATH
       better_html (~> 1.0.7)
       html_tokenizer
       rainbow
-      rubocop (~> 0.79.0)
+      rubocop (~> 0.79)
       smart_properties
 
 GEM
@@ -42,12 +42,12 @@ GEM
     i18n (1.8.1)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.4)
-    loofah (2.4.0)
+    loofah (2.5.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mini_portile2 (2.4.0)
     minitest (5.13.0)
-    nokogiri (1.10.7)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     parallel (1.19.1)
     parser (2.7.0.2)
