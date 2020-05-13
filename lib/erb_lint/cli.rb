@@ -169,6 +169,13 @@ module ERBLint
       option_parser.parse!(args)
     end
 
+    def load_linters
+      @load_linters ||= begin
+        ERBLint::LinterRegistry.load_custom_linters
+        ERBLint::LinterRegistry.linters
+      end
+    end
+
     def lint_files
       @lint_files ||=
         if @options[:lint_all]
@@ -211,7 +218,7 @@ module ERBLint
     end
 
     def known_linter_names
-      @known_linter_names ||= ERBLint::LinterRegistry.linters
+      @known_linter_names ||= load_linters
         .map(&:simple_name)
         .map(&:underscore)
     end
@@ -224,7 +231,7 @@ module ERBLint
     end
 
     def enabled_linter_classes
-      @enabled_linter_classes ||= ERBLint::LinterRegistry.linters
+      @enabled_linter_classes ||= load_linters
         .select { |klass| linter_can_run?(klass) && enabled_linter_names.include?(klass.simple_name.underscore) }
     end
 
@@ -239,7 +246,7 @@ module ERBLint
     def runner_config_override
       RunnerConfig.new(
         linters: {}.tap do |linters|
-          ERBLint::LinterRegistry.linters.map do |klass|
+          load_linters.map do |klass|
             linters[klass.simple_name] = { 'enabled' => enabled_linter_classes.include?(klass) }
           end
         end
