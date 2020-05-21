@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'better_html/ast/node'
+require 'better_html'
 require 'better_html/test_helper/ruby_node'
 require 'erb_lint/utils/block_map'
 require 'erb_lint/utils/ruby_to_erb'
