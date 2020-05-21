@@ -181,7 +181,7 @@ describe ERBLint::Linters::Rubocop do
         rubocop_config: {
           inherit_from: inherit_from_filename,
           AllCops: {
-            TargetRubyVersion: '2.3',
+            TargetRubyVersion: '2.7',
           },
         },
       )
