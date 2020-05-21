@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'better_html'
 
 describe ERBLint::Linters::ErbSafety do
   let(:linter_config) { described_class.config_schema.new }
