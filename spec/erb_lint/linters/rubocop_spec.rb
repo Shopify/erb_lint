@@ -95,6 +95,31 @@ describe ERBLint::Linters::Rubocop do
 
       it { expect(subject).to(eq("<%= safe_method %>\n")) }
     end
+
+    context 'when autocorrecting from rubocop cops' do
+      let(:file) { <<~FILE }
+        <%= 'should_be_double_quoted' %>
+      FILE
+
+      let(:linter_config) do
+        described_class.config_schema.new(
+          only: ['Style/StringLiterals'],
+          rubocop_config: {
+            AllCops: {
+              TargetRubyVersion: '2.7',
+            },
+            'Style/StringLiterals': {
+              EnforcedStyle: 'double_quotes',
+              Enabled: true,
+            },
+          },
+        )
+      end
+
+      subject { corrected_content }
+
+      it { expect(subject).to(eq(%(<%= "should_be_double_quoted" %>\n))) }
+    end
   end
 
   context 'when multiple offenses are found in the same block' do
