@@ -51,7 +51,11 @@ describe ERBLint::CLI do
         expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stderr)
       end
 
-      it 'shows all known linters in stderr' do
+      it 'runs load_custom_linters when showing all known linters in stderr' do
+        expect(ERBLint::LinterRegistry).to(receive(:load_custom_linters))
+
+        # Custom linters won't be loaded because we stub the return value of
+        # ERBLint::LinterRegistry.linters (Line 21-44).
         expect { subject }.to(output(
           /Known linters are: linter_with_errors, linter_without_errors, final_newline/
         ).to_stderr)
