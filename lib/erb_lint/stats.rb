@@ -8,8 +8,12 @@ module ERBLint
                   :files,
                   :processed_files
 
-    def initialize(found: 0, corrected: 0, exceptions: 0,
-                   linters: 0, files: 0, processed_files: {})
+    def initialize(found: 0,
+                   corrected: 0,
+                   exceptions: 0,
+                   linters: 0,
+                   files: 0,
+                   processed_files: {})
       @found = found
       @corrected = corrected
       @exceptions = exceptions

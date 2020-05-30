@@ -45,7 +45,7 @@ module ERBLint
       @options[:format] ||= :multiline
       @stats.files = lint_files.size
       @stats.linters = enabled_linter_classes.size
-      
+
       reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
       reporter.preview
 
