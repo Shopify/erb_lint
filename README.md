@@ -488,6 +488,35 @@ def autocorrect(_processed_source, offense)
 end
 ```
 
+## Output formats
+
+You can change the output format of ERB Lint by specifying formatters with the `-f/--format` option.
+
+### Multiline (default)
+
+```sh
+$ erblint
+Linting 8 files with 12 linters...
+
+Remove multiple trailing newline at the end of the file.
+In file: app/views/users/show.html.erb:95
+
+Remove newline before `%>` to match start of tag.
+In file: app/views/subscriptions/index.html.erb:38
+
+2 error(s) were found in ERB files
+```
+
+### Compact
+
+```sh
+erblint --format compact
+Linting 8 files with 12 linters...
+app/views/users/show.html.erb:95:0: Remove multiple trailing newline at the end of the file.
+app/views/users/_graph.html.erb:27:37: Extra space detected where there should be no space
+2 error(s) were found in ERB files
+```
+
 ## License
 
 This project is released under the [MIT license](LICENSE.txt).
