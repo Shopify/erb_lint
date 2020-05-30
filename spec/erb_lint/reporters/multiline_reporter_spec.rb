@@ -9,7 +9,7 @@ describe ERBLint::Reporters::MultilineReporter do
     let(:stats) do
       ERBLint::Stats.new(
         found: 2,
-        files: {
+        processed_files: {
           'app/views/subscriptions/_loader.html.erb' => offenses,
         }
       )
@@ -33,6 +33,7 @@ describe ERBLint::Reporters::MultilineReporter do
 
       it 'displays formatted offenses output' do
         expect { subject }.to(output(<<~MESSAGE).to_stdout)
+
           Extra space detected where there should be no space.
           In file: app/views/subscriptions/_loader.html.erb:1
 

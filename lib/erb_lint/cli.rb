@@ -42,9 +42,12 @@ module ERBLint
         failure!('no linter available with current configuration')
       end
 
-      puts "Linting #{lint_files.size} files with "\
-        "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect?}linters..."
-      puts
+      @options[:format] ||= :multiline
+      @stats.files = lint_files.size
+      @stats.linters = enabled_linter_classes.size
+      
+      reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
+      reporter.preview
 
       runner = ERBLint::Runner.new(file_loader, @config)
 
@@ -63,8 +66,6 @@ module ERBLint
         end
       end
 
-      @options[:format] ||= :multiline
-      reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
       reporter.show
 
       @stats.found == 0 && @stats.exceptions == 0
@@ -110,8 +111,8 @@ module ERBLint
       offenses = runner.offenses || []
 
       @stats.found += offenses.size
-      @stats.files[offenses_filename] ||= []
-      @stats.files[offenses_filename] |= offenses
+      @stats.processed_files[offenses_filename] ||= []
+      @stats.processed_files[offenses_filename] |= offenses
     end
 
     def correct(processed_source, offenses)

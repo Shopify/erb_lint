@@ -9,7 +9,7 @@ describe ERBLint::Reporters::CompactReporter do
     let(:stats) do
       ERBLint::Stats.new(
         found: 4,
-        files: {
+        processed_files: {
           'app/views/users/show.html.erb' => show_file_offenses,
           'app/views/shared/_notifications.html.erb' => notification_file_offenses,
         }

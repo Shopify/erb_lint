@@ -139,11 +139,13 @@ describe ERBLint::CLI do
         context 'when errors are found' do
           it 'shows all error messages and line numbers' do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
               fake message from a fake linter
               In file: /app/views/template.html.erb:1
 
               Missing a trailing newline at the end of the file.
               In file: /app/views/template.html.erb:1
+
             EOF
           end
 
@@ -248,11 +250,13 @@ describe ERBLint::CLI do
           context 'when errors are found' do
             it 'shows all error messages and line numbers' do
               expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
                 fake message from a fake linter
                 In file: /app/views/template.html.erb:1
 
                 Missing a trailing newline at the end of the file.
                 In file: /app/views/template.html.erb:1
+
               EOF
             end
 

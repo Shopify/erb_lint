@@ -3,14 +3,20 @@
 module ERBLint
   module Reporters
     class CompactReporter < Reporter
+      def preview
+        puts "Linting #{stats.files} files with "\
+          "#{stats.linters} #{'autocorrectable ' if autocorrect}linters..."
+      end
+
       def show
-        files.each do |filename, offenses|
+        processed_files.each do |filename, offenses|
           offenses.each do |offense|
             puts format_offense(filename, offense)
           end
         end
 
-        report_summary
+        footer
+        summary
       end
 
       private
@@ -24,7 +30,9 @@ module ERBLint
         ].join
       end
 
-      def report_summary
+      def footer; end
+
+      def summary
         if stats.corrected > 0
           report_corrected_offenses
         elsif stats.found > 0

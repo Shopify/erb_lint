@@ -26,11 +26,13 @@ module ERBLint
       @autocorrect = autocorrect
     end
 
+    def preview; end
+
     def show; end
 
     private
 
     attr_reader :stats, :autocorrect
-    delegate :files, to: :stats
+    delegate :processed_files, to: :stats
   end
 end
