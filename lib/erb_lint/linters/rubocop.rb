@@ -62,6 +62,7 @@ module ERBLint
         original_source = code_node.loc.source
         trimmed_source = original_source.sub(BLOCK_EXPR, '').sub(SUFFIX_EXPR, '')
         alignment_column = code_node.loc.column
+        offset = code_node.loc.begin_pos - alignment_column
         aligned_source = "#{' ' * alignment_column}#{trimmed_source}"
 
         source = rubocop_processed_source(aligned_source, processed_source.filename)
@@ -77,7 +78,6 @@ module ERBLint
               correction_offset += 1
             end
 
-            offset = code_node.loc.begin_pos - alignment_column
             offense_range = processed_source
               .to_source_range(rubocop_offense.location)
               .offset(offset)
