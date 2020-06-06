@@ -26,7 +26,7 @@ module ERBLint
         super
         @only_cops = @config.only
         custom_config = config_from_hash(@config.rubocop_config)
-        @rubocop_config = RuboCop::ConfigLoader.merge_with_default(custom_config, '')
+        @rubocop_config = ::RuboCop::ConfigLoader.merge_with_default(custom_config, '')
       end
 
       def run(processed_source)
@@ -97,7 +97,7 @@ module ERBLint
       end
 
       def rubocop_processed_source(content, filename)
-        RuboCop::ProcessedSource.new(
+        ::RuboCop::ProcessedSource.new(
           content,
           @rubocop_config.target_ruby_version,
           filename
@@ -106,15 +106,15 @@ module ERBLint
 
       def cop_classes
         if @only_cops.present?
-          selected_cops = RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
-          RuboCop::Cop::Registry.new(selected_cops)
+          selected_cops = ::RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
+          ::RuboCop::Cop::Registry.new(selected_cops)
         else
-          RuboCop::Cop::Registry.new(RuboCop::Cop::Cop.all)
+          ::RuboCop::Cop::Registry.new(::RuboCop::Cop::Cop.all)
         end
       end
 
       def build_team
-        RuboCop::Cop::Team.new(
+        ::RuboCop::Cop::Team.new(
           cop_classes,
           @rubocop_config,
           extra_details: true,
@@ -129,7 +129,7 @@ module ERBLint
         resolve_inheritance(hash, inherit_from)
 
         tempfile_from('.erblint-rubocop', hash.to_yaml) do |tempfile|
-          RuboCop::ConfigLoader.load_file(tempfile.path)
+          ::RuboCop::ConfigLoader.load_file(tempfile.path)
         end
       end
 
@@ -137,7 +137,7 @@ module ERBLint
         base_configs(inherit_from)
           .reverse_each do |base_config|
           base_config.each do |k, v|
-            hash[k] = hash.key?(k) ? RuboCop::ConfigLoader.merge(v, hash[k]) : v if v.is_a?(Hash)
+            hash[k] = hash.key?(k) ? ::RuboCop::ConfigLoader.merge(v, hash[k]) : v if v.is_a?(Hash)
           end
         end
       end
@@ -146,7 +146,7 @@ module ERBLint
         regex = URI::DEFAULT_PARSER.make_regexp(%w(http https))
         configs = Array(inherit_from).compact.map do |base_name|
           if base_name =~ /\A#{regex}\z/
-            RuboCop::ConfigLoader.load_file(RuboCop::RemoteConfig.new(base_name, Dir.pwd))
+            ::RuboCop::ConfigLoader.load_file(::RuboCop::RemoteConfig.new(base_name, Dir.pwd))
           else
             config_from_hash(@file_loader.yaml(base_name))
           end

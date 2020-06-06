@@ -17,7 +17,7 @@ module ERBLint
     end
 
     def corrector
-      RuboCop::Cop::Corrector.new(@processed_source.source_buffer, corrections)
+      ::RuboCop::Cop::Corrector.new(@processed_source.source_buffer, corrections)
     end
 
     def diagnostics
