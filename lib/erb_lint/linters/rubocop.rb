@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'better_html'
-require 'rubocop'
 require 'tempfile'
 require 'erb_lint/utils/offset_corrector'
 
@@ -35,17 +34,29 @@ module ERBLint
         end
       end
 
-      def autocorrect(processed_source, offense)
-        return unless offense.context
+      if ::RuboCop::Version::STRING.to_f >= 0.87
+        def autocorrect(_processed_source, offense)
+          return unless offense.context
+          rubocop_correction = offense.context[:rubocop_correction]
+          return unless rubocop_correction
 
-        lambda do |corrector|
-          passthrough = Utils::OffsetCorrector.new(
-            processed_source,
-            corrector,
-            offense.context[:offset],
-            offense.context[:bound_range],
-          )
-          offense.context[:rubocop_correction].call(passthrough)
+          lambda do |corrector|
+            corrector.import!(rubocop_correction, offset: offense.context[:offset])
+          end
+        end
+      else
+        def autocorrect(processed_source, offense)
+          return unless offense.context
+
+          lambda do |corrector|
+            passthrough = Utils::OffsetCorrector.new(
+              processed_source,
+              corrector,
+              offense.context[:offset],
+              offense.context[:bound_range],
+            )
+            offense.context[:rubocop_correction].call(passthrough)
+          end
         end
       end
 
@@ -68,21 +79,41 @@ module ERBLint
         source = rubocop_processed_source(aligned_source, processed_source.filename)
         return unless source.valid_syntax?
 
-        team = build_team
-        team.inspect_file(source)
-        team.cops.each do |cop|
-          correction_offset = 0
-          cop.offenses.reject(&:disabled?).each do |rubocop_offense|
-            if rubocop_offense.corrected?
-              correction = cop.corrections[correction_offset]
-              correction_offset += 1
-            end
+        activate_team(processed_source, source, offset, code_node, build_team)
+      end
+
+      if ::RuboCop::Version::STRING.to_f >= 0.87
+        def activate_team(processed_source, source, offset, code_node, team)
+          report = team.investigate(source)
+          report.offenses.each do |rubocop_offense|
+            next if rubocop_offense.disabled?
+
+            correction = rubocop_offense.corrector if rubocop_offense.corrected?
 
             offense_range = processed_source
               .to_source_range(rubocop_offense.location)
               .offset(offset)
 
             add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
+          end
+        end
+      else
+        def activate_team(processed_source, source, offset, code_node, team)
+          team.inspect_file(source)
+          team.cops.each do |cop|
+            correction_offset = 0
+            cop.offenses.reject(&:disabled?).each do |rubocop_offense|
+              if rubocop_offense.corrected?
+                correction = cop.corrections[correction_offset]
+                correction_offset += 1
+              end
+
+              offense_range = processed_source
+                .to_source_range(rubocop_offense.location)
+                .offset(offset)
+
+              add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
+            end
           end
         end
       end
