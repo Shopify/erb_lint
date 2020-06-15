@@ -38,7 +38,9 @@ module ERBLint
         @corrector.remove_trailing(range_with_offset(range), size)
       end
 
-      def range_with_offset(range)
+      def range_with_offset(node_or_range)
+        range = to_range(node_or_range)
+
         @processed_source.to_source_range(
           bound(@offset + range.begin_pos)..bound(@offset + (range.end_pos - 1))
         )
@@ -49,6 +51,21 @@ module ERBLint
           [pos, @bound_range.min].max,
           @bound_range.max,
         ].min
+      end
+
+      private
+
+      def to_range(node_or_range)
+        case node_or_range
+        when ::RuboCop::AST::Node, ::Parser::Source::Comment
+          node_or_range.loc.expression
+        when ::Parser::Source::Range
+          node_or_range
+        else
+          raise TypeError,
+            'Expected a Parser::Source::Range, Comment or ' \
+                        "Rubocop::AST::Node, got #{node_or_range.class}"
+        end
       end
     end
   end
