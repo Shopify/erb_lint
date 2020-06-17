@@ -16,8 +16,10 @@ module ERBLint
       end
 
       def linters
-        load_custom_linters
-        @loaded_linters
+        @linters ||= begin
+          load_custom_linters
+          @loaded_linters
+        end
       end
 
       def load_custom_linters(directory = CUSTOM_LINTERS_DIR)
