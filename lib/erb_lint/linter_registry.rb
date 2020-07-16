@@ -7,6 +7,10 @@ module ERBLint
     @loaded_linters = []
 
     class << self
+      def clear
+        @linters = nil
+      end
+
       def included(linter_class)
         @loaded_linters << linter_class
       end

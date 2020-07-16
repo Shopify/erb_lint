@@ -7,7 +7,7 @@ describe ERBLint::LinterRegistry do
 
   context 'when including the LinterRegistry module' do
     after do
-      described_class.linters.delete(FakeLinter)
+      described_class.clear
     end
 
     it 'adds the linter to the set of registered linters' do
