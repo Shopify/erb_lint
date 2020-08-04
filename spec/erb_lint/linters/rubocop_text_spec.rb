@@ -9,7 +9,7 @@ describe ERBLint::Linters::RubocopText do
       rubocop_config: {
         require: [File.expand_path('../../fixtures/cops/auto_correct_cop', __FILE__)],
         AllCops: {
-          TargetRubyVersion: '2.4',
+          TargetRubyVersion: '2.5',
         },
       },
     )
