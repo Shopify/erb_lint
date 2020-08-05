@@ -17,11 +17,22 @@ module ERBLint
     end
 
     def corrector
-      RuboCop::Cop::Corrector.new(@processed_source.source_buffer, corrections)
+      BASE.new(@processed_source.source_buffer, corrections)
     end
 
-    def diagnostics
-      corrector.diagnostics
+    if ::RuboCop::Version::STRING.to_f >= 0.87
+      require 'rubocop/cop/legacy/corrector'
+      BASE = ::RuboCop::Cop::Legacy::Corrector
+
+      def diagnostics
+        []
+      end
+    else
+      BASE = ::RuboCop::Cop::Corrector
+
+      def diagnostics
+        corrector.diagnostics
+      end
     end
   end
 end

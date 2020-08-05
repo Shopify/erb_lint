@@ -1,12 +1,13 @@
 language: ruby
-before_install:
-  - rm ./Gemfile.lock
 cache: bundler
 rvm:
   - 2.4.1
   - 2.5
   - 2.6
   - 2.7
+gemfile:
+- gemfiles/Gemfile.rubocop-old
+- gemfiles/Gemfile.rubocop-next
 script:
   - bundle exec rspec spec
   - bundle exec rubocop
