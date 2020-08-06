@@ -1,7 +1,6 @@
 language: ruby
 cache: bundler
 rvm:
-  - 2.4.1
   - 2.5
   - 2.6
   - 2.7
@@ -10,4 +9,6 @@ gemfile:
 - gemfiles/Gemfile.rubocop-next
 script:
   - bundle exec rspec spec
+  - bundle show rubocop
+  - bundle show rubocop-shopify
   - bundle exec rubocop

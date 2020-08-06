@@ -9,7 +9,7 @@ describe ERBLint::Linters::Rubocop do
       rubocop_config: {
         require: [File.expand_path('../../fixtures/cops/auto_correct_cop', __FILE__)],
         AllCops: {
-          TargetRubyVersion: '2.4',
+          TargetRubyVersion: '2.5',
         },
       },
     )
@@ -234,7 +234,7 @@ describe ERBLint::Linters::Rubocop do
         only: ['Layout/ArgumentAlignment'],
         rubocop_config: {
           AllCops: {
-            TargetRubyVersion: '2.4',
+            TargetRubyVersion: '2.5',
           },
           'Layout/ArgumentAlignment': {
             Enabled: true,
