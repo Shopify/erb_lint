@@ -3,3 +3,6 @@
 eval_gemfile "../Gemfile"
 
 gem "rubocop", ">= 0.87", "< 0.89"
+
+# most recent rubocop-shopify release (1.0.4) is not compatible with rubocop >= 0.87, but this unreleased version is
+gem "rubocop-shopify", git: "https://github.com/Shopify/ruby-style-guide.git", ref: "ee3b64392b09f7e8d8089a57c4e65f91c0594732"
