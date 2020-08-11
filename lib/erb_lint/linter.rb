@@ -14,6 +14,7 @@ module ERBLint
       # `ERBLint::Linters::Foo.simple_name`          #=> "Foo"
       # `ERBLint::Linters::Compass::Bar.simple_name` #=> "Compass::Bar"
       def inherited(linter)
+        super
         linter.simple_name = if linter.name.start_with?('ERBLint::Linters::')
           name_parts = linter.name.split('::')
           name_parts[2..-1].join('::')
