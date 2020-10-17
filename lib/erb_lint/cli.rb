@@ -42,6 +42,10 @@ module ERBLint
       if !@files.empty? && lint_files.empty?
         failure!("no files found...\n")
       elsif lint_files.empty?
+        if @options[:prevent_empty_failure]
+          success!('No files found or given, skipping because "--prevent-empty-failure" flag was passed')
+        end
+
         failure!("no files found or given, specify files or config...\n#{option_parser}")
       end
 
@@ -278,6 +282,10 @@ module ERBLint
 
         opts.on("-a", "--autocorrect", "Correct offenses automatically if possible (default: false)") do |config|
           @options[:autocorrect] = config
+        end
+
+        opts.on("--prevent-empty-failure", "Skip the linter check if no files match the given glob [default: #{DEFAULT_LINT_ALL_GLOB}]") do
+          @options[:prevent_empty_failure] = true
         end
 
         opts.on_tail("-h", "--help", "Show this message") do

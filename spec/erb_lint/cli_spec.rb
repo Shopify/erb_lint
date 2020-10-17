@@ -273,6 +273,19 @@ describe ERBLint::CLI do
       end
     end
 
+    context 'with --prevent-empty-failure' do
+      let(:args) { ['--prevent-empty-failure'] }
+
+      context 'when there are no files' do
+        before do
+          allow(cli).to(receive(:glob).and_return("no/file/glob"))
+        end
+
+        it { expect { subject }.not_to output(/no files found/).to_stderr }
+        it { expect { subject }.to output(/No files found or given, skipping because "--prevent-empty-failure" flag was passed/).to_stdout }
+      end
+    end
+
     context 'with unknown argument' do
       let(:args) { ['--foo'] }
 
