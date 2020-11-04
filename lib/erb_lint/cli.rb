@@ -38,6 +38,7 @@ module ERBLint
       @files = dupped_args
 
       load_config
+      @cache = Cache.new(config)
 
       if !@files.empty? && lint_files.empty?
         failure!("no files found...\n")
@@ -60,7 +61,7 @@ module ERBLint
       lint_files.each do |filename|
         runner.clear_offenses
         begin
-          run_with_corrections(runner, filename)
+          puts run_on_file(runner, filename)
         rescue => e
           @stats.exceptions += 1
           puts "Exception occured when processing: #{relative_filename(filename)}"
@@ -101,8 +102,34 @@ module ERBLint
 
     private
 
+    attr_reader :cache, :config
+
+    def run_on_file(runner, filename)
+      if with_cache? && !autocorrect?
+        run_using_cache(runner, filename)
+      else
+        run_with_corrections(runner, filename)
+      end
+    end
+
+    def run_using_cache(runner, filename)
+      puts cache.include?(filename)
+      if cache.include?(filename) && !autocorrect?
+        result = cache[filename]
+        @stats.found += result.size
+        result
+      else
+        result = run_with_corrections(runner, filename)
+        cache[filename] = result
+      end
+    end
+
     def autocorrect?
       @options[:autocorrect]
+    end
+
+    def with_cache?
+      @options[:with_cache]
     end
 
     def run_with_corrections(runner, filename)
@@ -128,8 +155,8 @@ module ERBLint
       end
 
       @stats.found += runner.offenses.size
-      runner.offenses.each do |offense|
-        puts <<~EOF
+      runner.offenses.map do |offense|
+        <<~EOF
           #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect?}
           In file: #{relative_filename(filename)}:#{offense.line_range.begin}
 
@@ -264,6 +291,10 @@ module ERBLint
 
         opts.on("--enable-all-linters", "Enable all known linters") do
           @options[:enabled_linters] = known_linter_names
+        end
+
+        opts.on("--with_cache", "Enable caching") do |config|
+          @options[:with_cache] = config
         end
 
         opts.on("--enable-linters LINTER[,LINTER,...]", Array,

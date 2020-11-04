@@ -3,6 +3,7 @@
 require 'rubocop'
 
 require 'erb_lint/corrector'
+require 'erb_lint/cache'
 require 'erb_lint/file_loader'
 require 'erb_lint/linter_config'
 require 'erb_lint/linter_registry'
