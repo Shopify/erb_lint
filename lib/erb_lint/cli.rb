@@ -16,15 +16,6 @@ module ERBLint
     class ExitWithFailure < RuntimeError; end
     class ExitWithSuccess < RuntimeError; end
 
-    class Stats
-      attr_accessor :found, :corrected, :exceptions
-      def initialize
-        @found = 0
-        @corrected = 0
-        @exceptions = 0
-      end
-    end
-
     def initialize
       @options = {}
       @config = nil
@@ -51,9 +42,12 @@ module ERBLint
         failure!('no linter available with current configuration')
       end
 
-      puts "Linting #{lint_files.size} files with "\
-        "#{enabled_linter_classes.size} #{'autocorrectable ' if autocorrect?}linters..."
-      puts
+      @options[:format] ||= :multiline
+      @stats.files = lint_files.size
+      @stats.linters = enabled_linter_classes.size
+
+      reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
+      reporter.preview
 
       runner = ERBLint::Runner.new(file_loader, @config)
 
@@ -72,20 +66,7 @@ module ERBLint
         end
       end
 
-      if @stats.corrected > 0
-        corrected_found_diff = @stats.found - @stats.corrected
-        if corrected_found_diff > 0
-          warn(Rainbow(
-            "#{@stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
-          ).red)
-        else
-          puts Rainbow("#{@stats.corrected} error(s) corrected in ERB files").green
-        end
-      elsif @stats.found > 0
-        warn(Rainbow("#{@stats.found} error(s) were found in ERB files").red)
-      else
-        puts Rainbow("No errors were found in ERB files").green
-      end
+      reporter.show
 
       @stats.found == 0 && @stats.exceptions == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
@@ -126,15 +107,12 @@ module ERBLint
         file_content = corrector.corrected_content
         runner.clear_offenses
       end
+      offenses_filename = relative_filename(filename)
+      offenses = runner.offenses || []
 
-      @stats.found += runner.offenses.size
-      runner.offenses.each do |offense|
-        puts <<~EOF
-          #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect?}
-          In file: #{relative_filename(filename)}:#{offense.line_range.begin}
-
-        EOF
-      end
+      @stats.found += offenses.size
+      @stats.processed_files[offenses_filename] ||= []
+      @stats.processed_files[offenses_filename] |= offenses
     end
 
     def correct(processed_source, offenses)
@@ -258,6 +236,15 @@ module ERBLint
           end
         end
 
+        opts.on("--format FORMAT", format_options_help) do |format|
+          unless Reporter.available_format?(format)
+            error_message = invalid_format_error_message(format)
+            failure!(error_message)
+          end
+
+          @options[:format] = format
+        end
+
         opts.on("--lint-all", "Lint all files matching configured glob [default: #{DEFAULT_LINT_ALL_GLOB}]") do |config|
           @options[:lint_all] = config
         end
@@ -288,6 +275,16 @@ module ERBLint
           success!(ERBLint::VERSION)
         end
       end
+    end
+
+    def format_options_help
+      "Report offenses in the given format: "\
+      "(#{Reporter.available_formats.join(', ')}) (default: multiline)"
+    end
+
+    def invalid_format_error_message(given_format)
+      formats = Reporter.available_formats.map { |format| "  - #{format}\n" }
+      "#{given_format}: is not a valid format. Available formats:\n#{formats.join}"
     end
   end
 end

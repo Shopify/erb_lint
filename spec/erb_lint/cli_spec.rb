@@ -73,6 +73,13 @@ describe ERBLint::CLI do
       it 'shows usage' do
         expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout)
       end
+
+      it 'shows format instructions' do
+        expect { subject }.to(
+          output(/Report offenses in the given format: \(compact, multiline\) \(default: multiline\)/).to_stdout
+        )
+      end
+
       it 'is successful' do
         expect(subject).to(be(true))
       end
@@ -132,11 +139,13 @@ describe ERBLint::CLI do
         context 'when errors are found' do
           it 'shows all error messages and line numbers' do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
               fake message from a fake linter
               In file: /app/views/template.html.erb:1
 
               Missing a trailing newline at the end of the file.
               In file: /app/views/template.html.erb:1
+
             EOF
           end
 
@@ -241,16 +250,61 @@ describe ERBLint::CLI do
           context 'when errors are found' do
             it 'shows all error messages and line numbers' do
               expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
                 fake message from a fake linter
                 In file: /app/views/template.html.erb:1
 
                 Missing a trailing newline at the end of the file.
                 In file: /app/views/template.html.erb:1
+
               EOF
             end
 
             it 'prints that errors were found to stdout' do
               expect { subject }.to(output(/2 error\(s\) were found in ERB files/).to_stderr)
+            end
+
+            it 'is not successful' do
+              expect(subject).to(be(false))
+            end
+          end
+
+          context 'with --format compact' do
+            let(:args) do
+              [
+                '--enable-linter', 'linter_with_errors,final_newline',
+                '--format', 'compact',
+                linted_dir
+              ]
+            end
+
+            it 'shows all error messages and line numbers' do
+              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+                /app/views/template.html.erb:1:1: fake message from a fake linter
+                /app/views/template.html.erb:1:19: Missing a trailing newline at the end of the file.
+              EOF
+            end
+
+            it 'is not successful' do
+              expect(subject).to(be(false))
+            end
+          end
+
+          context 'with invalid --format option' do
+            let(:args) do
+              [
+                '--enable-linter', 'linter_with_errors,final_newline',
+                '--format', 'nonexistentformat',
+                linted_dir
+              ]
+            end
+
+            it 'shows all error messages and line numbers' do
+              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF.strip))).to_stderr)
+                nonexistentformat: is not a valid format. Available formats:
+                  - compact
+                  - multiline
+              EOF
             end
 
             it 'is not successful' do
