@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'activesupport', '~> 5.1'
+gem 'activesupport', '~> 6.0'
 gem 'rake'
 
 group 'test' do
