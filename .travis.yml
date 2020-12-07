@@ -9,4 +9,8 @@ gemfile:
 - gemfiles/Gemfile.rubocop-next
 script:
   - bundle exec rspec spec
-  - bundle exec rubocop
+jobs:
+  include:
+    - stage: Lint Ruby
+      gemfile: Gemfile
+      script: bundle exec rubocop
