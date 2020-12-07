@@ -3,5 +3,3 @@
 eval_gemfile "../Gemfile"
 
 gem "rubocop", ">= 0.87"
-
-gem "rubocop-shopify", ">= 1.0.7"
