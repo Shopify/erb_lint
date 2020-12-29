@@ -88,7 +88,7 @@ linters:
 | [DeprecatedClasses](#DeprecatedClasses)          | No       | warns about deprecated css classes |
 | [ErbSafety](#ErbSafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
 | [Rubocop](#Rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
-
+| [RequireScriptNonce](#RequireScriptNonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
 
 ### DeprecatedClasses
 
@@ -320,6 +320,45 @@ linters:
 Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `correction_style`     | When configured with `cdata`, adds CDATA markers. When configured with `plain`, don't add makers. Defaults to `cdata`.
+
+### RequireScriptNonce
+This linter prevents the usage of HTML `<script>`, Rails `javascript_tag`, `javascript_include_tag` and `javascript_pack_tag` without a `nonce` argument. The purpose of such a check is to ensure that when [content securty policy](https://edgeguides.rubyonrails.org/security.html#content-security-policy) is implemented in an application, there is a means of discovering tags that need to be updated with a `nonce` argument to enable script execution at application runtime. 
+
+```
+Bad ❌
+<script> 
+    alert(1)
+</script>
+Good ✅
+<script nonce="<%= request.content_security_policy_nonce %>" > 
+    alert(1)
+</script>
+```
+
+```
+Bad ❌
+<%= javascript_tag do -%>
+  alert(1)
+<% end -%>
+Good ✅
+<%= javascript_tag nonce: true do -%>
+  alert(1)
+<% end -%>
+```
+
+```
+Bad ❌
+<%= javascript_include_tag "script" %>
+Good ✅
+<%= javascript_include_tag "script", nonce: true %>
+```
+
+```
+Bad ❌
+<%= javascript_pack_tag "script" %>
+Good ✅
+<%= javascript_pack_tag "script", nonce: true %>
+```
 
 ### SelfClosingTag
 
