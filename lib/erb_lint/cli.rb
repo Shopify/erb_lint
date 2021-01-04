@@ -14,6 +14,7 @@ module ERBLint
     DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
 
     class ExitWithFailure < RuntimeError; end
+
     class ExitWithSuccess < RuntimeError; end
 
     def initialize

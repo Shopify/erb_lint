@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('better_html', '~> 1.0.7')
   s.add_dependency('html_tokenizer')
-  s.add_dependency('rubocop', '~> 0.79')
+  s.add_dependency('rubocop')
   s.add_dependency('parser', '>= 2.7.1.4')
   s.add_dependency('activesupport')
   s.add_dependency('smart_properties')

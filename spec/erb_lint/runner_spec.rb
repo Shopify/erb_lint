@@ -20,6 +20,7 @@ describe ERBLint::Runner do
           add_offense(processed_source.to_source_range(1..1), "#{self.class.name} error")
         end
       end
+
       class FakeLinter2 < FakeLinter1; end
     end
   end
