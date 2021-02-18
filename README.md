@@ -1,4 +1,4 @@
-# ERB Lint [![Build Status](https://travis-ci.org/Shopify/erb-lint.svg?branch=master)](https://travis-ci.org/Shopify/erb-lint)
+# ERB Lint [![Build Status](https://github.com/Shopify/erb-lint/workflows/Tests/badge.svg)](https://github.com/Shopify/erb-lint/actions)
 
 `erb-lint` is a tool to help lint your ERB or HTML files using the included linters or by writing your own.
 
