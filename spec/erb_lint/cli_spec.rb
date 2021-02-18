@@ -180,8 +180,9 @@ describe ERBLint::CLI do
             File.write(config_file, config_file_content)
           end
 
-          it 'is successful' do
-            expect(subject).to(be(true))
+          it 'is not able to find the file' do
+            expect { subject }.to(output(/no files found\.\.\./).to_stderr)
+            expect(subject).to(be(false))
           end
         end
       end
