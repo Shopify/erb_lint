@@ -50,11 +50,14 @@ This gem provides a command-line interface which can be run like so:
 For example, `erblint --lint-all --enable-all-linters` will run all available
 linters on all ERB files in the current directory or its descendants (`**/*.html{+*,}.erb`).
 
-If you want to change the glob that is used, you can configure it by adding it to your config file as follows:
+If you want to change the glob & exclude that is used, you can configure it by adding it to your config file as follows:
 
 ```yaml
 ---
 glob: "**/*.{html,text,js}{+*,}.erb"
+exclude:
+  - '**/vendor/**/*'
+  - '**/node_modules/**/*'
 linters:
   ErbSafety:
     enabled: true
@@ -66,8 +69,24 @@ linters:
         - .rubocop.yml
 ```
 
+Make sure to add `**/` to exclude patterns; it matches the target files' absolute paths.
+
 ## Enable or disable default linters
 `EnableDefaultLinters`: enables or disables default linters. [Default linters](#Linters) are enabled by default.
+
+## Exclude
+
+You can specify the exclude patterns both of global and lint-local.
+
+```yaml
+---
+exclude:
+  - '**/global-lib/**/*'
+linters:
+  ErbSafety:
+    exclude:
+      - '**/lobal-lib/**/*'
+```
 
 ## Linters
 
