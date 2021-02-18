@@ -430,7 +430,7 @@ linters:
 Linter-Specific Option    | Description
 --------------------------|---------------------------------------------------------
 `allowed_types`           | An array of allowed types. Defaults to `["text/javascript"]`.
-`allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag.
+`allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag. Defaults to `true`.
 `disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
 
 ## Custom Linters
