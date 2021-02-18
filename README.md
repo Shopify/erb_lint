@@ -224,6 +224,8 @@ linters:
         - .rubocop.yml
       Layout/InitialIndentation:
         Enabled: false
+      Layout/LineLength:
+        Enabled: false
       Layout/TrailingEmptyLines:
         Enabled: false
       Layout/TrailingWhitespace:
@@ -231,8 +233,6 @@ linters:
       Naming/FileName:
         Enabled: false
       Style/FrozenStringLiteralComment:
-        Enabled: false
-      Metrics/LineLength:
         Enabled: false
       Lint/UselessAssignment:
         Enabled: false
