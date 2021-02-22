@@ -23,7 +23,7 @@ module ERBLint
         parser.nodes_with_type(:tag).each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           nonce_attribute = tag.attributes['nonce']
-          
+
           next if !html_javascript_tag?(tag) || nonce_present?(nonce_attribute)
 
           add_offense(
@@ -82,7 +82,7 @@ module ERBLint
         indicator = indicator_node&.loc&.source
         indicator == '#'
       end
-      
+
       def extract_ruby_node(source)
         BetterHtml::TestHelper::RubyNode.parse(source)
       rescue ::Parser::SyntaxError

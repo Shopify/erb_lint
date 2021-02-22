@@ -37,7 +37,6 @@ describe ERBLint::Linters::RequireScriptNonce do
         end
       end
 
-
       context 'when MIME type is not specificed' do
         let(:mime_type) { nil }
 
