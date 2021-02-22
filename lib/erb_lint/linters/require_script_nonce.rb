@@ -59,9 +59,9 @@ module ERBLint
           ruby_node = extract_ruby_node(source)
           send_node = ruby_node&.descendants(:send)&.first
 
-          next if is_a_comment?(indicator_node) ||
+          next if code_comment?(indicator_node) ||
             !ruby_node ||
-            !is_a_tag_helper?(send_node) ||
+            !tag_helper?(send_node) ||
             source.include?("nonce")
 
           add_offense(
@@ -72,15 +72,14 @@ module ERBLint
         end
       end
 
-      def is_a_tag_helper?(send_node)
+      def tag_helper?(send_node)
         send_node&.method_name?(:javascript_tag) ||
         send_node&.method_name?(:javascript_include_tag) ||
         send_node&.method_name?(:javascript_pack_tag)
       end
 
-      def is_a_comment?(indicator_node)
-        indicator = indicator_node&.loc&.source
-        indicator == '#'
+      def code_comment?(indicator_node)
+        indicator_node&.loc&.source == '#'
       end
 
       def extract_ruby_node(source)
