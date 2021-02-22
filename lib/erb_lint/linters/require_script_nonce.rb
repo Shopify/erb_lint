@@ -24,7 +24,7 @@ module ERBLint
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           nonce_attribute = tag.attributes['nonce']
           
-          next if !html_javascript_tag?(tag) || nonce_present(nonce_attribute)
+          next if !html_javascript_tag?(tag) || nonce_present?(nonce_attribute)
 
           add_offense(
             tag_node.to_a[1].loc,
@@ -34,8 +34,8 @@ module ERBLint
         end
       end
 
-      def nonce_present(nonce_attribute)
-        nonce_present = nonce_attribute.present? && nonce_attribute.value_node.present?
+      def nonce_present?(nonce_attribute)
+        nonce_attribute.present? && nonce_attribute.value_node.present?
       end
 
       def html_javascript_tag?(tag)
