@@ -29,6 +29,15 @@ describe ERBLint::Linters::RequireScriptNonce do
         end
       end
 
+      context 'when MIME type is application/javascript' do
+        let(:mime_type) { 'type="application/javascript"' }
+
+        it "passes the nonce check" do
+          expect(subject).to(eq([]))
+        end
+      end
+
+
       context 'when MIME type is not specificed' do
         let(:mime_type) { nil }
 
@@ -39,6 +48,14 @@ describe ERBLint::Linters::RequireScriptNonce do
 
       context 'when MIME type is not text/javascript' do
         let(:mime_type) { 'type="text/whatever"' }
+
+        it "passes the nonce check" do
+          expect(subject).to(eq([]))
+        end
+      end
+
+      context 'when MIME type is not application/javascript' do
+        let(:mime_type) { 'type="application/whatever"' }
 
         it "passes the nonce check" do
           expect(subject).to(eq([]))
@@ -59,6 +76,16 @@ describe ERBLint::Linters::RequireScriptNonce do
         end
       end
 
+      context 'when MIME type is application/javascript' do
+        let(:mime_type) { 'type="application/javascript"' }
+
+        it "builds an offense for a HTML script tag with a missing nonce" do
+          expect(subject).to(eq([
+            build_offense(1..6, html_nonce_message),
+          ]))
+        end
+      end
+
       context 'when MIME type is not specified' do
         let(:mime_type) { nil }
 
@@ -69,7 +96,7 @@ describe ERBLint::Linters::RequireScriptNonce do
         end
       end
 
-      context 'when MIME type is not text/javascript' do
+      context 'when MIME type is not text/javascript or application/javascript' do
         let(:mime_type) { 'type="text/whatever"' }
 
         it "passes the nonce check" do
@@ -123,10 +150,10 @@ describe ERBLint::Linters::RequireScriptNonce do
       end
     end
 
-    context 'usage of javascript_tag helper with a well formed nonce tag' do
+    context 'usage of javascript_tag helper with a nonce' do
       let(:file) { <<~FILE }
         <br />
-        <%= javascript_tag do nonce: true %>
+        <%= javascript_tag nonce: true do %>
         FILE
 
       it "passes the nonce check" do
@@ -134,10 +161,10 @@ describe ERBLint::Linters::RequireScriptNonce do
       end
     end
 
-    context 'usage of javascript_include_tag helper with a well formed nonce tag' do
+    context 'usage of javascript_include_tag helper with a nonce' do
       let(:file) { <<~FILE }
         <br />
-        <%= javascript_include_tag "script" nonce: true %>
+        <%= javascript_include_tag "script", nonce: true %>
         FILE
 
       it "passes the nonce check" do
@@ -145,10 +172,10 @@ describe ERBLint::Linters::RequireScriptNonce do
       end
     end
 
-    context 'usage of javascript_pack_tag helper with a well formed nonce tag' do
+    context 'usage of javascript_pack_tag helper with a nonce' do
       let(:file) { <<~FILE }
         <br />
-        <%= javascript_pack_tag "script" nonce: true %>
+        <%= javascript_pack_tag "script", nonce: true %>
         FILE
 
       it "passes the nonce check" do
