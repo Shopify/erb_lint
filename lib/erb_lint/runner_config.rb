@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'erb_lint/runner_config_resolver'
+require 'active_support/core_ext/object/deep_dup'
 
 module ERBLint
   class RunnerConfig
