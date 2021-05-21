@@ -55,7 +55,6 @@ module ERBLint
             FinalNewline: { enabled: default_enabled },
             NoJavascriptTagHelper: { enabled: default_enabled },
             ParserErrors: { enabled: default_enabled },
-            PartialInstanceVariable: { enabled: default_enabled },
             RightTrim: { enabled: default_enabled },
             SelfClosingTag: { enabled: default_enabled },
             SpaceAroundErbTag: { enabled: default_enabled },
