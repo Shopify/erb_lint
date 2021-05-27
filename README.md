@@ -98,6 +98,7 @@ linters:
 | [FinalNewline](#FinalNewline)                    | Yes      | warns about missing newline at the end of a ERB template |
 | [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
 | ParserErrors                                     | Yes      |             |
+| PartialInstanceVariable                          | No       | detects instance variables in partials |
 | [RightTrim](#RightTrim)                          | Yes      | enforces trimming at the right of an ERB tag |
 | [SelfClosingTag](#SelfClosingTag)                | Yes      | enforces self closing tag styles for void elements |
 | [SpaceAroundErbTag](#SpaceAroundErbTag)          | Yes      | enforces a single space after `<%` and before `%>`|
