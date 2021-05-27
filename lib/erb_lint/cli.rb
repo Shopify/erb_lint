@@ -58,7 +58,7 @@ module ERBLint
           run_with_corrections(runner, filename)
         rescue => e
           @stats.exceptions += 1
-          puts "Exception occured when processing: #{relative_filename(filename)}"
+          puts "Exception occurred when processing: #{relative_filename(filename)}"
           puts "If this file cannot be processed by erb-lint, "\
             "you can exclude it in your configuration file."
           puts e.message
