@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'erb_lint'
+require 'erb_lint/all'
 require 'active_support'
 require 'active_support/inflector'
 require 'optparse'
