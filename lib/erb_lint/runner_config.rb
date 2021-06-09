@@ -61,6 +61,7 @@ module ERBLint
             SpaceIndentation: { enabled: default_enabled },
             SpaceInHtmlTag: { enabled: default_enabled },
             TrailingWhitespace: { enabled: default_enabled },
+            RequireInputAutocomplete: { enabled: default_enabled },
           },
         )
       end
