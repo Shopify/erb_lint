@@ -99,6 +99,7 @@ linters:
 | [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
 | ParserErrors                                     | Yes      |             |
 | PartialInstanceVariable                          | No       | detects instance variables in partials |
+| [RequireInputAutocomplete](#RequireInputAutocomplete)        | Yes       | warns about missing autocomplete attributes in input tags |
 | [RightTrim](#RightTrim)                          | Yes      | enforces trimming at the right of an ERB tag |
 | [SelfClosingTag](#SelfClosingTag)                | Yes      | enforces self closing tag styles for void elements |
 | [SpaceAroundErbTag](#SpaceAroundErbTag)          | Yes      | enforces a single space after `<%` and before `%>`|
@@ -247,6 +248,18 @@ Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `rubocop_config`       | A valid rubocop configuration hash. Mandatory when this cop is enabled. See [rubocop's manual entry on Configuration](http://rubocop.readthedocs.io/en/latest/configuration/)
 `only`                 | Only run cops listed in this array instead of all cops.
+
+### RequireInputAutocomplete
+This linter prevents the usage of certain types of HTML `<input>` without an `autocomplete` argument: `color`, `date`, `datetime-local`, `email`, `hidden`, `month`, `number`, `password`, `range`, `search`, `tel`, `text`, `time`, `url`, or `week`.
+The HTML autocomplete helps users to complete filling in forms by using data stored in the browser. This is particularly useful for people with **motor disabilities** or **cognitive impairment** who may have difficulties filling out forms online.
+
+```
+Bad ❌
+<input type="email" ...>
+Good ✅
+<input type="email" autocomplete="nope" ...>
+<input type="email" autocomplete="email" ...>
+```
 
 ### RightTrim
 
