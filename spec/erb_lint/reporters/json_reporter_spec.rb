@@ -69,22 +69,22 @@ describe ERBLint::Reporters::JsonReporter do
               length: 2,
             },
           },
-          {
-            cop_name: 'ClosingErbTagIndent',
-            message: 'Remove newline before `%>` to match start of tag.',
-            location: {
-              start_line: 52,
-              start_column: 10,
-              last_line: 54,
-              last_column: 10,
-              length: 10,
-            },
-          }],
+                     {
+                       cop_name: 'ClosingErbTagIndent',
+                       message: 'Remove newline before `%>` to match start of tag.',
+                       location: {
+                         start_line: 52,
+                         start_column: 10,
+                         last_line: 54,
+                         last_column: 10,
+                         length: 10,
+                       },
+                     }],
         }],
         summary: {
           offenses: 2,
           inspected_files: 1,
-          corrected: 1
+          corrected: 1,
         },
       }
     end
