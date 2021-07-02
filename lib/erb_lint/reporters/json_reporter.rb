@@ -56,7 +56,7 @@ module ERBLint
 
       def format_offense(offense)
         {
-          cop_name: offense.linter.class.simple_name,
+          linter: offense.linter.class.simple_name,
           message: offense.message.to_s,
           location: {
             start_line: offense.line_number,

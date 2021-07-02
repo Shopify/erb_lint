@@ -59,7 +59,7 @@ describe ERBLint::Reporters::JsonReporter do
         files: [{
           path: 'app/views/subscriptions/_loader.html.erb',
           offenses: [{
-            cop_name: 'SpaceInHtmlTag',
+            linter: 'SpaceInHtmlTag',
             message: 'Extra space detected where there should be no space.',
             location: {
               start_line: 1,
@@ -69,17 +69,17 @@ describe ERBLint::Reporters::JsonReporter do
               length: 2,
             },
           },
-                     {
-                       cop_name: 'ClosingErbTagIndent',
-                       message: 'Remove newline before `%>` to match start of tag.',
-                       location: {
-                         start_line: 52,
-                         start_column: 10,
-                         last_line: 54,
-                         last_column: 10,
-                         length: 10,
-                       },
-                     }],
+          {
+            linter: 'ClosingErbTagIndent',
+            message: 'Remove newline before `%>` to match start of tag.',
+            location: {
+              start_line: 52,
+              start_column: 10,
+              last_line: 54,
+              last_column: 10,
+              length: 10,
+            },
+          }],
         }],
         summary: {
           offenses: 2,
