@@ -191,7 +191,7 @@ module ERBLint
           { rubocop_correction: correction, offset: offset, bound_range: bound_range }
         end
 
-        super(offense_range, rubocop_offense.message.strip, context)
+        super(offense_range, rubocop_offense.message.strip, context, rubocop_offense.severity.name)
       end
     end
   end

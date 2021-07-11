@@ -3,9 +3,9 @@
 module ERBLint
   # Defines common functionality available to all linters.
   class Offense
-    attr_reader :linter, :source_range, :message, :context
+    attr_reader :linter, :source_range, :message, :context, :severity
 
-    def initialize(linter, source_range, message, context = nil)
+    def initialize(linter, source_range, message, context = nil, severity = nil)
       unless source_range.is_a?(Parser::Source::Range)
         raise ArgumentError, "expected Parser::Source::Range for arg 2"
       end
@@ -13,19 +13,22 @@ module ERBLint
       @source_range = source_range
       @message = message
       @context = context
+      @severity = severity
     end
 
     def inspect
       "#<#{self.class.name} linter=#{linter.class.name} "\
         "source_range=#{source_range.begin_pos}...#{source_range.end_pos} "\
-        "message=#{message}>"
+        "message=#{message}> "\
+        "severity=#{severity}"
     end
 
     def ==(other)
       other.class <= ERBLint::Offense &&
         other.linter == linter &&
         other.source_range == source_range &&
-        other.message == message
+        other.message == message &&
+        other.severity == severity
     end
 
     def line_range

@@ -53,8 +53,8 @@ module ERBLint
       raise NotImplementedError, "must implement ##{__method__}"
     end
 
-    def add_offense(source_range, message, context = nil)
-      @offenses << Offense.new(self, source_range, message, context)
+    def add_offense(source_range, message, context = nil, severity = nil)
+      @offenses << Offense.new(self, source_range, message, context, severity)
     end
 
     def clear_offenses

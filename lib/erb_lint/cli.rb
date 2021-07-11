@@ -7,9 +7,12 @@ require 'optparse'
 require 'psych'
 require 'yaml'
 require 'rainbow'
+require 'erb_lint/utils/severity_levels'
 
 module ERBLint
   class CLI
+    include Utils::SeverityLevels
+
     DEFAULT_CONFIG_FILENAME = '.erb-lint.yml'
     DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
 
@@ -44,6 +47,7 @@ module ERBLint
       end
 
       @options[:format] ||= :multiline
+      @options[:fail_level] ||= severity_level_for_name(:refactor)
       @stats.files = lint_files.size
       @stats.linters = enabled_linter_classes.size
 
@@ -111,7 +115,12 @@ module ERBLint
       offenses_filename = relative_filename(filename)
       offenses = runner.offenses || []
 
-      @stats.found += offenses.size
+      @stats.ignored, @stats.found = offenses.partition do |offense|
+        severity_level_for_name(offense.severity) < @options[:fail_level]
+      end.map(&:size)
+        .zip([@stats.ignored, @stats.found])
+        .map(&:sum)
+
       @stats.processed_files[offenses_filename] ||= []
       @stats.processed_files[offenses_filename] |= offenses
     end
