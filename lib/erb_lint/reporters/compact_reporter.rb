@@ -35,8 +35,14 @@ module ERBLint
       def summary
         if stats.corrected > 0
           report_corrected_offenses
-        elsif stats.found > 0
-          warn(Rainbow("#{stats.found} error(s) were found in ERB files").red)
+        elsif stats.ignored > 0 || stats.found > 0
+          if stats.ignored > 0
+            warn(Rainbow("#{stats.ignored} error(s) were ignored in ERB files").yellow)
+          end
+
+          if stats.found > 0
+            warn(Rainbow("#{stats.found} error(s) were found in ERB files").red)
+          end
         else
           puts Rainbow("No errors were found in ERB files").green
         end

@@ -21,6 +21,7 @@ describe ERBLint::CLI do
   before do
     allow(ERBLint::LinterRegistry).to(receive(:linters)
       .and_return([ERBLint::Linters::LinterWithErrors,
+                   ERBLint::Linters::LinterWithInfoErrors,
                    ERBLint::Linters::LinterWithoutErrors,
                    ERBLint::Linters::FinalNewline]))
   end
@@ -40,6 +41,17 @@ describe ERBLint::CLI do
         def run(_processed_source)
         end
       end
+
+      class LinterWithInfoErrors < Linter
+        def run(processed_source)
+          add_offense(
+            processed_source.to_source_range(1..1),
+            'fake info message from a fake linter',
+            nil,
+            :info,
+          )
+        end
+      end
     end
   end
 
@@ -53,7 +65,7 @@ describe ERBLint::CLI do
 
       it 'shows all known linters in stderr' do
         expect { subject }.to(output(
-          /Known linters are: linter_with_errors, linter_without_errors, final_newline/
+          /Known linters are: linter_with_errors, linter_with_info_errors, linter_without_errors, final_newline/
         ).to_stderr)
       end
 
@@ -155,6 +167,27 @@ describe ERBLint::CLI do
 
           it 'is not successful' do
             expect(subject).to(be(false))
+          end
+        end
+
+        context 'when only errors with serverity info are found' do
+          let(:args) { ['--enable-linter', 'linter_with_info_errors', linted_file] }
+
+          it 'shows all error messages and line numbers' do
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
+              fake info message from a fake linter
+              In file: /app/views/template.html.erb:1
+
+            EOF
+          end
+
+          it 'prints that errors were ignored to stderr' do
+            expect { subject }.to(output(/1 error\(s\) were ignored in ERB files/).to_stderr)
+          end
+
+          it 'is successful' do
+            expect(subject).to(be(true))
           end
         end
 
@@ -355,10 +388,11 @@ describe ERBLint::CLI do
 
     context 'with invalid --enable-linters argument' do
       let(:args) { ['--enable-linter', 'foo'] }
+      let(:known_linters) { 'linter_with_errors, linter_with_info_errors, linter_without_errors, final_newline' }
 
       it do
         expect { subject }.to(output(
-          /foo: not a valid linter name \(linter_with_errors, linter_without_errors, final_newline\)/
+          /foo: not a valid linter name \(#{known_linters}\)/
         ).to_stderr)
       end
 
