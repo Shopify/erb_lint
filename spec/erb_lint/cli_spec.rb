@@ -421,6 +421,14 @@ describe ERBLint::CLI do
           it 'is not successful' do
             expect(subject).to(be(false))
           end
+
+          context 'when autocorrecting an error' do
+            let(:args) { ['--enable-linter', 'final_newline', '--stdin', linted_file, '--autocorrect'] }
+
+            it 'outputs the corrected ERB' do
+              expect { subject }.to(output(/#{file_content}\n/).to_stdout)
+            end
+          end
         end
 
         context 'when no errors are found' do
