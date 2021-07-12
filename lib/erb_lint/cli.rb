@@ -27,7 +27,7 @@ module ERBLint
     def run(args = ARGV)
       dupped_args = args.dup
       load_options(dupped_args)
-      @files = dupped_args
+      @files = @options[:stdin] || dupped_args
 
       load_config
 
@@ -88,7 +88,11 @@ module ERBLint
     end
 
     def run_with_corrections(runner, filename)
-      file_content = File.read(filename, encoding: Encoding::UTF_8)
+      file_content = if @options[:stdin]
+        $stdin.binmode.read.force_encoding("utf-8")
+      else
+        File.read(filename, encoding: Encoding::UTF_8)
+      end
 
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
@@ -267,6 +271,10 @@ module ERBLint
 
         opts.on("-a", "--autocorrect", "Correct offenses automatically if possible (default: false)") do |config|
           @options[:autocorrect] = config
+        end
+
+        opts.on("-sFILE", "--stdin FILE", "Pipe source from STDIN. Takes the path to be used to check which rules to apply.") do |file|
+          @options[:stdin] = [file]
         end
 
         opts.on_tail("-h", "--help", "Show this message") do
