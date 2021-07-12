@@ -27,7 +27,7 @@ module ERBLint
     def run(args = ARGV)
       dupped_args = args.dup
       load_options(dupped_args)
-      @files = stdin? || dupped_args
+      @files = @options[:stdin] || dupped_args
 
       load_config
 
@@ -71,6 +71,7 @@ module ERBLint
       reporter.show
 
       if stdin? && autocorrect?
+        # When running from stdin, we only lint a single file
         puts "================ #{lint_files.first} ==================\n"
         puts file_content
       end
@@ -94,11 +95,7 @@ module ERBLint
     end
 
     def run_with_corrections(runner, filename)
-      file_content = if stdin?
-        $stdin.binmode.read.force_encoding("utf-8")
-      else
-        File.read(filename, encoding: Encoding::UTF_8)
-      end
+      file_content = read_content(filename)
 
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
@@ -111,6 +108,7 @@ module ERBLint
 
         @stats.corrected += corrector.corrections.size
 
+        # Don't overwrite the file if the input comes from stdin
         unless stdin?
           File.open(filename, "wb") do |file|
             file.write(corrector.corrected_content)
@@ -128,6 +126,12 @@ module ERBLint
       @stats.processed_files[offenses_filename] |= offenses
 
       file_content
+    end
+
+    def read_content(filename)
+      return File.read(filename, encoding: Encoding::UTF_8) unless stdin?
+
+      $stdin.binmode.read.force_encoding("utf-8")
     end
 
     def correct(processed_source, offenses)
@@ -308,7 +312,7 @@ module ERBLint
     end
 
     def stdin?
-      @options[:stdin]
+      @options[:stdin].present?
     end
   end
 end
