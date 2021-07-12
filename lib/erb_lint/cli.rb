@@ -274,6 +274,15 @@ module ERBLint
           @options[:enabled_linters] = linters
         end
 
+        opts.on("--fail-level SEVERITY", "Minimum severity for exit with error code") do |level|
+          parsed_severity = SEVERITY_CODE_TABLE[level.upcase.to_sym] || (SEVERITY_NAMES & [level.downcase]).first
+
+          if parsed_severity.nil?
+            failure!("#{level}: not a valid failure level (#{SEVERITY_NAMES.join(', ')})")
+          end
+          @options[:fail_level] = severity_level_for_name(parsed_severity)
+        end
+
         opts.on("-a", "--autocorrect", "Correct offenses automatically if possible (default: false)") do |config|
           @options[:autocorrect] = config
         end

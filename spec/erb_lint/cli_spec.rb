@@ -248,6 +248,62 @@ describe ERBLint::CLI do
       end
     end
 
+    context 'with --fail-level as argument' do
+      let(:linted_file) { 'app/views/template.html.erb' }
+      let(:file_content) { "this is a fine file" }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(linted_file))
+        File.write(linted_file, file_content)
+      end
+
+      context 'when fail level is higher than found errors' do
+        let(:args) { ['--lint-all', '--fail-level', 'R', '--enable-linter', 'linter_with_info_errors'] }
+
+        context "with the default glob" do
+          it 'shows all error messages and line numbers' do
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
+              fake info message from a fake linter
+              In file: /app/views/template.html.erb:1
+
+            EOF
+          end
+
+          it 'prints that errors were ignored to stderr' do
+            expect { subject }.to(output(/1 error\(s\) were ignored in ERB files/).to_stderr)
+          end
+
+          it 'is successful' do
+            expect(subject).to(be(true))
+          end
+        end
+      end
+
+      context 'when fail level is lower or equal than found errors' do
+        let(:args) { ['--lint-all', '--fail-level', 'I', '--enable-linter', 'linter_with_info_errors'] }
+
+        context "with the default glob" do
+          it 'shows all error messages and line numbers' do
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
+              fake info message from a fake linter
+              In file: /app/views/template.html.erb:1
+
+            EOF
+          end
+
+          it 'prints that errors were ignored to stderr' do
+            expect { subject }.to(output(/1 error\(s\) were found in ERB files/).to_stderr)
+          end
+
+          it 'is successful' do
+            expect(subject).to(be(false))
+          end
+        end
+      end
+    end
+
     context 'with dir as argument' do
       context 'when dir does not exist' do
         let(:linted_dir) { '/path/to' }
