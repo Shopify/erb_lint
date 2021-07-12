@@ -131,7 +131,7 @@ module ERBLint
     def read_content(filename)
       return File.read(filename, encoding: Encoding::UTF_8) unless stdin?
 
-      $stdin.binmode.read.force_encoding("utf-8")
+      $stdin.binmode.read.force_encoding(Encoding::UTF_8)
     end
 
     def correct(processed_source, offenses)
