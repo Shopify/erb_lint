@@ -27,7 +27,7 @@ module ERBLint
     def run(args = ARGV)
       dupped_args = args.dup
       load_options(dupped_args)
-      @files = dupped_args
+      @files = @options[:stdin] || dupped_args
 
       load_config
 
@@ -51,11 +51,12 @@ module ERBLint
       reporter.preview
 
       runner = ERBLint::Runner.new(file_loader, @config)
+      file_content = nil
 
       lint_files.each do |filename|
         runner.clear_offenses
         begin
-          run_with_corrections(runner, filename)
+          file_content = run_with_corrections(runner, filename)
         rescue => e
           @stats.exceptions += 1
           puts "Exception occurred when processing: #{relative_filename(filename)}"
@@ -68,6 +69,12 @@ module ERBLint
       end
 
       reporter.show
+
+      if stdin? && autocorrect?
+        # When running from stdin, we only lint a single file
+        puts "================ #{lint_files.first} ==================\n"
+        puts file_content
+      end
 
       @stats.found == 0 && @stats.exceptions == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
@@ -88,7 +95,7 @@ module ERBLint
     end
 
     def run_with_corrections(runner, filename)
-      file_content = File.read(filename, encoding: Encoding::UTF_8)
+      file_content = read_content(filename)
 
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
@@ -101,8 +108,11 @@ module ERBLint
 
         @stats.corrected += corrector.corrections.size
 
-        File.open(filename, "wb") do |file|
-          file.write(corrector.corrected_content)
+        # Don't overwrite the file if the input comes from stdin
+        unless stdin?
+          File.open(filename, "wb") do |file|
+            file.write(corrector.corrected_content)
+          end
         end
 
         file_content = corrector.corrected_content
@@ -114,6 +124,14 @@ module ERBLint
       @stats.found += offenses.size
       @stats.processed_files[offenses_filename] ||= []
       @stats.processed_files[offenses_filename] |= offenses
+
+      file_content
+    end
+
+    def read_content(filename)
+      return File.read(filename, encoding: Encoding::UTF_8) unless stdin?
+
+      $stdin.binmode.read.force_encoding(Encoding::UTF_8)
     end
 
     def correct(processed_source, offenses)
@@ -269,6 +287,14 @@ module ERBLint
           @options[:autocorrect] = config
         end
 
+        opts.on(
+          "-sFILE",
+          "--stdin FILE",
+          "Pipe source from STDIN. Takes the path to be used to check which rules to apply."
+        ) do |file|
+          @options[:stdin] = [file]
+        end
+
         opts.on_tail("-h", "--help", "Show this message") do
           success!(opts)
         end
@@ -287,6 +313,10 @@ module ERBLint
     def invalid_format_error_message(given_format)
       formats = Reporter.available_formats.map { |format| "  - #{format}\n" }
       "#{given_format}: is not a valid format. Available formats:\n#{formats.join}"
+    end
+
+    def stdin?
+      @options[:stdin].present?
     end
   end
 end

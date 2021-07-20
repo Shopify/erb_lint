@@ -366,5 +366,101 @@ describe ERBLint::CLI do
         expect(subject).to(be(false))
       end
     end
+
+    context 'with --stdin as argument' do
+      context 'when file does not exist' do
+        let(:linted_file) { '/path/to/myfile.html.erb' }
+        let(:args) { ['--stdin', linted_file] }
+
+        it { expect { subject }.to(output(/#{Regexp.escape(linted_file)}: does not exist/).to_stderr) }
+        it { expect(subject).to(be(false)) }
+      end
+
+      context 'when file exists' do
+        let(:linted_file) { 'app/views/template.html.erb' }
+        let(:args) { ['--enable-linter', 'linter_with_errors,final_newline', '--stdin', linted_file] }
+        let(:file_content) { "this is a fine file" }
+
+        before do
+          FileUtils.mkdir_p(File.dirname(linted_file))
+          FileUtils.touch(linted_file)
+          $stdin = StringIO.new(file_content)
+        end
+
+        after do
+          $stdin = STDIN
+        end
+
+        context 'without --config' do
+          context 'when default config does not exist' do
+            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+          end
+        end
+
+        it 'shows how many files and linters are used' do
+          expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
+        end
+
+        context 'when errors are found' do
+          it 'shows all error messages and line numbers' do
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+
+              fake message from a fake linter
+              In file: /app/views/template.html.erb:1
+
+              Missing a trailing newline at the end of the file.
+              In file: /app/views/template.html.erb:1
+
+            EOF
+          end
+
+          it 'prints that errors were found to stderr' do
+            expect { subject }.to(output(/2 error\(s\) were found in ERB files/).to_stderr)
+          end
+
+          it 'is not successful' do
+            expect(subject).to(be(false))
+          end
+
+          context 'when autocorrecting an error' do
+            let(:args) { ['--enable-linter', 'final_newline', '--stdin', linted_file, '--autocorrect'] }
+
+            it 'outputs the corrected ERB' do
+              expect { subject }.to(output(/#{file_content}\n/).to_stdout)
+            end
+          end
+        end
+
+        context 'when no errors are found' do
+          let(:args) { ['--enable-linter', 'linter_without_errors', '--stdin', linted_file] }
+
+          it 'shows that no errors were found to stdout' do
+            expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
+          end
+
+          it 'is successful' do
+            expect(subject).to(be(true))
+          end
+        end
+
+        context 'with excluded relative file in config file' do
+          let(:config_file) { '.exclude.yml' }
+          let(:config_file_content) { "exclude:\n  - app/views/template.html.erb" }
+          let(:args) do
+            ['--config', config_file, '--enable-linter', 'linter_with_errors,final_newline', '--stdin', linted_file]
+          end
+
+          before do
+            FileUtils.mkdir_p(File.dirname(config_file))
+            File.write(config_file, config_file_content)
+          end
+
+          it 'is not able to find the file' do
+            expect { subject }.to(output(/no files found\.\.\./).to_stderr)
+            expect(subject).to(be(false))
+          end
+        end
+      end
+    end
   end
 end
