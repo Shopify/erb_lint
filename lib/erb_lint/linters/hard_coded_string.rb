@@ -19,7 +19,27 @@ module ERBLint
       )
 
       NON_TEXT_TAGS = Set.new(%w(script style xmp iframe noembed noframes listing))
-      BLACK_LISTED_TEXT = Set.new(%w(&nbsp; &ensp; &emsp; &thinsp;))
+      BLACK_LISTED_TEXT = Set.new(%w(
+        &nbsp;
+        &amp;
+        &lt;
+        &gt;
+        &quot;
+        &copy;
+        &reg;
+        &trade;
+        &hellip;
+        &mdash;
+        &bull;
+        &ldquo;
+        &rdquo;
+        &lsquo;
+        &rsquo;
+        &larr;
+        &rarr;
+        &darr;
+        &uarr;
+      ))
 
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: -> { {} }
