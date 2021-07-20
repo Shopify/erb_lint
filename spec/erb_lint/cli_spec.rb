@@ -446,7 +446,9 @@ describe ERBLint::CLI do
         context 'with excluded relative file in config file' do
           let(:config_file) { '.exclude.yml' }
           let(:config_file_content) { "exclude:\n  - app/views/template.html.erb" }
-          let(:args) { ['--config', config_file, '--enable-linter', 'linter_with_errors,final_newline', '--stdin', linted_file] }
+          let(:args) do
+            ['--config', config_file, '--enable-linter', 'linter_with_errors,final_newline', '--stdin', linted_file]
+          end
 
           before do
             FileUtils.mkdir_p(File.dirname(config_file))

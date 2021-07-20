@@ -287,7 +287,11 @@ module ERBLint
           @options[:autocorrect] = config
         end
 
-        opts.on("-sFILE", "--stdin FILE", "Pipe source from STDIN. Takes the path to be used to check which rules to apply.") do |file|
+        opts.on(
+          "-sFILE",
+          "--stdin FILE",
+          "Pipe source from STDIN. Takes the path to be used to check which rules to apply."
+        ) do |file|
           @options[:stdin] = [file]
         end
 
