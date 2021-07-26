@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 module ERBLint
   class Stats
-    attr_accessor :found,
+    attr_accessor :ignored,
+                  :found,
                   :corrected,
                   :exceptions,
                   :linters,
@@ -9,6 +10,7 @@ module ERBLint
                   :processed_files
 
     def initialize(
+      ignored: 0,
       found: 0,
       corrected: 0,
       exceptions: 0,
@@ -16,6 +18,7 @@ module ERBLint
       files: 0,
       processed_files: {}
     )
+      @ignored = ignored
       @found = found
       @corrected = corrected
       @exceptions = exceptions

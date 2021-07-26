@@ -8,6 +8,7 @@ describe ERBLint::Reporters::CompactReporter do
 
     let(:stats) do
       ERBLint::Stats.new(
+        ignored: 2,
         found: 4,
         processed_files: {
           'app/views/users/show.html.erb' => show_file_offenses,
@@ -26,6 +27,11 @@ describe ERBLint::Reporters::CompactReporter do
                         message: 'Remove multiple trailing newline at the end of the file.',
                         line_number: 125,
                         column: 1),
+        instance_double(ERBLint::Offense,
+                        message: 'Trailing comma expected.',
+                        line_number: 145,
+                        column: 4,
+                        severity: :info),
       ]
     end
 
@@ -39,6 +45,11 @@ describe ERBLint::Reporters::CompactReporter do
                         message: 'Extra space detected where there should be no space.',
                         line_number: 7,
                         column: 1),
+        instance_double(ERBLint::Offense,
+                        message: 'Trailing comma expected.',
+                        line_number: 8,
+                        column: 4,
+                        severity: :info),
       ]
     end
 
@@ -46,8 +57,17 @@ describe ERBLint::Reporters::CompactReporter do
       expect { subject }.to(output(<<~MESSAGE).to_stdout)
         app/views/users/show.html.erb:61:10: Extra space detected where there should be no space.
         app/views/users/show.html.erb:125:1: Remove multiple trailing newline at the end of the file.
+        app/views/users/show.html.erb:145:4: Trailing comma expected.
         app/views/shared/_notifications.html.erb:3:1: Indent with spaces instead of tabs.
         app/views/shared/_notifications.html.erb:7:1: Extra space detected where there should be no space.
+        app/views/shared/_notifications.html.erb:8:4: Trailing comma expected.
+      MESSAGE
+    end
+
+    it "outputs offenses summary to stderr" do
+      expect { subject }.to(output(<<~MESSAGE).to_stderr)
+        #{Rainbow('2 error(s) were ignored in ERB files').yellow}
+        #{Rainbow('4 error(s) were found in ERB files').red}
       MESSAGE
     end
   end

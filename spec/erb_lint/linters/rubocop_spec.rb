@@ -298,7 +298,9 @@ describe ERBLint::Linters::Rubocop do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      "ErbLint/AutoCorrectCop: An arbitrary rule has been violated."
+      "ErbLint/AutoCorrectCop: An arbitrary rule has been violated.",
+      nil,
+      :convention,
     )
   end
 end

@@ -7,9 +7,12 @@ require 'optparse'
 require 'psych'
 require 'yaml'
 require 'rainbow'
+require 'erb_lint/utils/severity_levels'
 
 module ERBLint
   class CLI
+    include Utils::SeverityLevels
+
     DEFAULT_CONFIG_FILENAME = '.erb-lint.yml'
     DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
 
@@ -44,6 +47,7 @@ module ERBLint
       end
 
       @options[:format] ||= :multiline
+      @options[:fail_level] ||= severity_level_for_name(:refactor)
       @stats.files = lint_files.size
       @stats.linters = enabled_linter_classes.size
 
@@ -121,7 +125,12 @@ module ERBLint
       offenses_filename = relative_filename(filename)
       offenses = runner.offenses || []
 
-      @stats.found += offenses.size
+      @stats.ignored, @stats.found = offenses.partition do |offense|
+        severity_level_for_name(offense.severity) < @options[:fail_level]
+      end.map(&:size)
+        .zip([@stats.ignored, @stats.found])
+        .map(&:sum)
+
       @stats.processed_files[offenses_filename] ||= []
       @stats.processed_files[offenses_filename] |= offenses
 
@@ -281,6 +290,15 @@ module ERBLint
             end
           end
           @options[:enabled_linters] = linters
+        end
+
+        opts.on("--fail-level SEVERITY", "Minimum severity for exit with error code") do |level|
+          parsed_severity = SEVERITY_CODE_TABLE[level.upcase.to_sym] || (SEVERITY_NAMES & [level.downcase]).first
+
+          if parsed_severity.nil?
+            failure!("#{level}: not a valid failure level (#{SEVERITY_NAMES.join(', ')})")
+          end
+          @options[:fail_level] = severity_level_for_name(parsed_severity)
         end
 
         opts.on("-a", "--autocorrect", "Correct offenses automatically if possible (default: false)") do |config|
