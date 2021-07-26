@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-gem 'rake'
+gem "rake"
 
-group 'test' do
-  gem 'fakefs'
+group "test" do
+  gem "fakefs"
 end
 
 gemspec

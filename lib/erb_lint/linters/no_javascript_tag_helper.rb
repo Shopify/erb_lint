@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'better_html/ast/node'
-require 'better_html/test_helper/ruby_node'
-require 'erb_lint/utils/block_map'
-require 'erb_lint/utils/ruby_to_erb'
+require "better_html"
+require "better_html/ast/node"
+require "better_html/test_helper/ruby_node"
+require "erb_lint/utils/block_map"
+require "erb_lint/utils/ruby_to_erb"
 
 module ERBLint
   module Linters
@@ -21,7 +21,7 @@ module ERBLint
         parser.ast.descendants(:erb).each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           indicator = indicator_node&.loc&.source
-          next if indicator == '#'
+          next if indicator == "#"
           source = code_node.loc.source
 
           ruby_node =
@@ -63,10 +63,10 @@ module ERBLint
         return unless (0..2).cover?(argument_nodes.size)
 
         script_content = unless argument_nodes.first&.type?(:hash)
-          Utils::RubyToERB.ruby_to_erb(argument_nodes.first, '==')
+          Utils::RubyToERB.ruby_to_erb(argument_nodes.first, "==")
         end
         arguments = if argument_nodes.last&.type?(:hash)
-          ' ' + Utils::RubyToERB.html_options_to_tag_attributes(argument_nodes.last)
+          " " + Utils::RubyToERB.html_options_to_tag_attributes(argument_nodes.last)
         end
 
         return if end_node && script_content

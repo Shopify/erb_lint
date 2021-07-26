@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'better_html/ast/node'
-require 'better_html/test_helper/ruby_node'
+require "better_html/ast/node"
+require "better_html/test_helper/ruby_node"
 
 module ERBLint
   module Utils

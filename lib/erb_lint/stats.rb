@@ -2,12 +2,12 @@
 module ERBLint
   class Stats
     attr_accessor :ignored,
-                  :found,
-                  :corrected,
-                  :exceptions,
-                  :linters,
-                  :files,
-                  :processed_files
+      :found,
+      :corrected,
+      :exceptions,
+      :linters,
+      :files,
+      :processed_files
 
     def initialize(
       ignored: 0,

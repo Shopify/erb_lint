@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe ERBLint::Linters::RequireInputAutocomplete do
   let(:linter_config) { described_class.config_schema.new }
 
-  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:file_loader) { ERBLint::FileLoader.new(".") }
   let(:linter) { described_class.new(file_loader, linter_config) }
-  let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
+  let(:processed_source) { ERBLint::ProcessedSource.new("file.rb", file) }
   let(:offenses) { linter.offenses }
   let(:corrector) { ERBLint::Corrector.new(processed_source, offenses) }
   let(:corrected_content) { corrector.corrected_content }
@@ -39,34 +39,34 @@ describe ERBLint::Linters::RequireInputAutocomplete do
   end
   before { linter.run(processed_source) }
 
-  describe 'pure HTML linting' do
+  describe "pure HTML linting" do
     subject { offenses }
 
-    context 'when input type requires autocomplete attribute and it is present' do
+    context "when input type requires autocomplete attribute and it is present" do
       let(:file) { '<input type="email" autocomplete="foo">' }
       it { expect(subject).to(eq([])) }
     end
 
-    context 'when input type does not require autocomplete attribute and it is not present' do
+    context "when input type does not require autocomplete attribute and it is not present" do
       let(:file) { '<input type="bar">' }
       it { expect(subject).to(eq([])) }
     end
 
-    context 'when input type requires autocomplete attribute and it is not present' do
+    context "when input type requires autocomplete attribute and it is not present" do
       let(:file) { '<input type="email">' }
       it { expect(subject).to(eq([build_offense(1..5, html_message)])) }
     end
   end
 
-  describe 'input field helpers linting' do
+  describe "input field helpers linting" do
     subject { offenses }
 
-    context 'usage of field helpers with autocomplete value' do
+    context "usage of field helpers with autocomplete value" do
       let(:file) { <<~FILE }
         <br />
         #{
-          form_helpers_requiring_autocomplete.inject('') do |s, helper|
-            s + '<%= ' + helper.to_s + ' autocomplete: "foo" do %>'
+          form_helpers_requiring_autocomplete.inject("") do |s, helper|
+            s + "<%= " + helper.to_s + ' autocomplete: "foo" do %>'
           end
         }
         FILE
@@ -74,12 +74,12 @@ describe ERBLint::Linters::RequireInputAutocomplete do
       it { expect(subject).to(eq([])) }
     end
 
-    context 'usage of field helpers without autocomplete value' do
+    context "usage of field helpers without autocomplete value" do
       let(:file) { <<~FILE }
         <br />
         #{
-          form_helpers_requiring_autocomplete.inject('') do |s, helper|
-            s + '<%= ' + helper.to_s + ' do %>'
+          form_helpers_requiring_autocomplete.inject("") do |s, helper|
+            s + "<%= " + helper.to_s + " do %>"
           end
         }
         FILE

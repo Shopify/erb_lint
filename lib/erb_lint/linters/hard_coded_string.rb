@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "set"
-require 'better_html/tree/tag'
-require 'active_support/core_ext/string/inflections'
+require "better_html/tree/tag"
+require "active_support/core_ext/string/inflections"
 
 module ERBLint
   module Linters
@@ -13,37 +13,34 @@ module ERBLint
       MissingCorrector = Class.new(StandardError)
       MissingI18nLoadPath = Class.new(StandardError)
 
-      ALLOWED_CORRECTORS = %w(
-        I18nCorrector
-        RuboCop::Corrector::I18n::HardCodedString
-      )
+      ALLOWED_CORRECTORS = ["I18nCorrector", "RuboCop::Corrector::I18n::HardCodedString"]
 
-      NON_TEXT_TAGS = Set.new(%w(script style xmp iframe noembed noframes listing))
-      BLACK_LISTED_TEXT = Set.new(%w(
-        &nbsp;
-        &amp;
-        &lt;
-        &gt;
-        &quot;
-        &copy;
-        &reg;
-        &trade;
-        &hellip;
-        &mdash;
-        &bull;
-        &ldquo;
-        &rdquo;
-        &lsquo;
-        &rsquo;
-        &larr;
-        &rarr;
-        &darr;
-        &uarr;
-      ))
+      NON_TEXT_TAGS = Set.new(["script", "style", "xmp", "iframe", "noembed", "noframes", "listing"])
+      TEXT_NOT_ALLOWED = Set.new([
+        "&nbsp;",
+        "&amp;",
+        "&lt;",
+        "&gt;",
+        "&quot;",
+        "&copy;",
+        "&reg;",
+        "&trade;",
+        "&hellip;",
+        "&mdash;",
+        "&bull;",
+        "&ldquo;",
+        "&rdquo;",
+        "&lsquo;",
+        "&rsquo;",
+        "&larr;",
+        "&rarr;",
+        "&darr;",
+        "&uarr;",
+      ])
 
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: -> { {} }
-        property :i18n_load_path, accepts: String, required: false, default: ''
+        property :i18n_load_path, accepts: String, required: false, default: ""
       end
       self.config_schema = ConfigSchema
 
@@ -85,7 +82,7 @@ module ERBLint
         return unless string.strip.length > 1
         node = ::RuboCop::AST::StrNode.new(:str, [string])
         corrector = klass.new(node, processed_source.filename, corrector_i18n_load_path, offense.source_range)
-        corrector.autocorrect(tag_start: '<%= ', tag_end: ' %>')
+        corrector.autocorrect(tag_start: "<%= ", tag_end: " %>")
       rescue MissingCorrector, MissingI18nLoadPath
         nil
       end
@@ -93,20 +90,20 @@ module ERBLint
       private
 
       def check_string?(str)
-        string = str.gsub(/\s*/, '')
-        string.length > 1 && !BLACK_LISTED_TEXT.include?(string)
+        string = str.gsub(/\s*/, "")
+        string.length > 1 && !TEXT_NOT_ALLOWED.include?(string)
       end
 
       def load_corrector
-        corrector_name = @config['corrector'].fetch('name') { raise MissingCorrector }
+        corrector_name = @config["corrector"].fetch("name") { raise MissingCorrector }
         raise ForbiddenCorrector unless ALLOWED_CORRECTORS.include?(corrector_name)
-        require @config['corrector'].fetch('path') { raise MissingCorrector }
+        require @config["corrector"].fetch("path") { raise MissingCorrector }
 
         corrector_name.safe_constantize
       end
 
       def corrector_i18n_load_path
-        @config['corrector'].fetch('i18n_load_path') { raise MissingI18nLoadPath }
+        @config["corrector"].fetch("i18n_load_path") { raise MissingI18nLoadPath }
       end
 
       def non_text_tag?(processed_source, text_node)

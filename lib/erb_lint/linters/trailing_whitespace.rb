@@ -25,7 +25,7 @@ module ERBLint
 
       def autocorrect(_processed_source, offense)
         lambda do |corrector|
-          corrector.replace(offense.source_range, '')
+          corrector.replace(offense.source_range, "")
         end
       end
     end

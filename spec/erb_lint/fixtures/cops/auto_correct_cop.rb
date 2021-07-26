@@ -4,8 +4,8 @@ module RuboCop
   module Cop
     module ErbLint
       class AutoCorrectCop < Cop
-        MSG = 'An arbitrary rule has been violated.'
-        METHODS_TO_WATCH = %i(auto_correct_me dont_auto_correct_me)
+        MSG = "An arbitrary rule has been violated."
+        METHODS_TO_WATCH = [:auto_correct_me, :dont_auto_correct_me]
 
         def on_send(node)
           return unless METHODS_TO_WATCH.include?(node.method_name)
@@ -18,7 +18,7 @@ module RuboCop
           return if node.method_name == :dont_auto_correct_me
 
           lambda do |corrector|
-            corrector.replace(node.loc.selector, 'safe_method')
+            corrector.replace(node.loc.selector, "safe_method")
           end
         end
       end

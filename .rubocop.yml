@@ -7,3 +7,4 @@ AllCops:
     - 'vendor/**/*'
     - 'gemfiles/vendor/**/*'
   DisplayCopNames: true
+  SuggestExtensions: false

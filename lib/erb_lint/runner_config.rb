@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'erb_lint/runner_config_resolver'
+require "erb_lint/runner_config_resolver"
 
 module ERBLint
   class RunnerConfig
@@ -9,7 +9,7 @@ module ERBLint
     def initialize(config = nil, file_loader = nil)
       @config = (config || {}).dup.deep_stringify_keys
 
-      resolver.resolve_inheritance_from_gems(@config, @config.delete('inherit_gem'))
+      resolver.resolve_inheritance_from_gems(@config, @config.delete("inherit_gem"))
       resolver.resolve_inheritance(@config, file_loader) if file_loader
       @config.delete("inherit_from")
     end
@@ -24,7 +24,7 @@ module ERBLint
       elsif klass.is_a?(Class) && klass <= ERBLint::Linter
         klass.simple_name
       else
-        raise ArgumentError, 'expected String or linter class'
+        raise ArgumentError, "expected String or linter class"
       end
       linter_klass = LinterRegistry.find_by_name(klass_name)
       raise Error, "#{klass_name}: linter not found (is it loaded?)" unless linter_klass
@@ -32,7 +32,7 @@ module ERBLint
     end
 
     def global_exclude
-      @config['exclude'] || []
+      @config["exclude"] || []
     end
 
     def merge(other_config)
@@ -75,13 +75,13 @@ module ERBLint
     private
 
     def linters_config
-      @config['linters'] || {}
+      @config["linters"] || {}
     end
 
     def config_hash_for_linter(klass_name)
       config_hash = linters_config[klass_name] || {}
-      config_hash['exclude'] ||= []
-      config_hash['exclude'].concat(global_exclude) if config_hash['exclude'].is_a?(Array)
+      config_hash["exclude"] ||= []
+      config_hash["exclude"].concat(global_exclude) if config_hash["exclude"].is_a?(Array)
       config_hash
     end
 

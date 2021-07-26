@@ -8,7 +8,7 @@ module ERBLint
       include LinterRegistry
 
       class ConfigSchema < LinterConfig
-        property :enforced_style, accepts: ['-', '='], default: '-'
+        property :enforced_style, accepts: ["-", "="], default: "-"
       end
       self.config_schema = ConfigSchema
 

@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe ERBLint::Reporters::JsonReporter do
-  describe '.show' do
+  describe ".show" do
     subject { described_class.new(stats, false).show }
 
     let(:stats) do
       ERBLint::Stats.new(
         found: 2,
         processed_files: {
-          'app/views/subscriptions/_loader.html.erb' => offenses,
+          "app/views/subscriptions/_loader.html.erb" => offenses,
         },
         corrected: 1
       )
@@ -20,7 +20,7 @@ describe ERBLint::Reporters::JsonReporter do
       [
         instance_double(
           ERBLint::Offense,
-          message: 'Extra space detected where there should be no space.',
+          message: "Extra space detected where there should be no space.",
           line_number: 1,
           column: 7,
           source_range: instance_double(
@@ -33,7 +33,7 @@ describe ERBLint::Reporters::JsonReporter do
         ),
         instance_double(
           ERBLint::Offense,
-          message: 'Remove newline before `%>` to match start of tag.',
+          message: "Remove newline before `%>` to match start of tag.",
           line_number: 52,
           column: 10,
           source_range: instance_double(
@@ -57,11 +57,11 @@ describe ERBLint::Reporters::JsonReporter do
           ruby_platform: RUBY_PLATFORM,
         },
         files: [{
-          path: 'app/views/subscriptions/_loader.html.erb',
+          path: "app/views/subscriptions/_loader.html.erb",
           offenses: [
             {
-              linter: 'SpaceInHtmlTag',
-              message: 'Extra space detected where there should be no space.',
+              linter: "SpaceInHtmlTag",
+              message: "Extra space detected where there should be no space.",
               location: {
                 start_line: 1,
                 start_column: 7,
@@ -71,8 +71,8 @@ describe ERBLint::Reporters::JsonReporter do
               },
             },
             {
-              linter: 'ClosingErbTagIndent',
-              message: 'Remove newline before `%>` to match start of tag.',
+              linter: "ClosingErbTagIndent",
+              message: "Remove newline before `%>` to match start of tag.",
               location: {
                 start_line: 52,
                 start_column: 10,
@@ -91,7 +91,7 @@ describe ERBLint::Reporters::JsonReporter do
       }
     end
 
-    it 'displays formatted offenses output' do
+    it "displays formatted offenses output" do
       expect { subject }.to(output(expected_hash.to_json + "\n").to_stdout)
     end
   end

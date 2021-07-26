@@ -24,7 +24,7 @@
 module ERBLint
   class RunnerConfigResolver
     def resolve_inheritance(hash, file_loader)
-      inherited_files = Array(hash['inherit_from'])
+      inherited_files = Array(hash["inherit_from"])
       base_configs(file_loader, inherited_files).reverse_each do |base_config|
         base_config.each do |k, v|
           next unless v.is_a?(Hash)
@@ -36,12 +36,12 @@ module ERBLint
 
     def resolve_inheritance_from_gems(hash, gems)
       (gems || {}).each_pair do |gem_name, config_path|
-        raise(ArgumentError, "can't inherit configuration from the erb-lint gem") if gem_name == 'erb-lint'
+        raise(ArgumentError, "can't inherit configuration from the erb-lint gem") if gem_name == "erb-lint"
 
-        hash['inherit_from'] = Array(hash['inherit_from'])
+        hash["inherit_from"] = Array(hash["inherit_from"])
         Array(config_path).reverse_each do |path|
           # Put gem configuration first so local configuration overrides it.
-          hash['inherit_from'].unshift(gem_config_path(gem_name, path))
+          hash["inherit_from"].unshift(gem_config_path(gem_name, path))
         end
       end
     end

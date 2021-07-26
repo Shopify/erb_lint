@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'tempfile'
-require 'erb_lint/utils/offset_corrector'
+require "better_html"
+require "tempfile"
+require "erb_lint/utils/offset_corrector"
 
 module ERBLint
   module Linters
@@ -25,7 +25,7 @@ module ERBLint
         super
         @only_cops = @config.only
         custom_config = config_from_hash(@config.rubocop_config)
-        @rubocop_config = ::RuboCop::ConfigLoader.merge_with_default(custom_config, '')
+        @rubocop_config = ::RuboCop::ConfigLoader.merge_with_default(custom_config, "")
       end
 
       def run(processed_source)
@@ -68,13 +68,13 @@ module ERBLint
 
       def inspect_content(processed_source, erb_node)
         indicator, _, code_node, = *erb_node
-        return if indicator&.children&.first == '#'
+        return if indicator&.children&.first == "#"
 
         original_source = code_node.loc.source
-        trimmed_source = original_source.sub(BLOCK_EXPR, '').sub(SUFFIX_EXPR, '')
+        trimmed_source = original_source.sub(BLOCK_EXPR, "").sub(SUFFIX_EXPR, "")
         alignment_column = code_node.loc.column
         offset = code_node.loc.begin_pos - alignment_column
-        aligned_source = "#{' ' * alignment_column}#{trimmed_source}"
+        aligned_source = "#{" " * alignment_column}#{trimmed_source}"
 
         source = rubocop_processed_source(aligned_source, processed_source.filename)
         return unless source.valid_syntax?
@@ -156,10 +156,10 @@ module ERBLint
       end
 
       def config_from_hash(hash)
-        inherit_from = hash&.delete('inherit_from')
+        inherit_from = hash&.delete("inherit_from")
         resolve_inheritance(hash, inherit_from)
 
-        tempfile_from('.erblint-rubocop', hash.to_yaml) do |tempfile|
+        tempfile_from(".erblint-rubocop", hash.to_yaml) do |tempfile|
           ::RuboCop::ConfigLoader.load_file(tempfile.path)
         end
       end
@@ -174,7 +174,7 @@ module ERBLint
       end
 
       def base_configs(inherit_from)
-        regex = URI::DEFAULT_PARSER.make_regexp(%w(http https))
+        regex = URI::DEFAULT_PARSER.make_regexp(["http", "https"])
         configs = Array(inherit_from).compact.map do |base_name|
           if base_name =~ /\A#{regex}\z/
             ::RuboCop::ConfigLoader.load_file(::RuboCop::RemoteConfig.new(base_name, Dir.pwd))

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'rubocop'
+require_relative "rubocop"
 
 module ERBLint
   module Linters

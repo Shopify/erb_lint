@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'better_html/tree/tag'
+require "better_html"
+require "better_html/tree/tag"
 
 module ERBLint
   module Linters
@@ -22,7 +22,7 @@ module ERBLint
       def find_html_script_tags(parser)
         parser.nodes_with_type(:tag).each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
-          nonce_attribute = tag.attributes['nonce']
+          nonce_attribute = tag.attributes["nonce"]
 
           next if !html_javascript_tag?(tag) || nonce_present?(nonce_attribute)
 
@@ -40,16 +40,16 @@ module ERBLint
 
       def html_javascript_tag?(tag)
         !tag.closing? &&
-          (tag.name == 'script' && !html_javascript_type_attribute?(tag))
+          (tag.name == "script" && !html_javascript_type_attribute?(tag))
       end
 
       def html_javascript_type_attribute?(tag)
-        type_attribute = tag.attributes['type']
+        type_attribute = tag.attributes["type"]
 
         type_attribute &&
           type_attribute.value_node.present? &&
-          type_attribute.value_node.to_a[1] != 'text/javascript' &&
-          type_attribute.value_node.to_a[1] != 'application/javascript'
+          type_attribute.value_node.to_a[1] != "text/javascript" &&
+          type_attribute.value_node.to_a[1] != "application/javascript"
       end
 
       def find_rails_helper_script_tags(parser)
@@ -79,7 +79,7 @@ module ERBLint
       end
 
       def code_comment?(indicator_node)
-        indicator_node&.loc&.source == '#'
+        indicator_node&.loc&.source == "#"
       end
 
       def extract_ruby_node(source)

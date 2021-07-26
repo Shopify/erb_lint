@@ -15,7 +15,7 @@ module ERBLint
         processed_source.ast.descendants(:erb).each do |erb_node|
           indicator_node, ltrim, code_node, rtrim = *erb_node
           indicator = indicator_node&.loc&.source
-          next if indicator == '#' || indicator == '%'
+          next if indicator == "#" || indicator == "%"
           code = code_node.children.first
 
           start_spaces = code.match(START_SPACES)&.captures&.first || ""
@@ -23,8 +23,8 @@ module ERBLint
             add_offense(
               code_node.loc.resize(start_spaces.size),
               "Use 1 space after `<%#{indicator}#{ltrim&.loc&.source}` "\
-              "instead of #{start_spaces.size} space#{'s' if start_spaces.size > 1}.",
-              ' '
+              "instead of #{start_spaces.size} space#{"s" if start_spaces.size > 1}.",
+              " "
             )
           elsif start_spaces.count("\n") > 1
             lines = start_spaces.split("\n", -1)
@@ -41,8 +41,8 @@ module ERBLint
             add_offense(
               code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Use 1 space before `#{rtrim&.loc&.source}%>` "\
-              "instead of #{end_spaces.size} space#{'s' if start_spaces.size > 1}.",
-              ' '
+              "instead of #{end_spaces.size} space#{"s" if start_spaces.size > 1}.",
+              " "
             )
           elsif end_spaces.count("\n") > 1
             lines = end_spaces.split("\n", -1)

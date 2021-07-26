@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'better_html/tree/tag'
+require "better_html"
+require "better_html/tree/tag"
 
 module ERBLint
   module Linters
@@ -13,7 +13,7 @@ module ERBLint
 
       class ConfigSchema < LinterConfig
         property :allowed_types, accepts: array_of?(String),
-          default: -> { ['text/javascript'] }
+          default: -> { ["text/javascript"] }
         property :allow_blank, accepts: [true, false], default: true, reader: :allow_blank?
         property :disallow_inline_scripts, accepts: [true, false], default: false, reader: :disallow_inline_scripts?
       end
@@ -24,7 +24,7 @@ module ERBLint
         parser.nodes_with_type(:tag).each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           next if tag.closing?
-          next unless tag.name == 'script'
+          next unless tag.name == "script"
 
           if @config.disallow_inline_scripts?
             name_node = tag_node.to_a[1]
@@ -36,7 +36,7 @@ module ERBLint
             next
           end
 
-          type_attribute = tag.attributes['type']
+          type_attribute = tag.attributes["type"]
           type_present = type_attribute.present? && type_attribute.value_node.present?
 
           if !type_present && !@config.allow_blank?
@@ -50,8 +50,8 @@ module ERBLint
             add_offense(
               type_attribute.loc,
               "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. "\
-              "Must be one of: #{@config.allowed_types.join(', ')}"\
-              "#{' (or no type attribute)' if @config.allow_blank?}."
+              "Must be one of: #{@config.allowed_types.join(", ")}"\
+              "#{" (or no type attribute)" if @config.allow_blank?}."
             )
           end
         end

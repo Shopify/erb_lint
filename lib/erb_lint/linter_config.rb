@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'active_support'
-require 'smart_properties'
+require "active_support"
+require "smart_properties"
 
 module ERBLint
   class LinterConfig
@@ -27,7 +27,7 @@ module ERBLint
       allowed_keys = self.class.properties.keys.map(&:to_s)
       given_keys = config.keys
       if (extra_keys = given_keys - allowed_keys).any?
-        raise Error, "Given key is not allowed: #{extra_keys.join(', ')}"
+        raise Error, "Given key is not allowed: #{extra_keys.join(", ")}"
       end
       super(config)
     rescue SmartProperties::InitializationError => e

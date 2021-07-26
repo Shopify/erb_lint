@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'better_html/tree/tag'
+require "better_html"
+require "better_html/tree/tag"
 
 module ERBLint
   module Linters
@@ -56,8 +56,8 @@ module ERBLint
         parser.nodes_with_type(:tag).each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
 
-          autocomplete_attribute = tag.attributes['autocomplete']
-          type_attribute = tag.attributes['type']
+          autocomplete_attribute = tag.attributes["autocomplete"]
+          type_attribute = tag.attributes["type"]
 
           next if !html_input_tag?(tag) || autocomplete_present?(autocomplete_attribute)
           next unless html_type_requires_autocomplete_attribute?(type_attribute)
@@ -76,7 +76,7 @@ module ERBLint
       end
 
       def html_input_tag?(tag)
-        !tag.closing? && tag.name == 'input'
+        !tag.closing? && tag.name == "input"
       end
 
       def html_type_requires_autocomplete_attribute?(type_attribute)
@@ -110,7 +110,7 @@ module ERBLint
       end
 
       def code_comment?(indicator_node)
-        indicator_node&.loc&.source == '#'
+        indicator_node&.loc&.source == "#"
       end
 
       def extract_ruby_node(source)

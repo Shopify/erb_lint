@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'better_html'
-require 'better_html/parser'
+require "better_html"
+require "better_html/parser"
 
 module ERBLint
   module Linters
@@ -11,7 +11,7 @@ module ERBLint
 
       class RuleSet
         include SmartProperties
-        property :suggestion, accepts: String, default: ''
+        property :suggestion, accepts: String, default: ""
         property :deprecated, accepts: LinterConfig.array_of?(String), default: -> { [] }
       end
 
@@ -57,9 +57,9 @@ module ERBLint
       def class_name_with_loc(processed_source)
         Enumerator.new do |yielder|
           tags(processed_source).each do |tag|
-            class_value = tag.attributes['class']&.value
+            class_value = tag.attributes["class"]&.value
             next unless class_value
-            class_value.split(' ').each do |class_name|
+            class_value.split(" ").each do |class_name|
               yielder.yield(class_name, tag.loc)
             end
           end
@@ -69,7 +69,7 @@ module ERBLint
       def text_tags_content(processed_source)
         Enumerator.new do |yielder|
           script_tags(processed_source)
-            .select { |tag| tag.attributes['type']&.value == 'text/html' }
+            .select { |tag| tag.attributes["type"]&.value == "text/html" }
             .each do |tag|
               index = processed_source.ast.to_a.find_index(tag.node)
               next_node = processed_source.ast.to_a[index + 1]
@@ -80,7 +80,7 @@ module ERBLint
       end
 
       def script_tags(processed_source)
-        tags(processed_source).select { |tag| tag.name == 'script' }
+        tags(processed_source).select { |tag| tag.name == "script" }
       end
 
       def tags(processed_source)

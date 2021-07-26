@@ -21,7 +21,7 @@ module ERBLint
     end
 
     if ::RuboCop::Version::STRING.to_f >= 0.87
-      require 'rubocop/cop/legacy/corrector'
+      require "rubocop/cop/legacy/corrector"
       BASE = ::RuboCop::Cop::Legacy::Corrector
 
       def diagnostics

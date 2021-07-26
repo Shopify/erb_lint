@@ -9,7 +9,7 @@ module ERBLint
       def format_offense(filename, offense)
         <<~EOF
 
-          #{offense.message}#{Rainbow(' (not autocorrected)').red if autocorrect}
+          #{offense.message}#{Rainbow(" (not autocorrected)").red if autocorrect}
           In file: #{filename}:#{offense.line_number}
         EOF
       end

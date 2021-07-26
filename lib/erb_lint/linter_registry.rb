@@ -3,7 +3,7 @@
 module ERBLint
   # Stores all linters available to the application.
   module LinterRegistry
-    CUSTOM_LINTERS_DIR = '.erb-linters'
+    CUSTOM_LINTERS_DIR = ".erb-linters"
     @loaded_linters = []
 
     class << self
@@ -27,7 +27,7 @@ module ERBLint
       end
 
       def load_custom_linters(directory = CUSTOM_LINTERS_DIR)
-        ruby_files = Dir.glob(File.expand_path(File.join(directory, '**', '*.rb')))
+        ruby_files = Dir.glob(File.expand_path(File.join(directory, "**", "*.rb")))
         ruby_files.each { |file| require file }
       end
     end

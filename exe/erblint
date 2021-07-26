@@ -3,7 +3,7 @@
 
 $LOAD_PATH.unshift("#{__dir__}/../lib")
 
-require 'erb_lint/cli'
+require "erb_lint/cli"
 
 cli = ERBLint::CLI.new
 exit(cli.run)

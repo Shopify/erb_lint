@@ -50,7 +50,7 @@ module ERBLint
         add_offense(
           processed_source.to_source_range(range),
           "Extra space detected where there should be no space.",
-          ''
+          ""
         )
       end
 
@@ -60,24 +60,24 @@ module ERBLint
 
       def single_space(processed_source, range, accept_newline: false)
         chars = processed_source.file_content[range]
-        return if chars == ' '
+        return if chars == " "
 
         newlines = chars.include?("\n")
-        expected = newlines && accept_newline ? "\n#{chars.split("\n", -1).last}" : ' '
+        expected = newlines && accept_newline ? "\n#{chars.split("\n", -1).last}" : " "
         non_space = chars.match(/([^[[:space:]]])/m)
 
         if non_space && !non_space.captures.empty?
           add_offense(
             processed_source.to_source_range(range),
             "Non-whitespace character(s) detected: "\
-              "#{non_space.captures.map(&:inspect).join(', ')}.",
+              "#{non_space.captures.map(&:inspect).join(", ")}.",
             expected
           )
         elsif newlines && accept_newline
           if expected != chars
             add_offense(
               processed_source.to_source_range(range),
-              "#{chars.empty? ? 'No' : 'Extra'} space detected where there should be "\
+              "#{chars.empty? ? "No" : "Extra"} space detected where there should be "\
                 "a single space or a single line break.",
               expected
             )
@@ -85,7 +85,7 @@ module ERBLint
         else
           add_offense(
             processed_source.to_source_range(range),
-            "#{chars.empty? ? 'No' : 'Extra'} space detected where there should be a single space.",
+            "#{chars.empty? ? "No" : "Extra"} space detected where there should be a single space.",
             expected
           )
         end

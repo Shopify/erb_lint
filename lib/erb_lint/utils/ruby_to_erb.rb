@@ -9,10 +9,10 @@ module ERBLint
         def html_options_to_tag_attributes(hash_node)
           hash_node.children.map do |pair_node|
             key_node, value_node = *pair_node
-            key = ruby_to_erb(key_node, '=') { |s| s.tr('_', '-') }
-            value = ruby_to_erb(value_node, '=') { |s| escape_quote(s) }
-            [key, "\"#{value}\""].join('=')
-          end.join(' ')
+            key = ruby_to_erb(key_node, "=") { |s| s.tr("_", "-") }
+            value = ruby_to_erb(value_node, "=") { |s| escape_quote(s) }
+            [key, "\"#{value}\""].join("=")
+          end.join(" ")
         end
 
         def ruby_to_erb(node, indicator = nil, &block)
@@ -43,7 +43,7 @@ module ERBLint
         end
 
         def escape_quote(str)
-          str.gsub('"', '&quot;')
+          str.gsub('"', "&quot;")
         end
       end
     end

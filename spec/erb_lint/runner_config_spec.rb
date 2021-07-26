@@ -1,27 +1,27 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe ERBLint::RunnerConfig do
-  describe '.default' do
-    it 'returns expected class' do
+  describe ".default" do
+    it "returns expected class" do
       expect(described_class.default.class).to(be(described_class))
     end
 
-    it 'has default linters enabled' do
-      expect(described_class.default.for_linter('FinalNewline').enabled?).to(be(true))
+    it "has default linters enabled" do
+      expect(described_class.default.for_linter("FinalNewline").enabled?).to(be(true))
     end
 
-    it 'disables default linters if asked to do so' do
+    it "disables default linters if asked to do so" do
       expect(
         described_class
           .default(default_enabled: false)
-          .for_linter('FinalNewline').enabled?
+          .for_linter("FinalNewline").enabled?
       ).to(be(false))
     end
   end
 
-  describe '.default_for' do
+  describe ".default_for" do
     let(:enabled_default_linters) do
       described_class.default(default_enabled: true)
     end
@@ -30,60 +30,60 @@ describe ERBLint::RunnerConfig do
       described_class.default(default_enabled: false)
     end
 
-    context 'without EnableDefaultLinters option' do
+    context "without EnableDefaultLinters option" do
       let(:config_hash) do
         { foo: true }.deep_stringify_keys
       end
 
       subject { described_class.default_for(config_hash) }
-      it 'enables the default linters' do
+      it "enables the default linters" do
         expect(subject.to_hash["linters"].to_json).to(eq(enabled_default_linters.to_hash["linters"].to_json))
       end
     end
 
-    context 'with EnableDefaultLinters option set to true' do
+    context "with EnableDefaultLinters option set to true" do
       let(:config_hash) do
         { "EnableDefaultLinters" => true }
       end
 
       subject { described_class.default_for(config_hash) }
-      it 'enables the default linters' do
+      it "enables the default linters" do
         expect(subject.to_hash["linters"].to_json).to(eq(enabled_default_linters.to_hash["linters"].to_json))
       end
     end
 
-    context 'with EnableDefaultLinters set to false' do
+    context "with EnableDefaultLinters set to false" do
       let(:config_hash) do
         { "EnableDefaultLinters" => false }
       end
 
       subject { described_class.default_for(config_hash) }
-      it 'disables the default linters' do
+      it "disables the default linters" do
         expect(subject.to_hash["linters"].to_json).to(eq(disabled_default_linters.to_hash["linters"].to_json))
       end
     end
   end
 
-  context 'with custom config' do
+  context "with custom config" do
     let(:runner_config) { described_class.new(config_hash) }
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { runner_config.to_hash }
 
-      context 'with empty hash' do
+      context "with empty hash" do
         let(:config_hash) { {} }
 
         it { expect(subject).to(eq({})) }
       end
 
-      context 'with custom data' do
+      context "with custom data" do
         let(:config_hash) { { foo: true } }
 
-        it { expect(subject).to(eq('foo' => true)) }
+        it { expect(subject).to(eq("foo" => true)) }
       end
     end
 
-    describe '#for_linter' do
+    describe "#for_linter" do
       subject { runner_config.for_linter(linter) }
 
       class MyCustomLinter < ERBLint::Linter
@@ -98,114 +98,114 @@ describe ERBLint::RunnerConfig do
           .and_return([ERBLint::Linters::FinalNewline, MyCustomLinter]))
       end
 
-      context 'with string argument' do
-        let(:linter) { 'MyCustomLinter' }
-        let(:config_hash) { { linters: { 'MyCustomLinter' => { 'my_option' => 'custom value' } } } }
+      context "with string argument" do
+        let(:linter) { "MyCustomLinter" }
+        let(:config_hash) { { linters: { "MyCustomLinter" => { "my_option" => "custom value" } } } }
 
         it { expect(subject.class).to(eq(MyCustomLinter::MySchema)) }
-        it { expect(subject['my_option']).to(eq('custom value')) }
+        it { expect(subject["my_option"]).to(eq("custom value")) }
       end
 
-      context 'with class argument' do
+      context "with class argument" do
         let(:linter) { MyCustomLinter }
-        let(:config_hash) { { linters: { 'MyCustomLinter' => { my_option: 'custom value' } } } }
+        let(:config_hash) { { linters: { "MyCustomLinter" => { my_option: "custom value" } } } }
 
         it { expect(subject.class).to(eq(MyCustomLinter::MySchema)) }
       end
 
-      context 'with argument that isnt a string and does not inherit from Linter' do
+      context "with argument that isnt a string and does not inherit from Linter" do
         let(:linter) { Object }
-        let(:config_hash) { { linters: { 'MyCustomLinter' => { my_option: 'custom value' } } } }
+        let(:config_hash) { { linters: { "MyCustomLinter" => { my_option: "custom value" } } } }
 
         it { expect { subject }.to(raise_error(ArgumentError, "expected String or linter class")) }
       end
 
-      context 'for linter not present in config hash' do
-        let(:linter) { 'FinalNewline' }
+      context "for linter not present in config hash" do
+        let(:linter) { "FinalNewline" }
         let(:config_hash) {}
 
         it { expect(subject.class).to(eq(ERBLint::Linters::FinalNewline::ConfigSchema)) }
-        it 'fills linter config with defaults from schema' do
+        it "fills linter config with defaults from schema" do
           expect(subject.to_hash).to(eq("enabled" => false, "exclude" => [], "present" => true))
         end
-        it 'is disabled by default' do
+        it "is disabled by default" do
           expect(subject.enabled?).to(eq(false))
         end
       end
 
-      context 'when global excludes are specified' do
+      context "when global excludes are specified" do
         let(:linter) { MyCustomLinter }
         let(:config_hash) do
           {
             linters: {
-              'MyCustomLinter' => { exclude: ['foo/bar.rb'] },
+              "MyCustomLinter" => { exclude: ["foo/bar.rb"] },
             },
             exclude: [
-              '**/node_modules/**',
+              "**/node_modules/**",
             ],
           }
         end
 
-        it 'excluded files are merged' do
-          expect(subject.exclude).to(eq(['foo/bar.rb', '**/node_modules/**']))
+        it "excluded files are merged" do
+          expect(subject.exclude).to(eq(["foo/bar.rb", "**/node_modules/**"]))
         end
       end
     end
 
-    describe '#merge' do
+    describe "#merge" do
       let(:first_config) { described_class.new(foo: 1) }
       let(:second_config) { described_class.new(bar: 2) }
       subject { first_config.merge(second_config) }
 
-      context 'creates a new object' do
+      context "creates a new object" do
         it { expect(subject.class).to(be(described_class)) }
         it { expect(subject).to_not(be(first_config)) }
         it { expect(subject).to_not(be(second_config)) }
       end
 
-      context 'new object has keys from both configs' do
-        it { expect(subject.to_hash).to(eq('foo' => 1, 'bar' => 2)) }
+      context "new object has keys from both configs" do
+        it { expect(subject.to_hash).to(eq("foo" => 1, "bar" => 2)) }
       end
 
-      context 'second object overwrites keys from first object' do
+      context "second object overwrites keys from first object" do
         let(:second_config) { described_class.new(foo: 42) }
-        it { expect(subject.to_hash).to(eq('foo' => 42)) }
+        it { expect(subject.to_hash).to(eq("foo" => 42)) }
       end
 
-      context 'performs a deep merge' do
+      context "performs a deep merge" do
         let(:first_config) { described_class.new(nested: { foo: 1 }) }
         let(:second_config) { described_class.new(nested: { bar: 2 }) }
-        it { expect(subject.to_hash).to(eq('nested' => { 'foo' => 1, 'bar' => 2 })) }
+        it { expect(subject.to_hash).to(eq("nested" => { "foo" => 1, "bar" => 2 })) }
       end
     end
 
-    describe '#merge!' do
+    describe "#merge!" do
       let(:first_config) { described_class.new(foo: 1) }
       let(:second_config) { described_class.new(bar: 2) }
       subject { first_config.merge!(second_config) }
 
-      context 'returns first object' do
+      context "returns first object" do
         it { expect(subject).to(be(first_config)) }
       end
 
-      context 'first object has keys from both configs' do
-        it { expect(subject.to_hash).to(eq('foo' => 1, 'bar' => 2)) }
+      context "first object has keys from both configs" do
+        it { expect(subject.to_hash).to(eq("foo" => 1, "bar" => 2)) }
       end
 
-      context 'second object overwrites keys from first object' do
+      context "second object overwrites keys from first object" do
         let(:second_config) { described_class.new(foo: 42) }
-        it { expect(subject.to_hash).to(eq('foo' => 42)) }
+        it { expect(subject.to_hash).to(eq("foo" => 42)) }
       end
 
-      context 'performs a deep merge' do
+      context "performs a deep merge" do
         let(:first_config) { described_class.new(nested: { foo: 1 }) }
         let(:second_config) { described_class.new(nested: { bar: 2 }) }
-        it { expect(subject.to_hash).to(eq('nested' => { 'foo' => 1, 'bar' => 2 })) }
+        it { expect(subject.to_hash).to(eq("nested" => { "foo" => 1, "bar" => 2 })) }
       end
     end
 
     skip "inheritance" do
-      let(:tmp_root) { 'tmp' }
+      let(:tmp_root) { "tmp" }
       let(:gem_root) { "#{tmp_root}/gems" }
 
       after { FileUtils.rm_rf(tmp_root) }
@@ -217,19 +217,19 @@ describe ERBLint::RunnerConfig do
         YAML
 
         gem_class = Struct.new(:gem_dir)
-        %w(gemone).each do |gem_name|
+        ["gemone"].each do |gem_name|
           mock_spec = gem_class.new(File.join(gem_root, gem_name))
           expect(Gem::Specification).to(receive(:find_by_name)
             .at_least(:once).with(gem_name).and_return(mock_spec))
         end
 
         runner_config = described_class.new({
-          'inherit_gem' => {
-            'gemone' => 'config/erb-lint.yml',
+          "inherit_gem" => {
+            "gemone" => "config/erb-lint.yml",
           },
         }, ERBLint::FileLoader.new(Dir.pwd))
 
-        expect(runner_config.to_hash['MyCustomLinter']).to(eq("my_option" => "custom value"))
+        expect(runner_config.to_hash["MyCustomLinter"]).to(eq("my_option" => "custom value"))
       end
 
       it "inherits from a gem and merges the config" do
@@ -240,28 +240,28 @@ describe ERBLint::RunnerConfig do
         YAML
 
         gem_class = Struct.new(:gem_dir)
-        %w(gemone).each do |gem_name|
+        ["gemone"].each do |gem_name|
           mock_spec = gem_class.new(File.join(gem_root, gem_name))
           expect(Gem::Specification).to(receive(:find_by_name)
             .at_least(:once).with(gem_name).and_return(mock_spec))
         end
 
         runner_config = described_class.new({
-          'inherit_gem' => {
-            'gemone' => 'config/erb-lint.yml',
+          "inherit_gem" => {
+            "gemone" => "config/erb-lint.yml",
           },
-          'MyCustomLinter1' => {
-            'a' => 'value for a',
-            'c' => 'value for c',
+          "MyCustomLinter1" => {
+            "a" => "value for a",
+            "c" => "value for c",
           },
-          'MyCustomLinter2' => {
-            'd' => 'value for d',
+          "MyCustomLinter2" => {
+            "d" => "value for d",
           },
         }, ERBLint::FileLoader.new(Dir.pwd))
 
         config_hash = runner_config.to_hash
-        expect(config_hash['MyCustomLinter1']).to(eq("a" => "value for a", "b" => "value for b", "c" => "value for c"))
-        expect(config_hash['MyCustomLinter2']).to(eq("d" => "value for d"))
+        expect(config_hash["MyCustomLinter1"]).to(eq("a" => "value for a", "b" => "value for b", "c" => "value for c"))
+        expect(config_hash["MyCustomLinter2"]).to(eq("d" => "value for d"))
       end
 
       it "inherits from a file and merges the config" do
@@ -272,19 +272,19 @@ describe ERBLint::RunnerConfig do
         YAML
 
         runner_config = described_class.new({
-          'inherit_from' => "#{tmp_root}/erb-lint-default.yml",
-          'MyCustomLinter1' => {
-            'a' => 'value for a',
-            'c' => 'value for c',
+          "inherit_from" => "#{tmp_root}/erb-lint-default.yml",
+          "MyCustomLinter1" => {
+            "a" => "value for a",
+            "c" => "value for c",
           },
-          'MyCustomLinter2' => {
-            'd' => 'value for d',
+          "MyCustomLinter2" => {
+            "d" => "value for d",
           },
         }, ERBLint::FileLoader.new(Dir.pwd))
 
         config_hash = runner_config.to_hash
-        expect(config_hash['MyCustomLinter1']).to(eq("a" => "value for a", "b" => "value for b", "c" => "value for c"))
-        expect(config_hash['MyCustomLinter2']).to(eq("d" => "value for d"))
+        expect(config_hash["MyCustomLinter1"]).to(eq("a" => "value for a", "b" => "value for b", "c" => "value for c"))
+        expect(config_hash["MyCustomLinter2"]).to(eq("d" => "value for d"))
       end
 
       it "does not inherit from a file if file loader is not provided" do
@@ -295,19 +295,19 @@ describe ERBLint::RunnerConfig do
         YAML
 
         runner_config = described_class.new(
-          'inherit_from' => "#{tmp_root}/erb-lint-default.yml",
-          'MyCustomLinter1' => {
-            'a' => 'value for a',
-            'c' => 'value for c',
+          "inherit_from" => "#{tmp_root}/erb-lint-default.yml",
+          "MyCustomLinter1" => {
+            "a" => "value for a",
+            "c" => "value for c",
           },
-          'MyCustomLinter2' => {
-            'd' => 'value for d',
+          "MyCustomLinter2" => {
+            "d" => "value for d",
           },
         )
 
         config_hash = runner_config.to_hash
-        expect(config_hash['MyCustomLinter1']).to(eq("a" => "value for a", "c" => "value for c"))
-        expect(config_hash['MyCustomLinter2']).to(eq("d" => "value for d"))
+        expect(config_hash["MyCustomLinter1"]).to(eq("a" => "value for a", "c" => "value for c"))
+        expect(config_hash["MyCustomLinter2"]).to(eq("d" => "value for d"))
       end
 
       it "inherits from a gem if file load is not provided" do
@@ -317,15 +317,15 @@ describe ERBLint::RunnerConfig do
         YAML
 
         gem_class = Struct.new(:gem_dir)
-        %w(gemone).each do |gem_name|
+        ["gemone"].each do |gem_name|
           mock_spec = gem_class.new(File.join(gem_root, gem_name))
           expect(Gem::Specification).to(receive(:find_by_name)
             .at_least(:once).with(gem_name).and_return(mock_spec))
         end
 
         runner_config = described_class.new(
-          'inherit_gem' => {
-            'gemone' => 'config/erb-lint.yml',
+          "inherit_gem" => {
+            "gemone" => "config/erb-lint.yml",
           },
         )
 
@@ -342,7 +342,7 @@ describe ERBLint::RunnerConfig do
     dir_path = File.dirname(file_path)
     FileUtils.makedirs(dir_path) unless File.exist?(dir_path)
 
-    File.open(file_path, 'w') do |file|
+    File.open(file_path, "w") do |file|
       case content
       when String
         file.puts content

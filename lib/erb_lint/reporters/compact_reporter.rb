@@ -5,7 +5,7 @@ module ERBLint
     class CompactReporter < Reporter
       def preview
         puts "Linting #{stats.files} files with "\
-          "#{stats.linters} #{'autocorrectable ' if autocorrect}linters..."
+          "#{stats.linters} #{"autocorrectable " if autocorrect}linters..."
       end
 
       def show

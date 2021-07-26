@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require 'erb_lint/all'
+require "erb_lint/all"

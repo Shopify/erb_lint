@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-require 'erb_lint/all'
-require 'active_support'
-require 'active_support/inflector'
-require 'optparse'
-require 'psych'
-require 'yaml'
-require 'rainbow'
-require 'erb_lint/utils/severity_levels'
+require "erb_lint/all"
+require "active_support"
+require "active_support/inflector"
+require "optparse"
+require "psych"
+require "yaml"
+require "rainbow"
+require "erb_lint/utils/severity_levels"
 
 module ERBLint
   class CLI
     include Utils::SeverityLevels
 
-    DEFAULT_CONFIG_FILENAME = '.erb-lint.yml'
+    DEFAULT_CONFIG_FILENAME = ".erb-lint.yml"
     DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
 
     class ExitWithFailure < RuntimeError; end
@@ -43,7 +43,7 @@ module ERBLint
       ensure_files_exist(lint_files)
 
       if enabled_linter_classes.empty?
-        failure!('no linter available with current configuration')
+        failure!("no linter available with current configuration")
       end
 
       @options[:format] ||= :multiline
@@ -145,7 +145,7 @@ module ERBLint
 
     def correct(processed_source, offenses)
       corrector = ERBLint::Corrector.new(processed_source, offenses)
-      failure!(corrector.diagnostics.join(', ')) if corrector.diagnostics.any?
+      failure!(corrector.diagnostics.join(", ")) if corrector.diagnostics.any?
       corrector
     end
 
@@ -183,7 +183,7 @@ module ERBLint
         else
           @files
             .map { |f| Dir.exist?(f) ? Dir[File.join(f, glob)] : f }
-            .map { |f| f.include?('*') ? Dir[f] : f }
+            .map { |f| f.include?("*") ? Dir[f] : f }
             .flatten
             .map { |f| File.expand_path(f, Dir.pwd) }
             .select { |filename| !excluded?(filename) }
@@ -240,14 +240,14 @@ module ERBLint
     end
 
     def relative_filename(filename)
-      filename.sub("#{File.expand_path('.', Dir.pwd)}/", '')
+      filename.sub("#{File.expand_path(".", Dir.pwd)}/", "")
     end
 
     def runner_config_override
       RunnerConfig.new(
         linters: {}.tap do |linters|
           ERBLint::LinterRegistry.linters.map do |klass|
-            linters[klass.simple_name] = { 'enabled' => enabled_linter_classes.include?(klass) }
+            linters[klass.simple_name] = { "enabled" => enabled_linter_classes.include?(klass) }
           end
         end
       )
@@ -283,10 +283,10 @@ module ERBLint
         end
 
         opts.on("--enable-linters LINTER[,LINTER,...]", Array,
-          "Only use specified linter", "Known linters are: #{known_linter_names.join(', ')}") do |linters|
+          "Only use specified linter", "Known linters are: #{known_linter_names.join(", ")}") do |linters|
           linters.each do |linter|
             unless known_linter_names.include?(linter)
-              failure!("#{linter}: not a valid linter name (#{known_linter_names.join(', ')})")
+              failure!("#{linter}: not a valid linter name (#{known_linter_names.join(", ")})")
             end
           end
           @options[:enabled_linters] = linters
@@ -296,7 +296,7 @@ module ERBLint
           parsed_severity = SEVERITY_CODE_TABLE[level.upcase.to_sym] || (SEVERITY_NAMES & [level.downcase]).first
 
           if parsed_severity.nil?
-            failure!("#{level}: not a valid failure level (#{SEVERITY_NAMES.join(', ')})")
+            failure!("#{level}: not a valid failure level (#{SEVERITY_NAMES.join(", ")})")
           end
           @options[:fail_level] = severity_level_for_name(parsed_severity)
         end
@@ -325,7 +325,7 @@ module ERBLint
 
     def format_options_help
       "Report offenses in the given format: "\
-      "(#{Reporter.available_formats.join(', ')}) (default: multiline)"
+      "(#{Reporter.available_formats.join(", ")}) (default: multiline)"
     end
 
     def invalid_format_error_message(given_format)

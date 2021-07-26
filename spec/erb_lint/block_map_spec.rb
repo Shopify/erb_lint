@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe ERBLint::Utils::BlockMap do
   include ::AST::Sexp
 
-  describe 'map' do
-    let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
+  describe "map" do
+    let(:processed_source) { ERBLint::ProcessedSource.new("file.rb", file) }
     let(:block_map) { described_class.new(processed_source) }
     subject { block_map.connections }
 
-    context 'with block' do
+    context "with block" do
       let(:file) { <<~ERB }
         <%= javascript_tag do %>
           foo
@@ -24,7 +24,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with block in single erb tag' do
+    context "with block in single erb tag" do
       let(:file) { <<~ERB }
         <%= javascript_tag do foo; end %>
       ERB
@@ -36,7 +36,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with if' do
+    context "with if" do
       let(:file) { <<~ERB }
         <% if foo %>
           foo
@@ -50,7 +50,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with if..else' do
+    context "with if..else" do
       let(:file) { <<~ERB }
         <% if foo %>
           a
@@ -66,7 +66,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with if..elsif..end' do
+    context "with if..elsif..end" do
       let(:file) { <<~ERB }
         <% if foo %>
           a
@@ -92,7 +92,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with block and if' do
+    context "with block and if" do
       let(:file) { <<~ERB }
         <% foo do %>
           <% if bar %>
@@ -112,7 +112,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with block and if overlapping' do
+    context "with block and if overlapping" do
       let(:file) { <<~ERB }
         <% foo do
           if bar %>
@@ -129,7 +129,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with begin..end' do
+    context "with begin..end" do
       let(:file) { <<~ERB }
         <% begin %>
           foo
@@ -143,7 +143,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with begin..rescue..end' do
+    context "with begin..rescue..end" do
       let(:file) { <<~ERB }
         <% begin %>
           <%= bla rescue nil %>
@@ -166,7 +166,7 @@ describe ERBLint::Utils::BlockMap do
       end
     end
 
-    context 'with case' do
+    context "with case" do
       let(:file) { <<~ERB }
         <% case foo %>
         <% when :bar %>

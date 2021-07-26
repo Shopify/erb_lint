@@ -8,7 +8,7 @@ module ERBLint
     def initialize(file_loader, config)
       @file_loader = file_loader
       @config = config || RunnerConfig.default
-      raise ArgumentError, 'expect `config` to be a RunnerConfig instance' unless @config.is_a?(RunnerConfig)
+      raise ArgumentError, "expect `config` to be a RunnerConfig instance" unless @config.is_a?(RunnerConfig)
 
       linter_classes = LinterRegistry.linters.select { |klass| @config.for_linter(klass).enabled? }
       @linters = linter_classes.map do |linter_class|

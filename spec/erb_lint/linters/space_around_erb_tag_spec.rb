@@ -1,37 +1,37 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 describe ERBLint::Linters::SpaceAroundErbTag do
   let(:linter_config) { described_class.config_schema.new }
 
-  let(:file_loader) { ERBLint::FileLoader.new('.') }
+  let(:file_loader) { ERBLint::FileLoader.new(".") }
   let(:linter) { described_class.new(file_loader, linter_config) }
-  let(:processed_source) { ERBLint::ProcessedSource.new('file.rb', file) }
+  let(:processed_source) { ERBLint::ProcessedSource.new("file.rb", file) }
   let(:offenses) { linter.offenses }
   let(:corrector) { ERBLint::Corrector.new(processed_source, offenses) }
   let(:corrected_content) { corrector.corrected_content }
   before { linter.run(processed_source) }
 
-  describe 'offenses' do
+  describe "offenses" do
     subject { offenses }
 
-    context 'when space is correct' do
+    context "when space is correct" do
       let(:file) { "<% foo %>" }
       it { expect(subject).to(eq([])) }
     end
 
-    context 'for escaped erb tag' do
+    context "for escaped erb tag" do
       let(:file) { "this is text <%%=text %> not erb\n" }
       it { expect(subject).to(eq([])) }
     end
 
-    context 'for erb comment' do
+    context "for erb comment" do
       let(:file) { "this is text <%#comment %> not erb\n" }
       it { expect(subject).to(eq([])) }
     end
 
-    context 'when tag starts with a newline' do
+    context "when tag starts with a newline" do
       let(:file) { <<~ERB }
         <%
           foo
@@ -40,12 +40,12 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       it { expect(subject).to(eq([])) }
     end
 
-    context 'when tag contains extra spaces and newlines' do
+    context "when tag contains extra spaces and newlines" do
       let(:file) { "<%  \n  foo  \n %>" }
       it { expect(subject).to(eq([])) }
     end
 
-    context 'when tag contains extra spaces and multiple newlines' do
+    context "when tag contains extra spaces and multiple newlines" do
       let(:file) { "<%  \n\n\n  foo  \n\n\n %>" }
       it do
         expect(subject).to(eq([
@@ -55,7 +55,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when space is missing on the left of statement' do
+    context "when space is missing on the left of statement" do
       let(:file) { "<%foo %>" }
       it do
         expect(subject).to(eq([
@@ -64,7 +64,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when space is missing on the left of expression' do
+    context "when space is missing on the left of expression" do
       let(:file) { "<%=foo %>" }
       it do
         expect(subject).to(eq([
@@ -73,7 +73,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when space is missing on the left of statement with trim' do
+    context "when space is missing on the left of statement with trim" do
       let(:file) { "<%-foo %>" }
       it do
         expect(subject).to(eq([
@@ -82,7 +82,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when more than 1 space on the left' do
+    context "when more than 1 space on the left" do
       let(:file) { "<%  foo %>" }
       it do
         expect(subject).to(eq([
@@ -91,7 +91,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when space is missing on the right' do
+    context "when space is missing on the right" do
       let(:file) { "<% foo%>" }
       it do
         expect(subject).to(eq([
@@ -100,7 +100,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when space is missing on the right with trim' do
+    context "when space is missing on the right with trim" do
       let(:file) { "<% foo-%>" }
       it do
         expect(subject).to(eq([
@@ -109,7 +109,7 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       end
     end
 
-    context 'when more than 1 space on the right' do
+    context "when more than 1 space on the right" do
       let(:file) { "<% foo   %>" }
       it do
         expect(subject).to(eq([
@@ -119,15 +119,15 @@ describe ERBLint::Linters::SpaceAroundErbTag do
     end
   end
 
-  describe 'autocorrect' do
+  describe "autocorrect" do
     subject { corrected_content }
 
-    context 'when space is correct' do
+    context "when space is correct" do
       let(:file) { "<% foo %>" }
       it { expect(subject).to(eq(file)) }
     end
 
-    context 'when tag starts with a newline' do
+    context "when tag starts with a newline" do
       let(:file) { <<~ERB }
         <%
           foo
@@ -136,47 +136,47 @@ describe ERBLint::Linters::SpaceAroundErbTag do
       it { expect(subject).to(eq(file)) }
     end
 
-    context 'when tag contains extra spaces and newlines' do
+    context "when tag contains extra spaces and newlines" do
       let(:file) { "<%  \n  foo  \n %>" }
       it { expect(subject).to(eq(file)) }
     end
 
-    context 'when tag contains extra spaces and multiple newlines' do
+    context "when tag contains extra spaces and multiple newlines" do
       let(:file) { "<%  \n\n\n  foo  \n\n\n %>" }
       it { expect(subject).to(eq("<%  \n  foo  \n %>")) }
     end
 
-    context 'when space is missing on the left of statement' do
+    context "when space is missing on the left of statement" do
       let(:file) { "<%foo %>" }
       it { expect(subject).to(eq("<% foo %>")) }
     end
 
-    context 'when space is missing on the left of expression' do
+    context "when space is missing on the left of expression" do
       let(:file) { "<%=foo %>" }
       it { expect(subject).to(eq("<%= foo %>")) }
     end
 
-    context 'when space is missing on the left of statement with trim' do
+    context "when space is missing on the left of statement with trim" do
       let(:file) { "<%-foo %>" }
       it { expect(subject).to(eq("<%- foo %>")) }
     end
 
-    context 'when more than 1 space on the left' do
+    context "when more than 1 space on the left" do
       let(:file) { "<%  foo %>" }
       it { expect(subject).to(eq("<% foo %>")) }
     end
 
-    context 'when space is missing on the right' do
+    context "when space is missing on the right" do
       let(:file) { "<% foo%>" }
       it { expect(subject).to(eq("<% foo %>")) }
     end
 
-    context 'when space is missing on the right with trim' do
+    context "when space is missing on the right with trim" do
       let(:file) { "<% foo-%>" }
       it { expect(subject).to(eq("<% foo -%>")) }
     end
 
-    context 'when more than 1 space on the right' do
+    context "when more than 1 space on the right" do
       let(:file) { "<% foo   %>" }
       it { expect(subject).to(eq("<% foo %>")) }
     end
