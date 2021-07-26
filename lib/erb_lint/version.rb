@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module ERBLint
-  VERSION = '0.0.37'
+  VERSION = '0.1.0'
 end
