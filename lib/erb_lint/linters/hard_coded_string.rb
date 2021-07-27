@@ -36,6 +36,9 @@ module ERBLint
         "&rarr;",
         "&darr;",
         "&uarr;",
+        "&ensp;",
+        "&emsp;",
+        "&thinsp;",
       ])
 
       class ConfigSchema < LinterConfig
