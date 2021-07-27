@@ -250,7 +250,7 @@ Linter-Specific Option | Description
 `only`                 | Only run cops listed in this array instead of all cops.
 
 ### RequireInputAutocomplete
-This linter prevents the usage of certain types of HTML `<input>` without an `autocomplete` argument: `color`, `date`, `datetime-local`, `email`, `hidden`, `month`, `number`, `password`, `range`, `search`, `tel`, `text`, `time`, `url`, or `week`.
+This linter prevents the usage of certain types of HTML `<input>` without an `autocomplete` argument: `color`, `date`, `datetime-local`, `email`, `month`, `number`, `password`, `range`, `search`, `tel`, `text`, `time`, `url`, or `week`.
 The HTML autocomplete helps users to complete filling in forms by using data stored in the browser. This is particularly useful for people with **motor disabilities** or **cognitive impairment** who may have difficulties filling out forms online.
 
 ```
