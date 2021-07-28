@@ -19,7 +19,6 @@ describe ERBLint::Linters::RequireInputAutocomplete do
       :text_field_tag,
       :utf8_enforcer_tag,
       :month_field_tag,
-      :hidden_field_tag,
       :number_field_tag,
       :password_field_tag,
       :search_field_tag,
@@ -93,13 +92,12 @@ describe ERBLint::Linters::RequireInputAutocomplete do
           build_offense(105..131, form_helper_message),
           build_offense(132..156, form_helper_message),
           build_offense(157..182, form_helper_message),
-          build_offense(183..208, form_helper_message),
-          build_offense(209..236, form_helper_message),
-          build_offense(237..262, form_helper_message),
-          build_offense(263..291, form_helper_message),
-          build_offense(292..315, form_helper_message),
-          build_offense(316..338, form_helper_message),
-          build_offense(339..362, form_helper_message),
+          build_offense(183..210, form_helper_message),
+          build_offense(211..236, form_helper_message),
+          build_offense(237..265, form_helper_message),
+          build_offense(266..289, form_helper_message),
+          build_offense(290..312, form_helper_message),
+          build_offense(313..336, form_helper_message),
         ]))
       end
     end
