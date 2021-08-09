@@ -32,6 +32,8 @@ describe ERBLint::Linters::RequireInputAutocomplete do
       :search_field,
       :telephone_field_tag,
       :telephone_field,
+      :phone_field_tag,
+      :phone_field,
       :time_field_tag,
       :time_field,
       :url_field_tag,
