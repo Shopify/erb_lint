@@ -34,7 +34,6 @@ module ERBLint
         :email_field,
         :text_field_tag,
         :text_field,
-        :utf8_enforcer_tag,
         :month_field_tag,
         :month_field,
         :number_field_tag,
