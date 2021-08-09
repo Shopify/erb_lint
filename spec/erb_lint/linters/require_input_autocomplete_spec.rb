@@ -77,7 +77,7 @@ describe ERBLint::Linters::RequireInputAutocomplete do
         <br />
         #{
           form_helpers_requiring_autocomplete.inject("") do |s, helper|
-            s + "<%= " + helper.to_s + ' autocomplete: "foo" do %>'
+            s + "<%= " + helper.to_s + ' autocomplete: "foo" %>'
           end
         }
         FILE
@@ -90,14 +90,14 @@ describe ERBLint::Linters::RequireInputAutocomplete do
         <br />
         #{
           form_helpers_requiring_autocomplete.inject("") do |s, helper|
-            s + "<%= " + helper.to_s + " do %>"
+            s + "<%= " + helper.to_s + " %>"
           end
         }
         FILE
 
       it do
         form_helpers_requiring_autocomplete.each do |helper|
-          tag = "<%= #{helper} do %>"
+          tag = "<%= #{helper} %>"
           index = processed_source.file_content.index(tag)
 
           expect(subject).to(
