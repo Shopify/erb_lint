@@ -14,7 +14,6 @@ describe ERBLint::Linters::PartialInstanceVariable do
     linter.run(processed_source_two)
   end
 
-
   describe "offenses" do
     subject { offenses }
 
