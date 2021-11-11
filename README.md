@@ -98,7 +98,8 @@ linters:
 | [FinalNewline](#FinalNewline)                    | Yes      | warns about missing newline at the end of a ERB template |
 | [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
 | ParserErrors                                     | Yes      |             |
-| PartialInstanceVariable                          | No       | detects instance variables in partials |
+| [InstanceVariable](#InstanceVariable)            | No       | detects instance variables |
+| PartialInstanceVariable                          | No       | detects instance variables in partials (deprecated in favor of [InstanceVariable](#InstanceVariable))|
 | [RequireInputAutocomplete](#RequireInputAutocomplete)        | Yes       | warns about missing autocomplete attributes in input tags |
 | [RightTrim](#RightTrim)                          | Yes      | enforces trimming at the right of an ERB tag |
 | [SelfClosingTag](#SelfClosingTag)                | Yes      | enforces self closing tag styles for void elements |
@@ -355,15 +356,15 @@ Linter-Specific Option | Description
 `correction_style`     | When configured with `cdata`, adds CDATA markers. When configured with `plain`, don't add makers. Defaults to `cdata`.
 
 ### RequireScriptNonce
-This linter prevents the usage of HTML `<script>`, Rails `javascript_tag`, `javascript_include_tag` and `javascript_pack_tag` without a `nonce` argument. The purpose of such a check is to ensure that when [content securty policy](https://edgeguides.rubyonrails.org/security.html#content-security-policy) is implemented in an application, there is a means of discovering tags that need to be updated with a `nonce` argument to enable script execution at application runtime. 
+This linter prevents the usage of HTML `<script>`, Rails `javascript_tag`, `javascript_include_tag` and `javascript_pack_tag` without a `nonce` argument. The purpose of such a check is to ensure that when [content securty policy](https://edgeguides.rubyonrails.org/security.html#content-security-policy) is implemented in an application, there is a means of discovering tags that need to be updated with a `nonce` argument to enable script execution at application runtime.
 
 ```
 Bad ❌
-<script> 
+<script>
     alert(1)
 </script>
 Good ✅
-<script nonce="<%= request.content_security_policy_nonce %>" > 
+<script nonce="<%= request.content_security_policy_nonce %>" >
     alert(1)
 </script>
 ```
@@ -485,6 +486,75 @@ Linter-Specific Option    | Description
 `allowed_types`           | An array of allowed types. Defaults to `["text/javascript"]`.
 `allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag. Defaults to `true`.
 `disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
+
+### InstanceVariables
+
+This linter prevents instance variables from being referenced in templates.
+
+```erb
+Bad ❌
+<%= @instance_variable %>
+
+Good ✅
+<%= local_variable %>
+```
+
+Instance variables in templates, if not declared (for example because of
+changes or even misspellings), will evaluate to `nil`. Using locals offers better
+protection against inadvertently referencing an undefined instance variable.
+
+Locals also offer more explicit specification of the dependencies of a template,
+which you may prefer for your project.
+
+While locals may be used in any template (see below), they have often been
+limited to use in partials. To restrict this linter to checking partials,
+specify the option `partials_only` to `true`. This configuration can replace the
+usage of the deprecated `PartialInstanceVariable` linter.
+
+To use locals in non-partials in Rails controller actions, you can use an
+explicit `render` method call, e.g.
+
+```ruby
+class MyController < ApplicationController
+  def my_action
+    render locals: { local1: 5, local2: "local 2" }
+  end
+end
+```
+
+To use locals in non-partials in Rails mailers, you can use an explicit `render`
+method call in a `format` block, e.g.
+
+```ruby
+class MyMailer < ApplicationMailer
+  def send_my_mail
+    mail(to: "example@example.com", subject: "Partials in mailer") do |format|
+      format.html do
+        render locals: { local1: 5, local2: "local 2" }
+      end
+    end
+  end
+end
+```
+
+Locals need not be required in templates either. Either of the following techniques
+will allow use of optional locals, including setting defaults within the template:
+
+```erb
+<%
+  optional_variable ||= nil
+  optional_variable_with_default ||= "some default"
+%>
+
+<% if defined?(other_optional_variable) %>
+  <span><%= other_optional_variable %></span>
+<% end %>
+%>
+```
+
+Linter-Specific Option    | Description
+--------------------------|---------------------------------------------------------
+`partials_only`           | Boolean to limit linting to partial templates only.
 
 ## Custom Linters
 
