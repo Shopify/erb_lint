@@ -85,7 +85,7 @@ exclude:
 linters:
   ErbSafety:
     exclude:
-      - '**/lobal-lib/**/*'
+      - '**/local-lib/**/*'
 ```
 
 ## Linters
