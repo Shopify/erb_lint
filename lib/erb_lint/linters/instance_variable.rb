@@ -7,7 +7,7 @@ module ERBLint
       include LinterRegistry
 
       class ConfigSchema < LinterConfig
-        property :partials_only, accepts: [true, false], default: false, reader: :partials_only?
+        property :partials_only, accepts: [true, false], default: true, reader: :partials_only?
       end
       self.config_schema = ConfigSchema
 

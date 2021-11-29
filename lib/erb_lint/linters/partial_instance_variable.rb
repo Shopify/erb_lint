@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "instance_variable"
+
 module ERBLint
   module Linters
     # Checks for instance variables in partials only
