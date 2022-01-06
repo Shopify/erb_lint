@@ -6,6 +6,7 @@ module ERBLint
       :corrected,
       :exceptions,
       :linters,
+      :autocorrectable_linters,
       :files,
       :processed_files
 
@@ -15,6 +16,7 @@ module ERBLint
       corrected: 0,
       exceptions: 0,
       linters: 0,
+      autocorrectable_linters: 0,
       files: 0,
       processed_files: {}
     )
@@ -23,6 +25,7 @@ module ERBLint
       @corrected = corrected
       @exceptions = exceptions
       @linters = linters
+      @autocorrectable_linters = autocorrectable_linters
       @files = files
       @processed_files = processed_files
     end

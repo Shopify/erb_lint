@@ -514,7 +514,16 @@ describe ERBLint::CLI do
           end
 
           context "when autocorrecting an error" do
-            let(:args) { ["--enable-linter", "final_newline", "--stdin", linted_file, "--autocorrect"] }
+            # We assume that linter_without_errors is not autocorrectable...
+            let(:args) { ["--enable-linter", "final_newline,linter_without_errors", "--stdin", linted_file, "--autocorrect"] }
+
+            it "tells the user it is autocorrecting" do
+              expect { subject }.to(output(/Linting and autocorrecting/).to_stdout)
+            end
+
+            it "shows how many total and autocorrectable linters are used" do
+              expect { subject }.to(output(/2 linters \(1 autocorrectable\)/).to_stdout)
+            end
 
             it "outputs the corrected ERB" do
               expect { subject }.to(output(/#{file_content}\n/).to_stdout)

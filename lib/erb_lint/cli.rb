@@ -50,6 +50,7 @@ module ERBLint
       @options[:fail_level] ||= severity_level_for_name(:refactor)
       @stats.files = lint_files.size
       @stats.linters = enabled_linter_classes.size
+      @stats.autocorrectable_linters = enabled_linter_classes.count(&:support_autocorrect?)
 
       reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
       reporter.preview
@@ -232,11 +233,7 @@ module ERBLint
 
     def enabled_linter_classes
       @enabled_linter_classes ||= ERBLint::LinterRegistry.linters
-        .select { |klass| linter_can_run?(klass) && enabled_linter_names.include?(klass.simple_name.underscore) }
-    end
-
-    def linter_can_run?(klass)
-      !autocorrect? || klass.support_autocorrect?
+        .select { |klass| enabled_linter_names.include?(klass.simple_name.underscore) }
     end
 
     def relative_filename(filename)
