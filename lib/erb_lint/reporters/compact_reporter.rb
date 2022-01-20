@@ -4,8 +4,7 @@ module ERBLint
   module Reporters
     class CompactReporter < Reporter
       def preview
-        puts "Linting #{stats.files} files with "\
-          "#{stats.linters} #{"autocorrectable " if autocorrect}linters..."
+        puts "#{linting} #{stats.files} files with #{linters}..."
       end
 
       def show
@@ -20,6 +19,14 @@ module ERBLint
       end
 
       private
+
+      def linting
+        "Linting" + (autocorrect ? " and autocorrecting" : "")
+      end
+
+      def linters
+        "#{stats.linters} linters" + (autocorrect ? " (#{stats.autocorrectable_linters} autocorrectable)" : "")
+      end
 
       def format_offense(filename, offense)
         [
