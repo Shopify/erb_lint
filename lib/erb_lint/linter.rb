@@ -55,10 +55,10 @@ module ERBLint
 
     def clear_ignored_offenses(_processed_source)
       @offenses = @offenses.reject do |offense|
-        source_range = offense.source_range
-        offending_lines = _processed_source.source_buffer.slice(source_range.range)
-        previous_line = _processed_source.source_buffer.source_lines[offense.source_range.line_range.first - 2]
-        offending_lines.match(/<%# erblint:disable #{offense.linter.simple_name} %>/) || previous_line.match(/<%# erblint:disable #{offense.linter.simple_name} %>/)
+        offending_line_ranges = offense.source_range.line_range
+        offending_lines =  _processed_source.source_buffer.source_lines[offending_line_ranges.first - 1..offending_line_ranges.last - 1].join
+        previous_line = _processed_source.source_buffer.source_lines[offending_line_ranges.first - 2]
+        offending_lines.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/) || previous_line.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/)
       end
     end
 
