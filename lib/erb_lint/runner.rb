@@ -21,7 +21,7 @@ module ERBLint
       @linters
         .reject { |linter| linter.excludes_file?(processed_source.filename) }
         .each do |linter|
-        linter.run(processed_source)
+        linter.run_and_clear_ignored_offenses(processed_source)
         @offenses.concat(linter.offenses)
       end
     end

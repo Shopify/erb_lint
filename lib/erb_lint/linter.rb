@@ -53,6 +53,20 @@ module ERBLint
       raise NotImplementedError, "must implement ##{__method__}"
     end
 
+    def clear_ignored_offenses(_processed_source)
+      @offenses = @offenses.reject do |offense|
+        source_range = offense.source_range
+        offending_lines = _processed_source.source_buffer.slice(source_range.range)
+        previous_line = _processed_source.source_buffer.source_lines[offense.source_range.line_range.first - 2]
+        offending_lines.match(/<%# erblint:disable #{offense.linter.simple_name} %>/) || previous_line.match(/<%# erblint:disable #{offense.linter.simple_name} %>/)
+      end
+    end
+
+    def run_and_clear_ignored_offenses(_processed_source)
+      run(_processed_source)
+      clear_ignored_offenses(_processed_source) if @offenses.any?
+    end
+
     def add_offense(source_range, message, context = nil, severity = nil)
       @offenses << Offense.new(self, source_range, message, context, severity)
     end
