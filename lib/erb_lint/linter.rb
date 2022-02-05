@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# frozen_string_literal: true
 
 module ERBLint
   # Defines common functionality available to all linters.
@@ -56,13 +55,22 @@ module ERBLint
 
     def set_offense_status(processed_source)
       @offenses = @offenses.each do |offense|
-        offending_line_ranges = offense.source_range.line_range
-        offending_lines =  processed_source.source_buffer.source_lines[offending_line_ranges.first - 1..offending_line_ranges.last - 1].join
-        previous_line = processed_source.source_buffer.source_lines[offense.source_range.line_range.first - 2]
-        if offending_lines.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/) || previous_line.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/)
+        offense_line_range = offense.source_range.line_range
+        offense_lines =  source_for_line_range(processed_source, offense_line_range)
+        previous_line = processed_source.source_buffer.source_lines[offense_line_range.first - 2]
+        
+        if rule_disable_comment?(offense_lines) || rule_disable_comment?(previous_line)
           offense.disabled = true
         end
       end
+    end
+
+    def source_for_line_range(processed_source, line_range)
+      processed_source.source_buffer.source_lines[line_range.first - 1..line_range.last - 1].join
+    end
+
+    def rule_disable_comment?(lines)
+      lines.match(/<%# erblint:disable (?<rules>.*#{self.class.simple_name}).*%>/).present?
     end
 
     def run_and_set_offense_status(_processed_source)
