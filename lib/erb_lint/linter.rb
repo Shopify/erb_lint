@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# frozen_string_literal: true
 
 module ERBLint
   # Defines common functionality available to all linters.
@@ -53,18 +54,20 @@ module ERBLint
       raise NotImplementedError, "must implement ##{__method__}"
     end
 
-    def clear_ignored_offenses(_processed_source)
-      @offenses = @offenses.reject do |offense|
+    def set_offense_status(processed_source)
+      @offenses = @offenses.each do |offense|
         offending_line_ranges = offense.source_range.line_range
-        offending_lines =  _processed_source.source_buffer.source_lines[offending_line_ranges.first - 1..offending_line_ranges.last - 1].join
-        previous_line = _processed_source.source_buffer.source_lines[offending_line_ranges.first - 2]
-        offending_lines.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/) || previous_line.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/)
+        offending_lines =  processed_source.source_buffer.source_lines[offending_line_ranges.first - 1..offending_line_ranges.last - 1].join
+        previous_line = processed_source.source_buffer.source_lines[offense.source_range.line_range.first - 2]
+        if offending_lines.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/) || previous_line.match(/<%# erblint:disable #{offense.linter.class.simple_name} %>/)
+          offense.disabled = true
+        end
       end
     end
 
-    def run_and_clear_ignored_offenses(_processed_source)
+    def run_and_set_offense_status(_processed_source)
       run(_processed_source)
-      clear_ignored_offenses(_processed_source) if @offenses.any?
+      set_offense_status(_processed_source) if @offenses.any?
     end
 
     def add_offense(source_range, message, context = nil, severity = nil)
