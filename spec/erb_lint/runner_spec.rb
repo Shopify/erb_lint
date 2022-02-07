@@ -20,13 +20,13 @@ describe ERBLint::Runner do
           add_offense(processed_source.to_source_range(1..1), "#{self.class.name} error")
         end
       end
+
       class FakeLinter2 < FakeLinter1; end
     end
   end
 
   let(:file_loader) { ERBLint::FileLoader.new(".") }
-  let(:runner) { described_class.new(file_loader, config) }  
-  
+  let(:runner) { described_class.new(file_loader, config) }
 
   describe "#run" do
     before do
@@ -36,7 +36,7 @@ describe ERBLint::Runner do
                      ERBLint::Linters::FinalNewline,]))
       runner.run(processed_source)
     end
-  
+
     let(:file) { "DummyFileContent" }
     let(:filename) { "/root/directory/somefolder/otherfolder/dummyfile.html.erb" }
     let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
@@ -161,7 +161,7 @@ describe ERBLint::Runner do
       allow(ERBLint::LinterRegistry).to(receive(:linters)
         .and_return([ERBLint::Linters::FakeLinter2,
                      ERBLint::Linters::FakeLinter3,
-                     ERBLint::Linters::FakeLinter4]))
+                     ERBLint::Linters::FakeLinter4,]))
       runner.run(processed_source)
     end
     subject { runner.offenses }
@@ -171,12 +171,12 @@ describe ERBLint::Runner do
         linters: {
           "FakeLinter2" => { "enabled" => true },
           "FakeLinter3" => { "enabled" => true },
-          "FakeLinter4" => { "enabled" => true }
+          "FakeLinter4" => { "enabled" => true },
         }
       )
     end
-    
-    context "comment after offending lines" do 
+
+    context "comment after offending lines" do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
         <div>something</div>
@@ -185,7 +185,7 @@ describe ERBLint::Runner do
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
-      it 'reports all offenses' do 
+      it "reports all offenses" do
         expect(subject.size).to(eq(3))
         expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter2))
         expect(subject[1].linter.class).to(eq(ERBLint::Linters::FakeLinter3))
@@ -193,7 +193,7 @@ describe ERBLint::Runner do
       end
     end
 
-    context "comment on offending lines" do 
+    context "comment on offending lines" do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
         <div>something</div>
@@ -201,14 +201,14 @@ describe ERBLint::Runner do
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
-      it 'does not report offense' do 
+      it "does not report offense" do
         expect(subject.size).to(eq(2))
         expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter2))
         expect(subject[1].linter.class).to(eq(ERBLint::Linters::FakeLinter4))
       end
     end
 
-    context "comment before offending lines" do 
+    context "comment before offending lines" do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
         <%# erblint:disable FakeLinter3 %>
@@ -216,14 +216,14 @@ describe ERBLint::Runner do
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
-      it 'does not report offense' do 
+      it "does not report offense" do
         expect(subject.size).to(eq(2))
         expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter2))
         expect(subject[1].linter.class).to(eq(ERBLint::Linters::FakeLinter4))
       end
     end
 
-    context "comment for multiple rules" do 
+    context "comment for multiple rules" do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
         <%# erblint:disable FakeLinter3, FakeLinter4 %>
@@ -231,7 +231,7 @@ describe ERBLint::Runner do
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
-      it 'does not report offense', focus: true do 
+      it "does not report offense", focus: true do
         expect(subject.size).to(eq(1))
         expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter2))
       end

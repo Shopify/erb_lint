@@ -45,9 +45,7 @@ module ERBLint
       line_range.begin
     end
 
-    def disabled=(disabled)
-      @disabled = disabled
-    end
+    attr_writer :disabled
 
     def disabled?
       @disabled

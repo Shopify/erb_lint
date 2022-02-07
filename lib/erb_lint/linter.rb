@@ -53,12 +53,27 @@ module ERBLint
       raise NotImplementedError, "must implement ##{__method__}"
     end
 
-    def set_offense_status(processed_source)
+    def run_and_update_offense_status(processed_source)
+      run(processed_source)
+      update_offense_status(processed_source) if @offenses.any?
+    end
+
+    def add_offense(source_range, message, context = nil, severity = nil)
+      @offenses << Offense.new(self, source_range, message, context, severity)
+    end
+
+    def clear_offenses
+      @offenses = []
+    end
+
+    private
+
+    def update_offense_status(processed_source)
       @offenses = @offenses.each do |offense|
         offense_line_range = offense.source_range.line_range
-        offense_lines =  source_for_line_range(processed_source, offense_line_range)
+        offense_lines = source_for_line_range(processed_source, offense_line_range)
         previous_line = processed_source.source_buffer.source_lines[offense_line_range.first - 2]
-        
+
         if rule_disable_comment?(offense_lines) || rule_disable_comment?(previous_line)
           offense.disabled = true
         end
@@ -71,19 +86,6 @@ module ERBLint
 
     def rule_disable_comment?(lines)
       lines.match(/<%# erblint:disable (?<rules>.*#{self.class.simple_name}).*%>/).present?
-    end
-
-    def run_and_set_offense_status(_processed_source)
-      run(_processed_source)
-      set_offense_status(_processed_source) if @offenses.any?
-    end
-
-    def add_offense(source_range, message, context = nil, severity = nil)
-      @offenses << Offense.new(self, source_range, message, context, severity)
-    end
-
-    def clear_offenses
-      @offenses = []
     end
   end
 end
