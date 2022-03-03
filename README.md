@@ -74,6 +74,22 @@ Make sure to add `**/` to exclude patterns; it matches the target files' absolut
 ## Enable or disable default linters
 `EnableDefaultLinters`: enables or disables default linters. [Default linters](#Linters) are enabled by default.
 
+## Disable rule at offense-level
+You can disable a rule by placing a disable comment in the following formats:
+
+1. Comment on offending lines
+```.erb
+<hr /> <%# erblint:disable SelfClosingTag %>
+```
+
+2. Comment on previous lines
+```.erb
+<%# erblint:disable SelfClosingTag %>
+<hr />
+```
+
+To raise an error when there is a useless disable comment, enable `NoUnusedDisable`.
+
 ## Exclude
 
 You can specify the exclude patterns both of global and lint-local.
