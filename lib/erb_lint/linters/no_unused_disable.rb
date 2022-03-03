@@ -10,8 +10,7 @@ module ERBLint
         disabled_rules_and_line_number = {}
 
         processed_source.source_buffer.source_lines.each_with_index do |line, index|
-          rule_disable = line.match(/<%# erblint:disable (?<rules>.*) %>/) &&
-            line.match(/<%# erblint:disable (?<rules>.*) %>/).named_captures["rules"]
+          rule_disable = disable_comment(line)
           next unless rule_disable
           rule_disable.split(",").each do |rule|
             disabled_rules_and_line_number[rule.strip] =
@@ -36,6 +35,12 @@ module ERBLint
               "Unused erblint:disable comment for #{rule}")
           end
         end
+      end
+
+      private
+
+      def disable_comment(line)
+        line.match(/<%# erblint:disable (?<rules>.*) %>/)&.named_captures&.fetch("rules")
       end
     end
   end
