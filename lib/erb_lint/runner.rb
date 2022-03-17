@@ -16,6 +16,7 @@ module ERBLint
       @linters = linter_classes.map do |linter_class|
         linter_class.new(@file_loader, @config.for_linter(linter_class))
       end
+      @no_unused_disable = nil
       @offenses = []
     end
 
@@ -42,10 +43,15 @@ module ERBLint
 
     private
 
-    def report_unused_disable(processed_source)
-      if LinterRegistry.linters.include?(ERBLint::Linters::NoUnusedDisable) &&
+    def no_unused_disable_enabled?
+      LinterRegistry.linters.include?(ERBLint::Linters::NoUnusedDisable) &&
         @config.for_linter(ERBLint::Linters::NoUnusedDisable).enabled?
-        @no_unused_disable = ERBLint::Linters::NoUnusedDisable.new(@file_loader,
+    end
+
+    def report_unused_disable(processed_source)
+      if no_unused_disable_enabled?
+        @no_unused_disable = ERBLint::Linters::NoUnusedDisable.new(
+          @file_loader,
           @config.for_linter(ERBLint::Linters::NoUnusedDisable))
         @no_unused_disable.run(processed_source, @offenses)
         @offenses.concat(@no_unused_disable.offenses)

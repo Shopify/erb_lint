@@ -69,7 +69,7 @@ module ERBLint
     private
 
     def update_offense_status(processed_source)
-      @offenses = @offenses.each do |offense|
+      @offenses.each do |offense|
         offense_line_range = offense.source_range.line_range
         offense_lines = source_for_line_range(processed_source, offense_line_range)
         previous_line = processed_source.source_buffer.source_lines[offense_line_range.first - 2]
@@ -85,7 +85,7 @@ module ERBLint
     end
 
     def rule_disable_comment?(lines)
-      lines.match(/<%# erblint:disable (?<rules>.*#{self.class.simple_name}).*%>/).present?
+      lines.match(/<%# erblint:disable (?<rules>.*#{self.class.simple_name}).*%>/)
     end
   end
 end
