@@ -72,9 +72,8 @@ module ERBLint
       @offenses.each do |offense|
         offense_line_range = offense.source_range.line_range
         offense_lines = source_for_line_range(processed_source, offense_line_range)
-        previous_line = processed_source.source_buffer.source_lines[offense_line_range.first - 2]
 
-        if rule_disable_comment?(offense_lines) || rule_disable_comment?(previous_line)
+        if rule_disable_comment?(offense_lines)
           offense.disabled = true
         end
       end

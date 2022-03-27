@@ -208,26 +208,11 @@ describe ERBLint::Runner do
       end
     end
 
-    context "comment before offending lines" do
-      let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
-      let(:file) { <<~FILE }
-        <%# erblint:disable FakeLinter3 %>
-        <span>bad content</span>
-      FILE
-      let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
-
-      it "does not report offense" do
-        expect(subject.size).to(eq(2))
-        expect(subject[0].linter.class).to(eq(ERBLint::Linters::FakeLinter2))
-        expect(subject[1].linter.class).to(eq(ERBLint::Linters::FakeLinter4))
-      end
-    end
-
     context "comment for multiple rules" do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
-        <%# erblint:disable FakeLinter3, FakeLinter4 %>
-        <span>bad content</span>
+        <div>something</div>
+        <span>bad content</span> <%# erblint:disable FakeLinter3, FakeLinter4 %>
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 

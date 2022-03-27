@@ -23,7 +23,7 @@ module ERBLint
           line_numbers = disabled_rules_and_line_number[rule_name]
           next unless line_numbers
           line_numbers.reject do |line_number|
-            if (offense.source_range.line_span.first - 1..offense.source_range.line_span.last).include?(line_number)
+            if (offense.source_range.line_span.first..offense.source_range.line_span.last).include?(line_number)
               disabled_rules_and_line_number[rule_name].delete(line_number)
             end
           end
