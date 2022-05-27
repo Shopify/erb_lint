@@ -18,8 +18,9 @@ module ERBLint
     end
 
     def run(processed_source)
+      relative_filename = processed_source.filename.delete_prefix("#{@file_loader.base_path}/")
       @linters
-        .reject { |linter| linter.excludes_file?(processed_source.filename) }
+        .reject { |linter| linter.excludes_file?(relative_filename) }
         .each do |linter|
         linter.run(processed_source)
         @offenses.concat(linter.offenses)
