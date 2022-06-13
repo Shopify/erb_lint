@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe ERBLint::Runner do
-  let(:file_loader) { ERBLint::FileLoader.new(".") }
+  let(:file_loader) { ERBLint::FileLoader.new("/root/directory") }
   let(:runner) { described_class.new(file_loader, config) }
 
   before do
@@ -27,7 +27,7 @@ describe ERBLint::Runner do
 
   describe "#run" do
     let(:file) { "DummyFileContent" }
-    let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
+    let(:filename) { "/root/directory/somefolder/otherfolder/dummyfile.html.erb" }
     let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
     before { runner.run(processed_source) }
     subject { runner.offenses }
