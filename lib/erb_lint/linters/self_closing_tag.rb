@@ -37,6 +37,7 @@ module ERBLint
           end
 
           next unless @config.enforced_style == :never && tag.self_closing?
+
           end_solidus = tag_node.children.last
           add_offense(
             end_solidus.loc,

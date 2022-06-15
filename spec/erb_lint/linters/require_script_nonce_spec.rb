@@ -120,7 +120,7 @@ describe ERBLint::Linters::RequireScriptNonce do
       let(:file) { <<~FILE }
         <br />
         <%= javascript_tag do %>
-        FILE
+      FILE
 
       it "builds an offense for a Rails helper script tag with a missing nonce" do
         expect(subject).to(eq([build_offense(7..30, tag_helper_nonce_message)]))
@@ -131,7 +131,7 @@ describe ERBLint::Linters::RequireScriptNonce do
       let(:file) { <<~FILE }
         <br />
         <%= javascript_include_tag "script" %>
-        FILE
+      FILE
 
       it "builds an offense for a Rails helper script tag with a missing nonce" do
         expect(subject).to(eq([build_offense(7..44, tag_helper_nonce_message)]))
@@ -142,7 +142,7 @@ describe ERBLint::Linters::RequireScriptNonce do
       let(:file) { <<~FILE }
         <br />
         <%= javascript_pack_tag "script" %>
-        FILE
+      FILE
 
       it "builds an offense for a Rails helper script tag with a missing nonce" do
         expect(subject).to(eq([build_offense(7..41, tag_helper_nonce_message)]))
@@ -153,7 +153,7 @@ describe ERBLint::Linters::RequireScriptNonce do
       let(:file) { <<~FILE }
         <br />
         <%= javascript_tag nonce: true do %>
-        FILE
+      FILE
 
       it "passes the nonce check" do
         expect(subject).to(eq([]))
@@ -164,7 +164,7 @@ describe ERBLint::Linters::RequireScriptNonce do
       let(:file) { <<~FILE }
         <br />
         <%= javascript_include_tag "script", nonce: true %>
-        FILE
+      FILE
 
       it "passes the nonce check" do
         expect(subject).to(eq([]))
@@ -175,7 +175,7 @@ describe ERBLint::Linters::RequireScriptNonce do
       let(:file) { <<~FILE }
         <br />
         <%= javascript_pack_tag "script", nonce: true %>
-        FILE
+      FILE
 
       it "passes the nonce check" do
         expect(subject).to(eq([]))

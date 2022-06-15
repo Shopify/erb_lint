@@ -269,7 +269,7 @@ describe ERBLint::Linters::Rubocop do
         expect(subject[0].line_range).to(eq(2..2))
         expect(subject[0].message).to(\
           eq("Layout/ArgumentAlignment: Use one level of indentation for "\
-             "arguments following the first line of a multi-line method call.")
+            "arguments following the first line of a multi-line method call.")
         )
       end
     end

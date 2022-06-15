@@ -64,7 +64,7 @@ module ERBLint
         else
           raise TypeError,
             "Expected a Parser::Source::Range, Comment or " \
-                        "Rubocop::AST::Node, got #{node_or_range.class}"
+              "Rubocop::AST::Node, got #{node_or_range.class}"
         end
       end
     end

@@ -74,8 +74,8 @@ module ERBLint
 
       def tag_helper?(send_node)
         send_node&.method_name?(:javascript_tag) ||
-        send_node&.method_name?(:javascript_include_tag) ||
-        send_node&.method_name?(:javascript_pack_tag)
+          send_node&.method_name?(:javascript_include_tag) ||
+          send_node&.method_name?(:javascript_pack_tag)
       end
 
       def code_comment?(indicator_node)

@@ -9,6 +9,7 @@ module ERBLint
       unless source_range.is_a?(Parser::Source::Range)
         raise ArgumentError, "expected Parser::Source::Range for arg 2"
       end
+
       @linter = linter
       @source_range = source_range
       @message = message

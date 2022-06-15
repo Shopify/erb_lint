@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "active_support/core_ext/class"
 require "active_support/core_ext/module/delegation"
 
@@ -34,6 +35,7 @@ module ERBLint
     private
 
     attr_reader :stats, :autocorrect
+
     delegate :processed_files, to: :stats
   end
 end

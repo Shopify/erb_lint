@@ -322,7 +322,7 @@ module ERBLint
 
     def format_options_help
       "Report offenses in the given format: "\
-      "(#{Reporter.available_formats.join(", ")}) (default: multiline)"
+        "(#{Reporter.available_formats.join(", ")}) (default: multiline)"
     end
 
     def invalid_format_error_message(given_format)

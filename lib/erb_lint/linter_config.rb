@@ -29,6 +29,7 @@ module ERBLint
       if (extra_keys = given_keys - allowed_keys).any?
         raise Error, "Given key is not allowed: #{extra_keys.join(", ")}"
       end
+
       super(config)
     rescue SmartProperties::InitializationError => e
       raise Error, "The following properties are required to be set: #{e.properties}"
@@ -40,6 +41,7 @@ module ERBLint
       unless self.class.properties.key?(name)
         raise Error, "No such property: #{name}"
       end
+
       super
     end
 

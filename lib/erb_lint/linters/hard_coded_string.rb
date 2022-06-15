@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "set"
 require "better_html/tree/tag"
 require "active_support/core_ext/string/inflections"
@@ -83,6 +84,7 @@ module ERBLint
         string = offense.source_range.source
         return unless (klass = load_corrector)
         return unless string.strip.length > 1
+
         node = ::RuboCop::AST::StrNode.new(:str, [string])
         corrector = klass.new(node, processed_source.filename, corrector_i18n_load_path, offense.source_range)
         corrector.autocorrect(tag_start: "<%= ", tag_end: " %>")
@@ -100,6 +102,7 @@ module ERBLint
       def load_corrector
         corrector_name = @config["corrector"].fetch("name") { raise MissingCorrector }
         raise ForbiddenCorrector unless ALLOWED_CORRECTORS.include?(corrector_name)
+
         require @config["corrector"].fetch("path") { raise MissingCorrector }
 
         corrector_name.safe_constantize

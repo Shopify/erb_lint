@@ -98,6 +98,7 @@ module ERBLint
           no_space(processed_source, equal.loc.end_pos...value.loc.begin_pos) if equal && value
 
           next if index >= attributes.children.size - 1
+
           next_attribute = attributes.children[index + 1]
 
           single_space_or_newline(

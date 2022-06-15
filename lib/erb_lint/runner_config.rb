@@ -28,6 +28,7 @@ module ERBLint
       end
       linter_klass = LinterRegistry.find_by_name(klass_name)
       raise Error, "#{klass_name}: linter not found (is it loaded?)" unless linter_klass
+
       linter_klass.config_schema.new(config_hash_for_linter(klass_name))
     end
 

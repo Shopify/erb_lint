@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module ERBLint
   class Stats
     attr_accessor :ignored,

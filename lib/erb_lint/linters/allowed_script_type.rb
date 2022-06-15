@@ -31,7 +31,7 @@ module ERBLint
             add_offense(
               name_node.loc,
               "Avoid using inline `<script>` tags altogether. "\
-              "Instead, move javascript code into a static file."
+                "Instead, move javascript code into a static file."
             )
             next
           end
@@ -50,8 +50,8 @@ module ERBLint
             add_offense(
               type_attribute.loc,
               "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. "\
-              "Must be one of: #{@config.allowed_types.join(", ")}"\
-              "#{" (or no type attribute)" if @config.allow_blank?}."
+                "Must be one of: #{@config.allowed_types.join(", ")}"\
+                "#{" (or no type attribute)" if @config.allow_blank?}."
             )
           end
         end
@@ -59,6 +59,7 @@ module ERBLint
 
       def autocorrect(_processed_source, offense)
         return unless offense.context
+
         lambda do |corrector|
           type_attribute, = *offense.context
           if type_attribute.nil?

@@ -194,6 +194,7 @@ module ERBLint
 
       def find_entry(range)
         return unless range
+
         @entries.find do |entry|
           entry.contains_ruby_range?(Range.new(range.begin_pos, range.end_pos))
         end

@@ -28,6 +28,7 @@ module ERBLint
       base_configs(file_loader, inherited_files).reverse_each do |base_config|
         base_config.each do |k, v|
           next unless v.is_a?(Hash)
+
           v = v.deep_merge(hash[k]) if hash.key?(k)
           hash[k] = v
         end

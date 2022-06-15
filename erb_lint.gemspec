@@ -24,13 +24,13 @@ Gem::Specification.new do |s|
     "allowed_push_host" => "https://rubygems.org",
   }
 
+  s.add_dependency("activesupport")
   s.add_dependency("better_html", "~> 1.0.7")
   s.add_dependency("html_tokenizer")
-  s.add_dependency("rubocop")
   s.add_dependency("parser", ">= 2.7.1.4")
-  s.add_dependency("activesupport")
-  s.add_dependency("smart_properties")
   s.add_dependency("rainbow")
+  s.add_dependency("rubocop")
+  s.add_dependency("smart_properties")
 
   s.add_development_dependency("rspec")
   s.add_development_dependency("rubocop")

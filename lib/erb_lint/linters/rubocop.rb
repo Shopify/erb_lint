@@ -37,6 +37,7 @@ module ERBLint
       if ::RuboCop::Version::STRING.to_f >= 0.87
         def autocorrect(_processed_source, offense)
           return unless offense.context
+
           rubocop_correction = offense.context[:rubocop_correction]
           return unless rubocop_correction
 

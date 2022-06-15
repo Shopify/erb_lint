@@ -17,6 +17,7 @@ module ERBLint
 
         def ruby_to_erb(node, indicator = nil, &block)
           return node if node.nil? || node.is_a?(String)
+
           case node.type
           when :str, :sym
             s = node.children.first.to_s

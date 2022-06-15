@@ -59,6 +59,7 @@ module ERBLint
           tags(processed_source).each do |tag|
             class_value = tag.attributes["class"]&.value
             next unless class_value
+
             class_value.split(" ").each do |class_name|
               yielder.yield(class_name, tag.loc)
             end
