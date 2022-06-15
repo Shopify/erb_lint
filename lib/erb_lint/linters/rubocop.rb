@@ -150,6 +150,7 @@ module ERBLint
           @rubocop_config,
           extra_details: true,
           display_cop_names: true,
+          autocorrect: true,
           auto_correct: true,
           stdin: "",
         )
