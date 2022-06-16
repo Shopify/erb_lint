@@ -53,9 +53,12 @@ module ERBLint
       end
     end
 
-    def excludes_file?(filename)
+    def excludes_file?(absolute_filename, base_path)
       exclude.any? do |path|
-        File.fnmatch?(path, filename)
+        return true if File.fnmatch?(path, absolute_filename)
+
+        relative_path = absolute_filename.delete_prefix("#{base_path}/")
+        File.fnmatch?(path, relative_path)
       end
     end
   end
