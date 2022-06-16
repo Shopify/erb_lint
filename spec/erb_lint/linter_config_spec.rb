@@ -100,13 +100,25 @@ describe ERBLint::LinterConfig do
     describe "#excludes_file?" do
       context "when glob matches" do
         let(:config_hash) { { exclude: ["vendor/**/*"] } }
-        subject { linter_config.excludes_file?("vendor/gem/foo.rb") }
+        subject { linter_config.excludes_file?("/src/vendor/gem/foo.rb", "/src") }
         it { expect(subject).to(eq(true)) }
       end
 
       context "when glob does not match" do
         let(:config_hash) { { exclude: ["vendor/**/*"] } }
-        subject { linter_config.excludes_file?("app/foo.rb") }
+        subject { linter_config.excludes_file?("/src/app/foo.rb", "/src") }
+        it { expect(subject).to(eq(false)) }
+      end
+
+      context "when absolute glob matches" do
+        let(:config_hash) { { exclude: ["**/vendor/**/*"] } }
+        subject { linter_config.excludes_file?("/src/vendor/gem/foo.rb", "/src") }
+        it { expect(subject).to(eq(true)) }
+      end
+
+      context "when absolute glob does not match" do
+        let(:config_hash) { { exclude: ["**/vendor/**/*"] } }
+        subject { linter_config.excludes_file?("/src/app/foo.rb", "/src") }
         it { expect(subject).to(eq(false)) }
       end
     end

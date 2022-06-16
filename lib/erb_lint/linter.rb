@@ -46,7 +46,7 @@ module ERBLint
     end
 
     def excludes_file?(filename)
-      @config.excludes_file?(filename)
+      @config.excludes_file?(filename, @file_loader.base_path)
     end
 
     def run(_processed_source)
