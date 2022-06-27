@@ -158,34 +158,9 @@ module ERBLint
       end
 
       def config_from_hash(hash)
-        inherit_from = hash&.delete("inherit_from")
-        resolve_inheritance(hash, inherit_from)
-
         tempfile_from(".erblint-rubocop", hash.to_yaml) do |tempfile|
           ::RuboCop::ConfigLoader.load_file(tempfile.path)
         end
-      end
-
-      def resolve_inheritance(hash, inherit_from)
-        base_configs(inherit_from)
-          .reverse_each do |base_config|
-          base_config.each do |k, v|
-            hash[k] = hash.key?(k) ? ::RuboCop::ConfigLoader.merge(v, hash[k]) : v if v.is_a?(Hash)
-          end
-        end
-      end
-
-      def base_configs(inherit_from)
-        regex = URI::DEFAULT_PARSER.make_regexp(["http", "https"])
-        configs = Array(inherit_from).compact.map do |base_name|
-          if base_name =~ /\A#{regex}\z/
-            ::RuboCop::ConfigLoader.load_file(::RuboCop::RemoteConfig.new(base_name, Dir.pwd))
-          else
-            config_from_hash(@file_loader.yaml(base_name))
-          end
-        end
-
-        configs.compact
       end
 
       def add_offense(rubocop_offense, offense_range, correction, offset, bound_range)
