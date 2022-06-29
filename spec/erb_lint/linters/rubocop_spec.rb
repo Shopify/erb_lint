@@ -24,7 +24,10 @@ describe ERBLint::Linters::Rubocop do
   let(:inherit_from_filename) { "custom_rubocop.yml" }
   subject { offenses }
   before do
-    allow(file_loader).to(receive(:yaml).with(inherit_from_filename).and_return(nested_config))
+    allow(::RuboCop::ConfigLoader).to(receive(:load_file).and_call_original)
+    allow(::RuboCop::ConfigLoader).to(
+      receive(:load_file).with(a_string_ending_with(inherit_from_filename)).and_return(nested_config),
+    )
   end
   before { linter.run(processed_source) }
 
