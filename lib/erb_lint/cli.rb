@@ -168,8 +168,12 @@ module ERBLint
       @config.merge!(runner_config_override)
     end
 
+    def working_directory
+      @working_directory ||= @options[:working_dir] || Dir.pwd
+    end
+
     def file_loader
-      @file_loader ||= ERBLint::FileLoader.new(Dir.pwd)
+      @file_loader ||= ERBLint::FileLoader.new(working_directory)
     end
 
     def load_options(args)
@@ -259,6 +263,14 @@ module ERBLint
             @options[:config] = config
           else
             failure!("#{config}: does not exist")
+          end
+        end
+
+        opts.on("--working-dir DIRECTORY", "Working directory requires read/write access. [default: #{Dir.pwd}]") do |working_dir|
+          if File.directory?(working_dir)
+            @options[:working_dir] = working_dir
+          else
+            failure!("#{working_dir}: does not exist")
           end
         end
 

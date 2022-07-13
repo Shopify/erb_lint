@@ -119,6 +119,28 @@ describe ERBLint::CLI do
       end
     end
 
+    context "with --working-dir" do
+      context "when working dir does not exist" do
+        let(:args) { ["--working-dir", "./somefolder/"] }
+
+        it { expect { subject }.to(output(/.\/somefolder\/: does not exist/).to_stderr) }
+        it "is not successful" do
+          expect(subject).to(be(false))
+        end
+      end
+
+      context "when directory does exist" do
+        before { FakeFS::FileSystem.clone(File.join(__dir__, "../fixtures"), "/") }
+
+        let(:args) { ["--working-dir", "/", "--config", "config.yml", "--lint-all"] }
+
+        it { expect { subject }.to_not(output(/.\/somefolder\/: does not exist/).to_stderr) }
+        it "is successful" do
+          expect(subject).to(be(true))
+        end
+      end
+    end
+
     context "with file as argument" do
       context "when file does not exist" do
         let(:linted_file) { "/path/to/myfile.html.erb" }
