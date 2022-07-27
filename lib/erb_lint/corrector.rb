@@ -12,7 +12,7 @@ module ERBLint
 
     def corrections
       @corrections ||= @offenses.map do |offense|
-        offense.linter.autocorrect(@processed_source, offense)
+        offense.linter.autocorrect(@processed_source, offense) if offense.linter.class.support_autocorrect?
       end.compact
     end
 
