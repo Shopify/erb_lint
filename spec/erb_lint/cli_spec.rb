@@ -514,9 +514,9 @@ describe ERBLint::CLI do
           end
 
           context "when autocorrecting an error" do
-            # We assume that linter_without_errors is not autocorrectable...
+            # We assume that linter_with_errors is not autocorrectable...
             let(:args) do
-              ["--enable-linter", "final_newline,linter_without_errors", "--stdin", linted_file, "--autocorrect"]
+              ["--enable-linter", "final_newline,linter_with_errors", "--stdin", linted_file, "--autocorrect"]
             end
 
             it "tells the user it is autocorrecting" do
