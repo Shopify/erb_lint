@@ -66,7 +66,7 @@ module ERBLint
       lint_files.each do |filename|
         runner.clear_offenses
         begin
-          puts file_content = run_on_file(runner, filename)
+          file_content = run_on_file(runner, filename)
         rescue => e
           @stats.exceptions += 1
           puts "Exception occurred when processing: #{relative_filename(filename)}"
@@ -77,6 +77,8 @@ module ERBLint
           puts
         end
       end
+
+      cache.clean if clean_cache?
 
       reporter.show
 
@@ -111,14 +113,16 @@ module ERBLint
     end
 
     def run_using_cache(runner, filename)
-      puts cache.include?(filename)
+      # puts cache.include?(filename)
       if cache.include?(filename) && !autocorrect?
         result = cache[filename]
         @stats.found += result.size
+        cache.add_hit(filename) if clean_cache?
         result
       else
         result = run_with_corrections(runner, filename)
         cache[filename] = result
+        cache.add_new_result(filename) if clean_cache?
       end
     end
 
@@ -128,6 +132,10 @@ module ERBLint
 
     def with_cache?
       @options[:with_cache]
+    end
+
+    def clean_cache?
+      @options[:clean_cache]
     end
 
     def run_with_corrections(runner, filename)
@@ -310,8 +318,12 @@ module ERBLint
           @options[:enabled_linters] = known_linter_names
         end
 
-        opts.on("--with_cache", "Enable caching") do |config|
+        opts.on("--with-cache", "Enable caching") do |config|
           @options[:with_cache] = config
+        end
+
+        opts.on("--clean-cache", "Clean cache") do |config|
+          @options[:clean_cache] = config
         end
 
         opts.on("--enable-linters LINTER[,LINTER,...]", Array,

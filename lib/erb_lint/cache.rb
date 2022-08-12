@@ -7,6 +7,8 @@ module ERBLint
 
     def initialize(config)
       @config = config.to_hash
+      @hits = []
+      @new_results = []
     end
 
     def [](filename)
@@ -25,9 +27,40 @@ module ERBLint
       end
     end
 
+    def add_hit(hit)
+      @hits.push(hit)
+    end
+
+    def add_new_result(filename)
+      @new_results.push(filename)
+    end
+
+    def clean
+      if hits.empty?
+        puts "Cache being created, skipping clean"
+        return
+      end
+
+      cache_files = Dir.new(CACHE_DIRECTORY).children
+      hits_as_checksums = hits.map{|hit| checksum(hit) }
+      new_results_as_checksums = new_results.map{|new_result| checksum(new_result) }
+      cache_files.each do |cache_file|
+        next if hits_as_checksums.include?(cache_file)
+        if new_results_as_checksums.include?(cache_file)
+          puts "Skipping deletion of new cache result #{cache_file} in clean"
+          return
+        end
+
+        puts "Cleaning deleted cached file with checksum #{cache_file}}"
+        File.delete(File.join(CACHE_DIRECTORY, cache_file))
+      end
+
+      @hits = []
+    end
+
     private
 
-    attr_reader :config
+    attr_reader :config, :hits, :new_results
 
     def checksum(file)
       digester = Digest::SHA1.new
