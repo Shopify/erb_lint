@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require "erb_lint/cli"
+require "erb_lint/cache"
 require "pp"
 require "fakefs"
 require "fakefs/spec_helpers"
@@ -97,6 +98,34 @@ describe ERBLint::CLI do
       end
     end
 
+    context "with --clear-cache" do
+      let(:args) { ["--clear-cache"] }
+      context "without a cache folder" do
+        it { expect { subject }.to(output(/cache directory already doesn't exist, skipped deletion/).to_stderr) }
+        it "shows cache not cleared message if cache is empty and fails" do
+          expect(subject).to(be(false))
+        end
+      end
+
+      context "with a cache folder" do
+        before do
+          FileUtils.mkdir_p(ERBLint::Cache::CACHE_DIRECTORY)
+        end
+        it {
+          expect do
+            subject
+          end.to(output(<<~EOF).to_stdout)
+            Cache mode is on
+            Clearing cache by deleting cache directory
+            cache directory cleared
+          EOF
+        }
+        it "is successful and empties the cache if there are cache file" do
+          expect(subject).to(be(true))
+        end
+      end
+    end
+
     context "with --config" do
       context "when file does not exist" do
         let(:args) { ["--config", ".somefile.yml"] }
@@ -170,7 +199,7 @@ describe ERBLint::CLI do
           end
         end
 
-        context "when only errors with serverity info are found" do
+        context "when only errors with severity info are found" do
           let(:args) { ["--enable-linter", "linter_with_info_errors", linted_file] }
 
           it "shows all error messages and line numbers" do
@@ -216,6 +245,19 @@ describe ERBLint::CLI do
           it "is not able to find the file" do
             expect { subject }.to(output(/no files found\.\.\./).to_stderr)
             expect(subject).to(be(false))
+          end
+        end
+
+        context "with cache" do
+          let(:args) { ["--enable-linter", "linter_without_errors", "--with-cache", linted_file] }
+
+          it "lints the file and adds it to the cache" do
+            expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
+
+            expect { subject }.to(output(/Cache mode is on/).to_stdout)
+            expect(subject).to(be(true))
+
+            expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
           end
         end
       end
@@ -428,6 +470,19 @@ describe ERBLint::CLI do
             it "is successful" do
               expect(subject).to(be(true))
             end
+
+            context "with cache" do
+              let(:args) { ["--enable-linter", "linter_without_errors", "--with-cache", linted_dir] }
+
+              it "lints the file and adds it to the cache" do
+                expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
+
+                expect { subject }.to(output(/Cache mode is on/).to_stdout)
+                expect(subject).to(be(true))
+
+                expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
+              end
+            end
           end
         end
       end
@@ -529,6 +584,17 @@ describe ERBLint::CLI do
 
             it "outputs the corrected ERB" do
               expect { subject }.to(output(/#{file_content}\n/).to_stdout)
+            end
+          end
+
+          context "when autocorrecting and caching are turned on" do
+            # We assume that linter_with_errors is not autocorrectable...
+            let(:args) do
+              ["--enable-linter", "linter_without_errors", "--stdin", linted_file, "--autocorrect", "--with-cache"]
+            end
+
+            it "throws an error saying the two modes cannot be used together" do
+              expect { subject }.to(output(/cannot run autocorrect mode with cache/).to_stderr)
             end
           end
         end

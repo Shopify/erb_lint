@@ -30,18 +30,23 @@ module ERBLint
     def run(args = ARGV)
       dupped_args = args.dup
       load_options(dupped_args)
-      @files = @options[:stdin] || dupped_args
-
-      load_config
 
       if with_cache? && autocorrect?
         failure!("cannot run autocorrect mode with cache")
       end
 
+      @files = @options[:stdin] || dupped_args
+
+      load_config
+
       @cache = Cache.new(config) if with_cache? || clear_cache?
       if clear_cache?
-        cache.clear
-        exit(0)
+        if cache.cache_dir_exists?
+          cache.clear
+          success!("cache directory cleared")
+        else
+          failure!("cache directory already doesn't exist, skipped deletion.")
+        end
       end
 
       if !@files.empty? && lint_files.empty?

@@ -3,12 +3,12 @@
 module ERBLint
   class Cache
     CACHE_DIRECTORY = ".erb-lint-cache"
-    private_constant :CACHE_DIRECTORY
 
     def initialize(config)
       @config = config.to_hash
       @hits = []
       @new_results = []
+      puts "Cache mode is on"
     end
 
     def [](filename)
@@ -59,14 +59,15 @@ module ERBLint
       @hits = []
     end
 
+    def cache_dir_exists?
+      File.directory?(CACHE_DIRECTORY)
+    end
+
     def clear
-      puts "Clearing cache by deleting cache directory..."
-      begin
-        FileUtils.remove_dir(CACHE_DIRECTORY)
-        puts "...cache directory cleared"
-      rescue Errno::ENOENT
-        puts "...directory already doesn't exist, skipped deletion."
-      end
+      return unless cache_dir_exists?
+
+      puts "Clearing cache by deleting cache directory"
+      FileUtils.rm_r(CACHE_DIRECTORY)
     end
 
     private
