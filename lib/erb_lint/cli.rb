@@ -41,10 +41,8 @@ module ERBLint
       @cache = Cache.new(config) if with_cache? || clear_cache?
       if clear_cache?
         cache.clear
-        exit 0
+        exit(0)
       end
-
-
 
       if !@files.empty? && lint_files.empty?
         if allow_no_files?

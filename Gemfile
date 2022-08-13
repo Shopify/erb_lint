@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 gem "rake"
-gem 'pry'
+gem "pry"
 
 group "test" do
   gem "fakefs"
