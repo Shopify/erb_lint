@@ -35,9 +35,9 @@ module ERBLint
       @new_results.push(filename)
     end
 
-    def clean
+    def prune
       if hits.empty?
-        puts "Cache being created, skipping clean"
+        puts "Cache being created for the first time, skipping prune"
         return
       end
 
@@ -47,7 +47,7 @@ module ERBLint
       cache_files.each do |cache_file|
         next if hits_as_checksums.include?(cache_file)
         if new_results_as_checksums.include?(cache_file)
-          puts "Skipping deletion of new cache result #{cache_file} in clean"
+          puts "Skipping deletion of new cache result #{cache_file} in prune"
           return
         end
 
@@ -56,6 +56,16 @@ module ERBLint
       end
 
       @hits = []
+    end
+
+    def clear
+      puts "Clearing cache by deleting cache directory..."
+      begin
+        FileUtils.remove_dir(CACHE_DIRECTORY)
+        puts "...cache directory cleared"
+      rescue Errno::ENOENT => e
+        puts "...directory already doesn't exist, skipped deletion."
+      end
     end
 
     private

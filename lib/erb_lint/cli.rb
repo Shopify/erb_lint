@@ -33,7 +33,18 @@ module ERBLint
       @files = @options[:stdin] || dupped_args
 
       load_config
-      @cache = Cache.new(config)
+
+      if with_cache? && autocorrect?
+        failure!("cannot run autocorrect mode with cache")
+      end
+
+      @cache = Cache.new(config) if with_cache? || clear_cache?
+      if clear_cache?
+        cache.clear
+        exit 0
+      end
+
+
 
       if !@files.empty? && lint_files.empty?
         if allow_no_files?
@@ -78,7 +89,7 @@ module ERBLint
         end
       end
 
-      cache.clean if clean_cache?
+      cache.prune if prune_cache?
 
       reporter.show
 
@@ -116,13 +127,12 @@ module ERBLint
       # puts cache.include?(filename)
       if cache.include?(filename) && !autocorrect?
         result = cache[filename]
-        @stats.found += result.size
-        cache.add_hit(filename) if clean_cache?
+        cache.add_hit(filename) if prune_cache?
         result
       else
         result = run_with_corrections(runner, filename)
         cache[filename] = result
-        cache.add_new_result(filename) if clean_cache?
+        cache.add_new_result(filename) if prune_cache?
       end
     end
 
@@ -134,8 +144,12 @@ module ERBLint
       @options[:with_cache]
     end
 
-    def clean_cache?
-      @options[:clean_cache]
+    def prune_cache?
+      @options[:prune_cache]
+    end
+
+    def clear_cache?
+      @options[:clear_cache]
     end
 
     def run_with_corrections(runner, filename)
@@ -322,8 +336,12 @@ module ERBLint
           @options[:with_cache] = config
         end
 
-        opts.on("--clean-cache", "Clean cache") do |config|
-          @options[:clean_cache] = config
+        opts.on("--prune-cache", "Prune cache") do |config|
+          @options[:prune_cache] = config
+        end
+
+        opts.on("--clear-cache", "Clear cache") do |config|
+          @options[:clear_cache] = config
         end
 
         opts.on("--enable-linters LINTER[,LINTER,...]", Array,
