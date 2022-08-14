@@ -39,7 +39,7 @@ module ERBLint
 
       load_config
 
-      @cache = Cache.new(config) if with_cache? || clear_cache?
+      @cache = Cache.new(@config, file_loader) if with_cache? || clear_cache?
       if clear_cache?
         if cache.cache_dir_exists?
           cache.clear
@@ -119,22 +119,24 @@ module ERBLint
     attr_reader :cache, :config
 
     def run_on_file(runner, filename)
+      file_content = read_content(filename)
       if with_cache? && !autocorrect?
-        run_using_cache(runner, filename)
+        run_using_cache(runner, filename, file_content)
       else
-        run_with_corrections(runner, filename)
+        file_content = run_with_corrections(runner, filename, file_content)
       end
+      log_offense_stats(runner, filename)
+      file_content
     end
 
-    def run_using_cache(runner, filename)
+    def run_using_cache(runner, filename, file_content)
       # puts cache.include?(filename)
       if cache.include?(filename) && !autocorrect?
-        result = cache[filename]
+        runner.restore_offenses(cache[filename])
         cache.add_hit(filename) if prune_cache?
-        result
       else
-        result = run_with_corrections(runner, filename)
-        cache[filename] = result
+        run_with_corrections(runner, filename, file_content)
+        cache[filename] = runner.offenses.map(&:to_json_format).to_json
         cache.add_new_result(filename) if prune_cache?
       end
     end
@@ -155,9 +157,7 @@ module ERBLint
       @options[:clear_cache]
     end
 
-    def run_with_corrections(runner, filename)
-      file_content = read_content(filename)
-
+    def run_with_corrections(runner, filename, file_content)
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
         runner.run(processed_source)
@@ -179,6 +179,11 @@ module ERBLint
         file_content = corrector.corrected_content
         runner.clear_offenses
       end
+
+      file_content
+    end
+
+    def log_offense_stats(runner, filename)
       offenses_filename = relative_filename(filename)
       offenses = runner.offenses || []
 
@@ -190,8 +195,6 @@ module ERBLint
 
       @stats.processed_files[offenses_filename] ||= []
       @stats.processed_files[offenses_filename] |= offenses
-
-      file_content
     end
 
     def read_content(filename)

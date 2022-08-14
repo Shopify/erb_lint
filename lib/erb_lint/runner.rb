@@ -30,5 +30,9 @@ module ERBLint
       @offenses = []
       @linters.each(&:clear_offenses)
     end
+
+    def restore_offenses(offenses)
+      @offenses.concat(offenses)
+    end
   end
 end

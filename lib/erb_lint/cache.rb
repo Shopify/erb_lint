@@ -4,26 +4,29 @@ module ERBLint
   class Cache
     CACHE_DIRECTORY = ".erb-lint-cache"
 
-    def initialize(config)
-      @config = config.to_hash
+    def initialize(config, file_loader = nil)
+      @config = config
+      @file_loader = file_loader
       @hits = []
       @new_results = []
       puts "Cache mode is on"
     end
 
     def [](filename)
-      JSON.parse(File.read(File.join(CACHE_DIRECTORY, checksum(filename))))
+      JSON.parse(File.read(File.join(CACHE_DIRECTORY, checksum(filename)))).map do |offense|
+        ERBLint::Offense.from_json(offense, @file_loader, config)
+      end
     end
 
     def include?(filename)
       File.exist?(File.join(CACHE_DIRECTORY, checksum(filename)))
     end
 
-    def []=(filename, messages)
+    def []=(filename, offenses_as_json)
       FileUtils.mkdir_p(CACHE_DIRECTORY)
 
       File.open(File.join(CACHE_DIRECTORY, checksum(filename)), "wb") do |f|
-        f.write(messages.to_json)
+        f.write(offenses_as_json)
       end
     end
 
@@ -52,7 +55,7 @@ module ERBLint
           next
         end
 
-        puts "Cleaning deleted cached file with checksum #{cache_file}}"
+        puts "Cleaning deleted cached file with checksum #{cache_file}"
         File.delete(File.join(CACHE_DIRECTORY, cache_file))
       end
 
@@ -79,7 +82,7 @@ module ERBLint
       mode = File.stat(file).mode
 
       digester.update(
-        "#{file}#{mode}#{config}"
+        "#{file}#{mode}#{config.to_hash}"
       )
       digester.file(file)
       digester.hexdigest
