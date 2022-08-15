@@ -12,9 +12,9 @@ module ERBLint
       puts "Cache mode is on"
     end
 
-    def [](filename)
+    def get(filename, file_content)
       JSON.parse(File.read(File.join(CACHE_DIRECTORY, checksum(filename)))).map do |offense|
-        ERBLint::Offense.from_json(offense, @file_loader, config)
+        ERBLint::Offense.from_json(offense, config, @file_loader, file_content)
       end
     end
 

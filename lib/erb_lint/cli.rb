@@ -132,7 +132,7 @@ module ERBLint
     def run_using_cache(runner, filename, file_content)
       # puts cache.include?(filename)
       if cache.include?(filename) && !autocorrect?
-        runner.restore_offenses(cache[filename])
+        runner.restore_offenses(cache.get(filename, file_content))
         cache.add_hit(filename) if prune_cache?
       else
         run_with_corrections(runner, filename, file_content)
