@@ -10,6 +10,7 @@ module ERBLint
       class ConfigSchema < LinterConfig
         property :only, accepts: array_of?(String)
         property :rubocop_config, accepts: Hash
+        property :config_file_path, accepts: String
       end
 
       self.config_schema = ConfigSchema

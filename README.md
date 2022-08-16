@@ -248,6 +248,7 @@ Linter-Specific Option | Description
 -----------------------|---------------------------------------------------------
 `rubocop_config`       | A valid rubocop configuration hash. Mandatory when this cop is enabled. See [rubocop's manual entry on Configuration](http://rubocop.readthedocs.io/en/latest/configuration/)
 `only`                 | Only run cops listed in this array instead of all cops.
+`config_file_path`     | A path to a valid rubocop configuration file. When this is provided, `rubocop_config` will be ignored.
 
 ### RequireInputAutocomplete
 This linter prevents the usage of certain types of HTML `<input>` without an `autocomplete` argument: `color`, `date`, `datetime-local`, `email`, `month`, `number`, `password`, `range`, `search`, `tel`, `text`, `time`, `url`, or `week`.
@@ -355,15 +356,15 @@ Linter-Specific Option | Description
 `correction_style`     | When configured with `cdata`, adds CDATA markers. When configured with `plain`, don't add makers. Defaults to `cdata`.
 
 ### RequireScriptNonce
-This linter prevents the usage of HTML `<script>`, Rails `javascript_tag`, `javascript_include_tag` and `javascript_pack_tag` without a `nonce` argument. The purpose of such a check is to ensure that when [content securty policy](https://edgeguides.rubyonrails.org/security.html#content-security-policy) is implemented in an application, there is a means of discovering tags that need to be updated with a `nonce` argument to enable script execution at application runtime. 
+This linter prevents the usage of HTML `<script>`, Rails `javascript_tag`, `javascript_include_tag` and `javascript_pack_tag` without a `nonce` argument. The purpose of such a check is to ensure that when [content securty policy](https://edgeguides.rubyonrails.org/security.html#content-security-policy) is implemented in an application, there is a means of discovering tags that need to be updated with a `nonce` argument to enable script execution at application runtime.
 
 ```
 Bad ❌
-<script> 
+<script>
     alert(1)
 </script>
 Good ✅
-<script nonce="<%= request.content_security_policy_nonce %>" > 
+<script nonce="<%= request.content_security_policy_nonce %>" >
     alert(1)
 </script>
 ```

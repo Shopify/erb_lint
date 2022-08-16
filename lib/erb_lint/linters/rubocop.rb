@@ -13,6 +13,7 @@ module ERBLint
       class ConfigSchema < LinterConfig
         property :only, accepts: array_of?(String)
         property :rubocop_config, accepts: Hash, default: -> { {} }
+        property :config_file_path, accepts: String
       end
 
       self.config_schema = ConfigSchema
@@ -24,7 +25,8 @@ module ERBLint
       def initialize(file_loader, config)
         super
         @only_cops = @config.only
-        custom_config = config_from_hash(@config.rubocop_config)
+        custom_config = config_from_path(@config.config_file_path) if @config.config_file_path
+        custom_config ||= config_from_hash(@config.rubocop_config)
         @rubocop_config = ::RuboCop::ConfigLoader.merge_with_default(custom_config, "")
       end
 
@@ -159,8 +161,12 @@ module ERBLint
 
       def config_from_hash(hash)
         tempfile_from(".erblint-rubocop", hash.to_yaml) do |tempfile|
-          ::RuboCop::ConfigLoader.load_file(tempfile.path)
+          config_from_path(tempfile.path)
         end
+      end
+
+      def config_from_path(path)
+        ::RuboCop::ConfigLoader.load_file(path)
       end
 
       def add_offense(rubocop_offense, offense_range, correction, offset, bound_range)

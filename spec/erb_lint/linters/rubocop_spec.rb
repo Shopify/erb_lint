@@ -231,6 +231,40 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
+  context "supports config from a provided path" do
+    after do
+      config_file.close
+      config_file.unlink
+    end
+
+    let(:config_file) do
+      tempfile = Tempfile.new("config.yml")
+      tempfile.write(nested_config.to_yaml)
+      tempfile.rewind
+      tempfile
+    end
+    let(:linter_config) do
+      described_class.config_schema.new(
+        only: ["ErbLint/AutoCorrectCop"],
+        config_file_path: config_file.path,
+      )
+    end
+    let(:nested_config) do
+      {
+        "ErbLint/AutoCorrectCop": {
+          "Enabled": false,
+        },
+      }.deep_stringify_keys
+    end
+    let(:file) { <<~FILE }
+      <% auto_correct_me %>
+    FILE
+
+    it "loads rubocop config from specified file path" do
+      expect(subject).to(eq([]))
+    end
+  end
+
   context "code is aligned to the column matching start of ruby code" do
     let(:linter_config) do
       described_class.config_schema.new(
