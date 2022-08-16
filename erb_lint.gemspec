@@ -18,15 +18,14 @@ Gem::Specification.new do |s|
   s.bindir = "exe"
   s.executables = s.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
-  s.required_ruby_version = ">= 2.5.0"
+  s.required_ruby_version = ">= 2.7.0"
 
   s.metadata = {
     "allowed_push_host" => "https://rubygems.org",
   }
 
   s.add_dependency("activesupport")
-  s.add_dependency("better_html", "~> 1.0.7")
-  s.add_dependency("html_tokenizer")
+  s.add_dependency("better_html", ">= 2.0.1")
   s.add_dependency("parser", ">= 2.7.1.4")
   s.add_dependency("rainbow")
   s.add_dependency("rubocop")
