@@ -564,7 +564,12 @@ describe ERBLint::CLI do
 
           context "allowing for no matching files" do
             let(:args) do
-              ["--config", config_file, "--enable-linter", "linter_with_errors,final_newline", "--allow-no-files", "--stdin", linted_file]
+              [
+                "--config", config_file,
+                "--enable-linter", "linter_with_errors,final_newline",
+                "--stdin", linted_file,
+                "--allow-no-files"
+              ]
             end
 
             it "exits with success status" do
