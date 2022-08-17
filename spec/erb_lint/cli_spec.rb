@@ -568,7 +568,7 @@ describe ERBLint::CLI do
                 "--config", config_file,
                 "--enable-linter", "linter_with_errors,final_newline",
                 "--stdin", linted_file,
-                "--allow-no-files"
+                "--allow-no-files",
               ]
             end
 
