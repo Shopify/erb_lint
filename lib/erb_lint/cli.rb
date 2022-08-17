@@ -35,7 +35,11 @@ module ERBLint
       load_config
 
       if !@files.empty? && lint_files.empty?
-        failure!("no files found...\n")
+        if allow_no_files?
+          success!("no files found...\n")
+        else
+          failure!("no files found...\n")
+        end
       elsif lint_files.empty?
         failure!("no files found or given, specify files or config...\n#{option_parser}")
       end
@@ -302,6 +306,10 @@ module ERBLint
           @options[:autocorrect] = config
         end
 
+        opts.on("--allow-no-files", "When no matching files found, exit successfully (default: false)") do |config|
+          @options[:allow_no_files] = config
+        end
+
         opts.on(
           "-sFILE",
           "--stdin FILE",
@@ -332,6 +340,10 @@ module ERBLint
 
     def stdin?
       @options[:stdin].present?
+    end
+
+    def allow_no_files?
+      @options[:allow_no_files]
     end
   end
 end
