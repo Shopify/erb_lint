@@ -561,6 +561,22 @@ describe ERBLint::CLI do
             expect { subject }.to(output(/no files found\.\.\./).to_stderr)
             expect(subject).to(be(false))
           end
+
+          context "allowing for no matching files" do
+            let(:args) do
+              [
+                "--config", config_file,
+                "--enable-linter", "linter_with_errors,final_newline",
+                "--stdin", linted_file,
+                "--allow-no-files",
+              ]
+            end
+
+            it "exits with success status" do
+              expect { subject }.to(output(/no files found\.\.\./).to_stdout)
+              expect(subject).to(be(true))
+            end
+          end
         end
       end
     end
