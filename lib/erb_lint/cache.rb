@@ -82,7 +82,7 @@ module ERBLint
       mode = File.stat(file).mode
 
       digester.update(
-        "#{file}#{mode}#{config.to_hash}"
+        "#{file}#{mode}#{config.to_hash}#{ERBLint::VERSION}"
       )
       digester.file(file)
       digester.hexdigest

@@ -11,7 +11,7 @@ describe ERBLint::Cache do
   let(:linter_config) { ERBLint::LinterConfig.new }
   let(:cache) { described_class.new(linter_config) }
   let(:linted_file_path) { "app/components/elements/image_component/image_component.html.erb" }
-  let(:checksum) { "835c15465bc22783257bdafb33acc2d78c29abaa" }
+  let(:checksum) { "2dc3e17183b87889cc783b0157723570d4bbb90a" }
   let(:cache_dir) { ERBLint::Cache::CACHE_DIRECTORY }
   let(:rubocop_yml) { %(SpaceAroundErbTag:\n  Enabled: true\n) }
   let(:cache_file_content) do
