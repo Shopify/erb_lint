@@ -40,6 +40,7 @@ module ERBLint
       load_config
 
       @cache = Cache.new(@config, file_loader) if with_cache? || clear_cache?
+
       if clear_cache?
         if cache.cache_dir_exists?
           cache.clear
@@ -120,17 +121,19 @@ module ERBLint
 
     def run_on_file(runner, filename)
       file_content = read_content(filename)
+
       if with_cache? && !autocorrect?
         run_using_cache(runner, filename, file_content)
       else
         file_content = run_with_corrections(runner, filename, file_content)
       end
+
       log_offense_stats(runner, filename)
       file_content
     end
 
     def run_using_cache(runner, filename, file_content)
-      if cache.include?(filename) && !autocorrect?
+      if cache.include?(filename)
         runner.restore_offenses(cache.get(filename, file_content))
         cache.add_hit(filename) if prune_cache?
       else
