@@ -45,7 +45,7 @@ module ERBLint
           cache.clear
           success!("cache directory cleared")
         else
-          failure!("cache directory already doesn't exist, skipped deletion.")
+          failure!("cache directory doesn't exist, skipping deletion.")
         end
       end
 

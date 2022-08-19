@@ -101,7 +101,7 @@ describe ERBLint::CLI do
     context "with --clear-cache" do
       let(:args) { ["--clear-cache"] }
       context "without a cache folder" do
-        it { expect { subject }.to(output(/cache directory already doesn't exist, skipped deletion/).to_stderr) }
+        it { expect { subject }.to(output(/cache directory doesn't exist, skipping deletion/).to_stderr) }
         it "shows cache not cleared message if cache is empty and fails" do
           expect(subject).to(be(false))
         end
