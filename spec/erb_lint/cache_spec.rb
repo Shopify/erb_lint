@@ -42,8 +42,11 @@ describe ERBLint::Cache do
       f.write(cache_file_content)
     end
 
-    allow(::RuboCop::ConfigLoader).to(receive(:load_file).and_call_original)
-    allow(::RuboCop::ConfigLoader).to(receive(:read_file).and_return(rubocop_yml))
+    digest_sha1_double = instance_double(Digest::SHA1)
+    allow(Digest::SHA1).to(receive(:new).and_return(digest_sha1_double))
+    allow(digest_sha1_double).to(receive(:hexdigest).and_return(checksum))
+    allow(digest_sha1_double).to(receive(:update).and_return(true))
+    allow(digest_sha1_double).to(receive(:file).and_return(true))
   end
 
   describe "#get" do
@@ -127,7 +130,7 @@ describe ERBLint::Cache do
       )).to(be(true))
     end
 
-    it "prunes outdated cache results" do
+    it "prunes unused cache results" do
       fakefs_dir = Struct.new(:fakefs_dir)
       allow(fakefs_dir).to(receive(:children).and_return([checksum, "fake-checksum"]))
       allow(FakeFS::Dir).to(receive(:new).and_return(fakefs_dir))
