@@ -266,7 +266,7 @@ module ERBLint
           end
         end
 
-        opts.on("--format FORMAT", format_options_help) do |format|
+        opts.on("-f", "--format FORMAT", format_options_help) do |format|
           unless Reporter.available_format?(format)
             error_message = invalid_format_error_message(format)
             failure!(error_message)
