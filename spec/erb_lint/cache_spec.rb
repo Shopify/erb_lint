@@ -95,15 +95,15 @@ describe ERBLint::Cache do
     end
   end
 
-  describe "#prune" do
+  describe "#prune_cache" do
     it "skips prune if no cache hits" do
       allow(cache).to(receive(:hits).and_return([]))
 
-      expect { cache.prune }.to(output(/Cache being created for the first time, skipping prune/).to_stdout)
+      expect { cache.prune_cache }.to(output(/Cache being created for the first time, skipping prune/).to_stdout)
     end
 
     it "does not prune actual cache hits" do
-      cache.prune
+      cache.prune_cache
 
       expect(File.exist?(
         File.join(
@@ -120,7 +120,7 @@ describe ERBLint::Cache do
       allow(fakefs_dir).to(receive(:children).and_return([checksum]))
       allow(FakeFS::Dir).to(receive(:new).and_return(fakefs_dir))
 
-      expect { cache.prune }.to(output(/Skipping deletion of new cache result #{checksum} in prune/).to_stdout)
+      expect { cache.prune_cache }.to(output(/Skipping deletion of new cache result #{checksum}/).to_stdout)
 
       expect(File.exist?(
         File.join(
@@ -140,7 +140,7 @@ describe ERBLint::Cache do
         f.write(cache_file_content)
       end
 
-      expect { cache.prune }.to(output(/Cleaning deleted cached file with checksum fake-checksum/).to_stdout)
+      expect { cache.prune_cache }.to(output(/Cleaning deleted cached file with checksum fake-checksum/).to_stdout)
 
       expect(File.exist?(
         File.join(
@@ -151,19 +151,29 @@ describe ERBLint::Cache do
     end
   end
 
-  describe "#add_new_result" do
-    it "adds new result to cache object new_results attribute" do
-      cache.add_new_result(linted_file_path)
+  describe "prune cache mode on #get and #[] behavior" do
+    before do
+      allow(cache).to(receive(:prune?).and_return(true))
+    end
+
+    it "adds new result to cache object new_results list attribute" do
+      cache[linted_file_path] = cache_file_content
 
       expect(cache.send(:new_results)).to(include(linted_file_path))
     end
-  end
 
-  describe "#add_hit" do
-    it "adds new cache hit to cache object hits attribute" do
-      cache.add_hit(linted_file_path)
+    it "adds new cache hit to cache object hits list attribute" do
+      cache.get(linted_file_path, linted_file_content)
 
       expect(cache.send(:hits)).to(include(linted_file_path))
+    end
+  end
+
+  describe "#close" do
+    it "Calls prune_cache if prune_cache mode is on" do
+      allow(cache).to(receive(:prune?).and_return(true))
+      expect(cache).to(receive(:prune_cache))
+      cache.close
     end
   end
 end

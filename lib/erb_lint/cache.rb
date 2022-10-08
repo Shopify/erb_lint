@@ -4,15 +4,18 @@ module ERBLint
   class Cache
     CACHE_DIRECTORY = ".erb-lint-cache"
 
-    def initialize(config, file_loader = nil)
+    def initialize(config, file_loader = nil, prune = false)
       @config = config
       @file_loader = file_loader
       @hits = []
       @new_results = []
+      @prune = prune
       puts "Cache mode is on"
     end
 
     def get(filename, file_content)
+      @hits.push(filename) if prune?
+
       JSON.parse(File.read(File.join(CACHE_DIRECTORY, checksum(filename)))).map do |offense|
         ERBLint::Offense.from_json(offense, config, @file_loader, file_content)
       end
@@ -23,6 +26,8 @@ module ERBLint
     end
 
     def []=(filename, offenses_as_json)
+      @new_results.push(filename) if prune?
+
       FileUtils.mkdir_p(CACHE_DIRECTORY)
 
       File.open(File.join(CACHE_DIRECTORY, checksum(filename)), "wb") do |f|
@@ -30,15 +35,12 @@ module ERBLint
       end
     end
 
-    def add_hit(hit)
-      @hits.push(hit)
+    def close
+      prune_cache if prune?
     end
 
-    def add_new_result(filename)
-      @new_results.push(filename)
-    end
-
-    def prune
+    def prune_cache
+      puts "Prune cache mode is on - pruned file names will be logged"
       if hits.empty?
         puts "Cache being created for the first time, skipping prune"
         return
@@ -51,7 +53,7 @@ module ERBLint
         next if hits_as_checksums.include?(cache_file)
 
         if new_results_as_checksums.include?(cache_file)
-          puts "Skipping deletion of new cache result #{cache_file} in prune"
+          puts "Skipping deletion of new cache result #{cache_file}"
           next
         end
 
@@ -90,6 +92,10 @@ module ERBLint
       # Spurious files that come and go should not cause a crash, at least not
       # here.
       "_"
+    end
+
+    def prune?
+      @prune
     end
   end
 end

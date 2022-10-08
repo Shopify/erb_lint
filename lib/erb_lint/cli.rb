@@ -39,7 +39,7 @@ module ERBLint
 
       load_config
 
-      @cache = Cache.new(@config, file_loader) if with_cache? || clear_cache?
+      @cache = Cache.new(@config, file_loader, prune_cache?) if with_cache? || clear_cache?
 
       if clear_cache?
         if cache.cache_dir_exists?
@@ -93,7 +93,7 @@ module ERBLint
         end
       end
 
-      cache.prune if prune_cache?
+      cache.close if with_cache? || clear_cache?
 
       reporter.show
 
@@ -135,11 +135,9 @@ module ERBLint
     def run_using_cache(runner, filename, file_content)
       if cache.include?(filename)
         runner.restore_offenses(cache.get(filename, file_content))
-        cache.add_hit(filename) if prune_cache?
       else
         run_with_corrections(runner, filename, file_content)
         cache[filename] = runner.offenses.map(&:to_json_format).to_json
-        cache.add_new_result(filename) if prune_cache?
       end
     end
 
