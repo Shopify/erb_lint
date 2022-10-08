@@ -14,23 +14,27 @@ module ERBLint
     end
 
     def get(filename, file_content)
-      @hits.push(filename) if prune?
-
-      JSON.parse(File.read(File.join(CACHE_DIRECTORY, checksum(filename)))).map do |offense|
-        ERBLint::Offense.from_json(offense, config, @file_loader, file_content)
+      file_checksum = checksum(filename, file_content)
+      begin
+        cache_file_contents_as_offenses = JSON.parse(
+          File.read(File.join(CACHE_DIRECTORY, file_checksum))
+        ).map do |offense|
+          ERBLint::Offense.from_json(offense, config, @file_loader, file_content)
+        end
+      rescue Errno::ENOENT
+        return false
       end
+      @hits.push(file_checksum) if prune?
+      cache_file_contents_as_offenses
     end
 
-    def include?(filename)
-      File.exist?(File.join(CACHE_DIRECTORY, checksum(filename)))
-    end
-
-    def []=(filename, offenses_as_json)
-      @new_results.push(filename) if prune?
+    def set(filename, file_content, offenses_as_json)
+      file_checksum = checksum(filename, file_content)
+      @new_results.push(file_checksum) if prune?
 
       FileUtils.mkdir_p(CACHE_DIRECTORY)
 
-      File.open(File.join(CACHE_DIRECTORY, checksum(filename)), "wb") do |f|
+      File.open(File.join(CACHE_DIRECTORY, file_checksum), "wb") do |f|
         f.write(offenses_as_json)
       end
     end
@@ -47,12 +51,10 @@ module ERBLint
       end
 
       cache_files = Dir.new(CACHE_DIRECTORY).children
-      hits_as_checksums = hits.map { |hit| checksum(hit) }
-      new_results_as_checksums = new_results.map { |new_result| checksum(new_result) }
       cache_files.each do |cache_file|
-        next if hits_as_checksums.include?(cache_file)
+        next if hits.include?(cache_file)
 
-        if new_results_as_checksums.include?(cache_file)
+        if new_results.include?(cache_file)
           puts "Skipping deletion of new cache result #{cache_file}"
           next
         end
@@ -79,14 +81,13 @@ module ERBLint
 
     attr_reader :config, :hits, :new_results
 
-    def checksum(file)
+    def checksum(filename, file_content)
       digester = Digest::SHA1.new
-      mode = File.stat(file).mode
+      mode = File.stat(filename).mode
 
       digester.update(
-        "#{file}#{mode}#{config.to_hash}#{ERBLint::VERSION}"
+        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{file_content}"
       )
-      digester.file(file)
       digester.hexdigest
     rescue Errno::ENOENT
       # Spurious files that come and go should not cause a crash, at least not

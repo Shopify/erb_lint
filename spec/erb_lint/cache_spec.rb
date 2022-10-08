@@ -51,30 +51,20 @@ describe ERBLint::Cache do
 
   describe "#get" do
     it "returns a cached lint result" do
-      cache_result = cache.get(linted_file_path, cache_file_content)
+      cache_result = cache.get(linted_file_path, linted_file_content)
       expect(cache_result.count).to(eq(2))
     end
   end
 
   describe "#[]=" do
     it "caches a lint result" do
-      cache[linted_file_path] = cache_file_content
+      cache.set(linted_file_path, linted_file_content, cache_file_content)
       expect(File.exist?(
         File.join(
           cache_dir,
           checksum
         )
       )).to(be(true))
-    end
-  end
-
-  describe "#include?" do
-    it "returns true if the cache includes the filename" do
-      expect(cache.include?(linted_file_path)).to(be(true))
-    end
-
-    it "returns false if the cache does not include the filename" do
-      expect(cache.include?("gibberish")).to(be(false))
     end
   end
 
@@ -115,12 +105,12 @@ describe ERBLint::Cache do
 
     it "does not prune new cache results" do
       allow(cache).to(receive(:hits).and_return(["fake-hit"]))
-      allow(cache).to(receive(:new_results).and_return([linted_file_path]))
+      allow(cache).to(receive(:new_results).and_return([checksum]))
       fakefs_dir = Struct.new(:fakefs_dir)
       allow(fakefs_dir).to(receive(:children).and_return([checksum]))
       allow(FakeFS::Dir).to(receive(:new).and_return(fakefs_dir))
 
-      expect { cache.prune_cache }.to(output(/Skipping deletion of new cache result #{checksum}/).to_stdout)
+      expect { cache.prune_cache }.to(output(/.*Skipping deletion of new cache result #{checksum}/).to_stdout)
 
       expect(File.exist?(
         File.join(
@@ -157,15 +147,15 @@ describe ERBLint::Cache do
     end
 
     it "adds new result to cache object new_results list attribute" do
-      cache[linted_file_path] = cache_file_content
+      cache.set(linted_file_path, linted_file_content, cache_file_content)
 
-      expect(cache.send(:new_results)).to(include(linted_file_path))
+      expect(cache.send(:new_results)).to(include(checksum))
     end
 
     it "adds new cache hit to cache object hits list attribute" do
       cache.get(linted_file_path, linted_file_content)
 
-      expect(cache.send(:hits)).to(include(linted_file_path))
+      expect(cache.send(:hits)).to(include(checksum))
     end
   end
 

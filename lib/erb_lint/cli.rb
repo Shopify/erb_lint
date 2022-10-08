@@ -133,11 +133,11 @@ module ERBLint
     end
 
     def run_using_cache(runner, filename, file_content)
-      if cache.include?(filename)
-        runner.restore_offenses(cache.get(filename, file_content))
+      if (cache_result_offenses = cache.get(filename, file_content))
+        runner.restore_offenses(cache_result_offenses)
       else
         run_with_corrections(runner, filename, file_content)
-        cache[filename] = runner.offenses.map(&:to_json_format).to_json
+        cache.set(filename, file_content, runner.offenses.map(&:to_json_format).to_json)
       end
     end
 
