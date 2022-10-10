@@ -17,49 +17,8 @@ module ERBLint
       @severity = severity
     end
 
-    def to_json_format
-      {
-        linter_config: linter.config.to_hash,
-        linter_config_class: linter.config.class.name,
-        linter_class: linter.class.name,
-        source_range: source_range_to_json_format,
-        message: message,
-        context: context,
-        severity: severity,
-      }
-    end
-
-    def source_range_to_json_format
-      {
-        begin_pos: source_range.begin_pos,
-        end_pos: source_range.end_pos,
-        source_buffer_name: source_range.source_buffer.name,
-      }
-    end
-
-    def self.from_json(parsed_json, config, file_loader, file_content)
-      parsed_json.transform_keys!(&:to_sym)
-      linter_config = const_get(parsed_json[:linter_config_class]).new(parsed_json[:linter_config])
-      linter = const_get(parsed_json[:linter_class]).new(file_loader, linter_config)
-      new(
-        linter,
-        source_range_from_json_format(parsed_json[:source_range], file_content),
-        parsed_json[:message].presence,
-        parsed_json[:context].presence,
-        parsed_json[:severity].presence&.to_sym
-      )
-    end
-
-    def self.source_range_from_json_format(parsed_json_source_range, file_content)
-      parsed_json_source_range.transform_keys!(&:to_sym)
-      Parser::Source::Range.new(
-        Parser::Source::Buffer.new(
-          parsed_json_source_range[:source_buffer_name],
-          source: file_content
-        ),
-        parsed_json_source_range[:begin_pos],
-        parsed_json_source_range[:end_pos]
-      )
+    def to_cached_offense_json_format
+      ERBLint::CachedOffense.new_from_offense(self).to_json_format
     end
 
     def inspect
