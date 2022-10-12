@@ -3,37 +3,56 @@
 module ERBLint
   # A Cached version of an Offense with only essential information represented as strings
   class CachedOffense
-    attr_reader :line_number, :message, :severity
+    attr_reader(
+      :message,
+      :line_number,
+      :severity,
+      :column,
+      :simple_name,
+      :last_line,
+      :last_column,
+      :length,
+    )
 
-    def initialize(message, line_number, severity)
-      @message = message
-      @line_number = line_number
-      @severity = severity
+    def initialize(params)
+      params = params.transform_keys(&:to_sym)
+
+      @message = params[:message]
+      @line_number = params[:line_number]
+      @severity = params[:severity]&.to_sym
+      @column = params[:column]
+      @simple_name = params[:simple_name]
+      @last_line = params[:last_line]
+      @last_column = params[:last_column]
+      @length = params[:length]
     end
 
     def self.new_from_offense(offense)
       new(
-        offense.message,
-        offense.line_number.to_s,
-        offense.severity
+        {
+          message: offense.message,
+          line_number: offense.line_number,
+          severity: offense.severity,
+          column: offense.column,
+          simple_name: offense.simple_name,
+          last_line: offense.last_line,
+          last_column: offense.last_column,
+          length: offense.length,
+        }
       )
     end
 
-    def to_json_format
+    def to_h
       {
         message: message,
         line_number: line_number,
         severity: severity,
+        column: column,
+        simple_name: simple_name,
+        last_line: last_line,
+        last_column: last_column,
+        length: length,
       }
-    end
-
-    def self.from_json(parsed_json)
-      parsed_json.transform_keys!(&:to_sym)
-      new(
-        parsed_json[:message],
-        parsed_json[:line_number],
-        parsed_json[:severity]&.to_sym
-      )
     end
   end
 end
