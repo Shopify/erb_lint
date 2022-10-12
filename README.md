@@ -90,26 +90,28 @@ linters:
 
 ## Linters
 
-| Available Linters                                | Default  | Description |
-| ------------------------------------------------ |:--------:|-------------|
-| [AllowedScriptType](#AllowedScriptType)          | Yes      | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values |
-| ClosingErbTagIndent                              | Yes      |             |
-| ExtraNewline                                     | Yes      |             |
-| [FinalNewline](#FinalNewline)                    | Yes      | warns about missing newline at the end of a ERB template |
-| [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
-| ParserErrors                                     | Yes      |             |
-| PartialInstanceVariable                          | No       | detects instance variables in partials |
-| [RequireInputAutocomplete](#RequireInputAutocomplete)        | Yes       | warns about missing autocomplete attributes in input tags |
-| [RightTrim](#RightTrim)                          | Yes      | enforces trimming at the right of an ERB tag |
-| [SelfClosingTag](#SelfClosingTag)                | Yes      | enforces self closing tag styles for void elements |
-| [SpaceAroundErbTag](#SpaceAroundErbTag)          | Yes      | enforces a single space after `<%` and before `%>`|
-| SpaceIndentation                                 | Yes      |             |
-| SpaceInHtmlTag                                   | Yes      |             |
-| TrailingWhitespace                               | Yes      |             |
-| [DeprecatedClasses](#DeprecatedClasses)          | No       | warns about deprecated css classes |
-| [ErbSafety](#ErbSafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
-| [Rubocop](#Rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
-| [RequireScriptNonce](#RequireScriptNonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
+| Available Linters                                     | Default | Description                                                                                                                               |
+|-------------------------------------------------------|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------|
+| [AllowedScriptType](#AllowedScriptType)               | Yes     | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values                       |
+| ClosingErbTagIndent                                   | Yes     |                                                                                                                                           |
+| ExtraNewline                                          | Yes     |                                                                                                                                           |
+| [FinalNewline](#FinalNewline)                         | Yes     | warns about missing newline at the end of a ERB template                                                                                  |
+| [NoJavascriptTagHelper](#NoJavascriptTagHelper)       | Yes     | prevents the usage of Rails' `javascript_tag`                                                                                             |
+| ParserErrors                                          | Yes     |                                                                                                                                           |
+| PartialInstanceVariable                               | No      | detects instance variables in partials                                                                                                    |
+| [RequireInputAutocomplete](#RequireInputAutocomplete) | Yes     | warns about missing autocomplete attributes in input tags                                                                                 |
+| [RightTrim](#RightTrim)                               | Yes     | enforces trimming at the right of an ERB tag                                                                                              |
+| [SelfClosingTag](#SelfClosingTag)                     | Yes     | enforces self closing tag styles for void elements                                                                                        |
+| [SpaceAroundErbTag](#SpaceAroundErbTag)               | Yes     | enforces a single space after `<%` and before `%>`                                                                                        |
+| SpaceIndentation                                      | Yes     |                                                                                                                                           |
+| SpaceInHtmlTag                                        | Yes     |                                                                                                                                           |
+| TrailingWhitespace                                    | Yes     |                                                                                                                                           |
+| [DeprecatedClasses](#DeprecatedClasses)               | No      | warns about deprecated css classes                                                                                                        |
+| [ErbSafety](#ErbSafety)                               | No      | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`.             |
+| [Rubocop](#Rubocop)                                   | No      | runs RuboCop rules on ruby statements found in ERB templates                                                                              |
+| [RequireScriptNonce](#RequireScriptNonce)             | No      | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
+| HardCodedString                                       | No      | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
+
 
 ### DeprecatedClasses
 
