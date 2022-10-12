@@ -32,7 +32,7 @@ module ERBLint
       new(
         parsed_json[:message],
         parsed_json[:line_number],
-        parsed_json[:severity].to_sym
+        parsed_json[:severity]&.to_sym
       )
     end
   end
