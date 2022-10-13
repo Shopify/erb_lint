@@ -93,7 +93,7 @@ module ERBLint
         end
       end
 
-      cache.close if with_cache? || clear_cache?
+      cache&.close
 
       reporter.show
 
