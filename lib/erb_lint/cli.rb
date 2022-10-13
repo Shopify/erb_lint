@@ -31,7 +31,7 @@ module ERBLint
       dupped_args = args.dup
       load_options(dupped_args)
 
-      if with_cache? && autocorrect?
+      if cache? && autocorrect?
         failure!("cannot run autocorrect mode with cache")
       end
 
@@ -39,7 +39,7 @@ module ERBLint
 
       load_config
 
-      @cache = Cache.new(@config, file_loader, prune_cache?) if with_cache? || clear_cache?
+      @cache = Cache.new(@config, file_loader, prune_cache?) if cache? || clear_cache?
 
       if clear_cache?
         if cache.cache_dir_exists?
@@ -122,7 +122,7 @@ module ERBLint
     def run_on_file(runner, filename)
       file_content = read_content(filename)
 
-      if with_cache? && !autocorrect?
+      if cache? && !autocorrect?
         run_using_cache(runner, filename, file_content)
       else
         file_content = run_with_corrections(runner, filename, file_content)
@@ -145,8 +145,8 @@ module ERBLint
       @options[:autocorrect]
     end
 
-    def with_cache?
-      @options[:with_cache]
+    def cache?
+      @options[:cache]
     end
 
     def prune_cache?
@@ -338,8 +338,8 @@ module ERBLint
           @options[:enabled_linters] = known_linter_names
         end
 
-        opts.on("--with-cache", "Enable caching") do |config|
-          @options[:with_cache] = config
+        opts.on("--cache", "Enable caching") do |config|
+          @options[:cache] = config
         end
 
         opts.on("--prune-cache", "Prune cache") do |config|

@@ -249,7 +249,7 @@ describe ERBLint::CLI do
         end
 
         context "with cache" do
-          let(:args) { ["--enable-linter", "linter_without_errors", "--with-cache", linted_file] }
+          let(:args) { ["--enable-linter", "linter_without_errors", "--cache", linted_file] }
 
           it "lints the file and adds it to the cache" do
             expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
@@ -472,7 +472,7 @@ describe ERBLint::CLI do
             end
 
             context "with cache" do
-              let(:args) { ["--enable-linter", "linter_without_errors", "--with-cache", linted_dir] }
+              let(:args) { ["--enable-linter", "linter_without_errors", "--cache", linted_dir] }
 
               it "lints the file and adds it to the cache" do
                 expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
@@ -590,7 +590,7 @@ describe ERBLint::CLI do
           context "when autocorrecting and caching are turned on" do
             # We assume that linter_with_errors is not autocorrectable...
             let(:args) do
-              ["--enable-linter", "linter_without_errors", "--stdin", linted_file, "--autocorrect", "--with-cache"]
+              ["--enable-linter", "linter_without_errors", "--stdin", linted_file, "--autocorrect", "--cache"]
             end
 
             it "throws an error saying the two modes cannot be used together" do
