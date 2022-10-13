@@ -53,6 +53,7 @@ describe ERBLint::Cache do
     it "returns a cached lint result" do
       cache_result = cache.get(linted_file_path, linted_file_content)
       expect(cache_result.count).to(eq(2))
+      expect(cache.send(:hits)).to(include(checksum))
     end
   end
 
@@ -65,6 +66,7 @@ describe ERBLint::Cache do
           checksum
         )
       )).to(be(true))
+      expect(cache.send(:new_results)).to(include(checksum))
     end
   end
 
@@ -141,27 +143,8 @@ describe ERBLint::Cache do
     end
   end
 
-  describe "prune cache mode on #get and #[] behavior" do
-    before do
-      allow(cache).to(receive(:prune?).and_return(true))
-    end
-
-    it "adds new result to cache object new_results list attribute" do
-      cache.set(linted_file_path, linted_file_content, cache_file_content)
-
-      expect(cache.send(:new_results)).to(include(checksum))
-    end
-
-    it "adds new cache hit to cache object hits list attribute" do
-      cache.get(linted_file_path, linted_file_content)
-
-      expect(cache.send(:hits)).to(include(checksum))
-    end
-  end
-
   describe "#close" do
     it "Calls prune_cache if prune_cache mode is on" do
-      allow(cache).to(receive(:prune?).and_return(true))
       expect(cache).to(receive(:prune_cache))
       cache.close
     end

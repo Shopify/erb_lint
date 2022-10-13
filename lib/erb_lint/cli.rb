@@ -39,7 +39,7 @@ module ERBLint
 
       load_config
 
-      @cache = Cache.new(@config, file_loader, prune_cache?) if cache? || clear_cache?
+      @cache = Cache.new(@config, file_loader) if cache? || clear_cache?
 
       if clear_cache?
         if cache.cache_dir_exists?
@@ -147,10 +147,6 @@ module ERBLint
 
     def cache?
       @options[:cache]
-    end
-
-    def prune_cache?
-      @options[:prune_cache]
     end
 
     def clear_cache?
@@ -340,10 +336,6 @@ module ERBLint
 
         opts.on("--cache", "Enable caching") do |config|
           @options[:cache] = config
-        end
-
-        opts.on("--prune-cache", "Prune cache") do |config|
-          @options[:prune_cache] = config
         end
 
         opts.on("--clear-cache", "Clear cache") do |config|

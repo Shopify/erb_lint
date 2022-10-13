@@ -4,12 +4,11 @@ module ERBLint
   class Cache
     CACHE_DIRECTORY = ".erb-lint-cache"
 
-    def initialize(config, file_loader = nil, prune = false)
+    def initialize(config, file_loader = nil)
       @config = config
       @file_loader = file_loader
       @hits = []
       @new_results = []
-      @prune = prune
       puts "Cache mode is on"
     end
 
@@ -24,13 +23,13 @@ module ERBLint
       rescue Errno::ENOENT
         return false
       end
-      @hits.push(file_checksum) if prune?
+      @hits.push(file_checksum)
       cache_file_contents_as_offenses
     end
 
     def set(filename, file_content, offenses_as_json)
       file_checksum = checksum(filename, file_content)
-      @new_results.push(file_checksum) if prune?
+      @new_results.push(file_checksum)
 
       FileUtils.mkdir_p(CACHE_DIRECTORY)
 
@@ -40,11 +39,11 @@ module ERBLint
     end
 
     def close
-      prune_cache if prune?
+      prune_cache
     end
 
     def prune_cache
-      puts "Prune cache mode is on - pruned file names will be logged"
+      puts "File names pruned from the cache will be logged"
       if hits.empty?
         puts "Cache being created for the first time, skipping prune"
         return
@@ -93,10 +92,6 @@ module ERBLint
       # Spurious files that come and go should not cause a crash, at least not
       # here.
       "_"
-    end
-
-    def prune?
-      @prune
     end
   end
 end
