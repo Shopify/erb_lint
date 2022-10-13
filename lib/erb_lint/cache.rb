@@ -18,8 +18,8 @@ module ERBLint
       begin
         cache_file_contents_as_offenses = JSON.parse(
           File.read(File.join(CACHE_DIRECTORY, file_checksum))
-        ).map do |offense|
-          ERBLint::CachedOffense.from_json(offense)
+        ).map do |offense_hash|
+          ERBLint::CachedOffense.new(offense_hash)
         end
       rescue Errno::ENOENT
         return false

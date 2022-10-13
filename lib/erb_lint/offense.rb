@@ -17,8 +17,8 @@ module ERBLint
       @severity = severity
     end
 
-    def to_cached_offense_json_format
-      ERBLint::CachedOffense.new_from_offense(self).to_json_format
+    def to_cached_offense_hash
+      ERBLint::CachedOffense.new_from_offense(self).to_h
     end
 
     def inspect
@@ -46,6 +46,22 @@ module ERBLint
 
     def column
       source_range.column
+    end
+
+    def simple_name
+      linter.class.simple_name
+    end
+
+    def last_line
+      source_range.last_line
+    end
+
+    def last_column
+      source_range.last_column
+    end
+
+    def length
+      source_range.length
     end
   end
 end

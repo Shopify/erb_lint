@@ -137,7 +137,7 @@ module ERBLint
         runner.restore_offenses(cache_result_offenses)
       else
         run_with_corrections(runner, filename, file_content)
-        cache.set(filename, file_content, runner.offenses.map(&:to_cached_offense_json_format).to_json)
+        cache.set(filename, file_content, runner.offenses.map(&:to_cached_offense_hash).to_json)
       end
     end
 
