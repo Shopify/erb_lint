@@ -112,7 +112,7 @@ describe ERBLint::Cache do
       allow(fakefs_dir).to(receive(:children).and_return([checksum]))
       allow(FakeFS::Dir).to(receive(:new).and_return(fakefs_dir))
 
-      expect { cache.prune_cache }.to(output(/.*Skipping deletion of new cache result #{checksum}/).to_stdout)
+      cache.prune_cache
 
       expect(File.exist?(
         File.join(
@@ -132,7 +132,7 @@ describe ERBLint::Cache do
         f.write(cache_file_content)
       end
 
-      expect { cache.prune_cache }.to(output(/Cleaning deleted cached file with checksum fake-checksum/).to_stdout)
+      cache.prune_cache
 
       expect(File.exist?(
         File.join(

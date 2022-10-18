@@ -43,7 +43,6 @@ module ERBLint
     end
 
     def prune_cache
-      puts "File names pruned from the cache will be logged"
       if hits.empty?
         puts "Cache being created for the first time, skipping prune"
         return
@@ -51,18 +50,10 @@ module ERBLint
 
       cache_files = Dir.new(CACHE_DIRECTORY).children
       cache_files.each do |cache_file|
-        next if hits.include?(cache_file)
+        next if hits.include?(cache_file) || new_results.include?(cache_file)
 
-        if new_results.include?(cache_file)
-          puts "Skipping deletion of new cache result #{cache_file}"
-          next
-        end
-
-        puts "Cleaning deleted cached file with checksum #{cache_file}"
         File.delete(File.join(CACHE_DIRECTORY, cache_file))
       end
-
-      @hits = []
     end
 
     def cache_dir_exists?
