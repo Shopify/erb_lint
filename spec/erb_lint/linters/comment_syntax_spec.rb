@@ -22,6 +22,18 @@ describe ERBLint::Linters::CommentSyntax do
     end
   end
 
+  context "when the ERB multi-line comment syntax is correct" do
+    let(:file) { <<~FILE }
+      <%
+        # good comment
+      %>
+    FILE
+
+    it "does not report any offenses" do
+      expect(subject.size).to(eq(0))
+    end
+  end
+
   context "when the ERB comment syntax is incorrect" do
     let(:file) { <<~FILE }
       <% # first bad comment %>

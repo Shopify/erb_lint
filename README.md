@@ -110,6 +110,7 @@ linters:
 | [ErbSafety](#ErbSafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
 | [Rubocop](#Rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
 | [RequireScriptNonce](#RequireScriptNonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
+| CommentSyntax                                    | No       | detects bad comment syntax, ie `<% # comment %>` is not technically valid ERB but `<%# comment %>` is |
 
 ### DeprecatedClasses
 
