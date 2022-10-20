@@ -561,6 +561,25 @@ def autocorrect(_processed_source, offense)
 end
 ```
 
+## Rake
+
+You can add Rake support by adding the following to your `Rakefile`:
+
+    require "erb_lint/rake_task"
+    ERBLint::RakeTask.new
+
+The Rake task can be customized as follows:
+
+    # Custom arguments.
+    ERBLint::RakeTask.new { %w[--autocorrect .] }
+
+    # Custom name and arguments.
+    ERBLint::RakeTask.new(:erb_auto_correct) { %w[--autocorrect .] }
+
+Once required, the default tasks will be available (i.e. `bundle exec rake -T`) unless customized further:
+
+    rake erb_lint
+
 ## Output formats
 
 You can change the output format of ERB Lint by specifying formatters with the `-f/--format` option.
