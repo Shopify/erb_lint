@@ -36,6 +36,20 @@ describe ERBLint::Linters::CommentSyntax do
 
   context "when the ERB comment syntax is incorrect" do
     let(:file) { <<~FILE }
+      <% # bad comment %>
+    FILE
+
+    it "reports one offense" do
+      expect(subject.size).to(eq(1))
+    end
+
+    it "reports the suggested fix" do
+      expect(subject.first.message).to(include("Bad ERB comment syntax. Should be <%# without a space between."))
+    end
+  end
+
+  context "when the ERB comment syntax is incorrect multiple times in one file" do
+    let(:file) { <<~FILE }
       <% # first bad comment %>
       <%= # second bad comment %>
     FILE
@@ -44,9 +58,9 @@ describe ERBLint::Linters::CommentSyntax do
       expect(subject.size).to(eq(2))
     end
 
-    it "reports two offenses with their suggested fixes" do
-      expect(subject.first.message).to(include("Bad ERB comment syntax. Should be `<%#=` without a space between."))
-      expect(subject.last.message).to(include("Bad ERB comment syntax. Should be `<%#` without a space between."))
+    it "reports the suggested fixes" do
+      expect(subject.first.message).to(include("Bad ERB comment syntax. Should be <%# without a space between."))
+      expect(subject.last.message).to(include("Bad ERB comment syntax. Should be <%#= without a space between."))
     end
   end
 end

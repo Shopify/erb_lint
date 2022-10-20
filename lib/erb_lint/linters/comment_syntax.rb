@@ -16,23 +16,10 @@ module ERBLint
 
         processed_source.ast.descendants(:erb).each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
-          next if indicator_node.nil? || code_node.nil?
+          next if code_node.nil?
 
-          indicator_node_str = indicator_node.deconstruct.last
+          indicator_node_str = indicator_node&.deconstruct&.last
           next if indicator_node_str == "#"
-
-          if indicator_node_str == "="
-            range = find_range(erb_node, indicator_node_str)
-            source_range = processed_source.to_source_range(range)
-
-            add_offense(
-              source_range,
-              <<~EOF.chomp
-                Bad ERB comment syntax. Should be `<%#=` without a space between.
-                Leaving a space between ERB tags and the Ruby comment character can cause parser errors.
-              EOF
-            )
-          end
 
           code_node_str = code_node.deconstruct.last
           next unless code_node_str.start_with?(" #")
@@ -40,10 +27,12 @@ module ERBLint
           range = find_range(erb_node, code_node_str)
           source_range = processed_source.to_source_range(range)
 
+          correct_erb_tag = indicator_node_str == "=" ? "<%#=" : "<%#"
+
           add_offense(
             source_range,
             <<~EOF.chomp
-              Bad ERB comment syntax. Should be `<%#` without a space between.
+              Bad ERB comment syntax. Should be #{correct_erb_tag} without a space between.
               Leaving a space between ERB tags and the Ruby comment character can cause parser errors.
             EOF
           )
