@@ -4,9 +4,8 @@ module ERBLint
   class Cache
     CACHE_DIRECTORY = ".erb-lint-cache"
 
-    def initialize(config, file_loader = nil)
+    def initialize(config)
       @config = config
-      @file_loader = file_loader
       @hits = []
       @new_results = []
       puts "Cache mode is on"

@@ -39,7 +39,7 @@ module ERBLint
 
       load_config
 
-      @cache = Cache.new(@config, file_loader) if cache? || clear_cache?
+      @cache = Cache.new(@config) if cache? || clear_cache?
 
       if clear_cache?
         if cache.cache_dir_exists?
