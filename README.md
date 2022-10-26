@@ -94,6 +94,7 @@ linters:
 | ------------------------------------------------ |:--------:|-------------|
 | [AllowedScriptType](#AllowedScriptType)          | Yes      | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values |
 | ClosingErbTagIndent                              | Yes      |             |
+| [CommentSyntax](#CommentSyntax)                  | Yes      | detects bad ERB comment syntax |
 | ExtraNewline                                     | Yes      |             |
 | [FinalNewline](#FinalNewline)                    | Yes      | warns about missing newline at the end of a ERB template |
 | [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
@@ -110,7 +111,6 @@ linters:
 | [ErbSafety](#ErbSafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
 | [Rubocop](#Rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
 | [RequireScriptNonce](#RequireScriptNonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
-| [CommentSyntax](#CommentSyntax)                  | No       | detects bad ERB comment syntax |
 
 ### DeprecatedClasses
 
