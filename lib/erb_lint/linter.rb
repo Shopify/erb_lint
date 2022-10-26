@@ -30,7 +30,7 @@ module ERBLint
       end
     end
 
-    attr_reader :offenses
+    attr_reader :offenses, :config
 
     # Must be implemented by the concrete inheriting class.
     def initialize(file_loader, config)

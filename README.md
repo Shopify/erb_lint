@@ -612,6 +612,23 @@ app/views/users/_graph.html.erb:27:37: Extra space detected where there should b
 2 error(s) were found in ERB files
 ```
 
+## Caching
+
+The cache is currently opt-in - to turn it on, use the --cache option:
+
+```sh
+erblint --cache ./app
+Cache mode is on
+Linting 413 files with 15 linters...
+File names pruned from the cache will be logged
+
+No errors were found in ERB files
+```
+
+When the cache is on, lint results are stored in the `.erb-lint-cache` directory, in files with a filename computed with a hash of information about the file and `erb-lint` that should change when necessary. These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes necessary to restore the results of running `erb-lint` for output. The cache also automatically prunes outdated files each time it's run.
+
+You can also use the --clear-cache option to delete the cache file directory.
+
 ## License
 
 This project is released under the [MIT license](LICENSE.txt).
