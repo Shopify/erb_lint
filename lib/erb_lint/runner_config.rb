@@ -63,6 +63,7 @@ module ERBLint
             SpaceInHtmlTag: { enabled: default_enabled },
             TrailingWhitespace: { enabled: default_enabled },
             RequireInputAutocomplete: { enabled: default_enabled },
+            CommentSyntax: { enabled: default_enabled },
           },
         )
       end

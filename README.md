@@ -94,6 +94,7 @@ linters:
 | ------------------------------------------------ |:--------:|-------------|
 | [AllowedScriptType](#AllowedScriptType)          | Yes      | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values |
 | ClosingErbTagIndent                              | Yes      |             |
+| [CommentSyntax](#CommentSyntax)                  | Yes      | detects bad ERB comment syntax |
 | ExtraNewline                                     | Yes      |             |
 | [FinalNewline](#FinalNewline)                    | Yes      | warns about missing newline at the end of a ERB template |
 | [NoJavascriptTagHelper](#NoJavascriptTagHelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
@@ -486,6 +487,27 @@ Linter-Specific Option    | Description
 `allowed_types`           | An array of allowed types. Defaults to `["text/javascript"]`.
 `allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag. Defaults to `true`.
 `disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
+
+## CommentSyntax
+
+This linter enforces the use of the correct ERB comment syntax, since Ruby comments (`<% # comment %>` with a space) are not technically valid ERB comments.
+
+```erb
+Bad ❌
+<% # This is a Ruby comment %>
+Good ✅
+<%# This is an ERB comment %>
+
+Bad ❌
+<% # This is a Ruby comment; it can fail to parse. %>
+Good ✅
+<%# This is an ERB comment; it is parsed correctly. %>
+
+Good ✅
+<%
+  # This is a multi-line ERB comment.
+%>
+```
 
 ## Custom Linters
 
