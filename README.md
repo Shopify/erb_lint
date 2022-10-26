@@ -110,7 +110,7 @@ linters:
 | [ErbSafety](#ErbSafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
 | [Rubocop](#Rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
 | [RequireScriptNonce](#RequireScriptNonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
-| CommentSyntax                                    | No       | detects bad comment syntax, ie `<% # comment %>` is not technically valid ERB but `<%# comment %>` is |
+| [CommentSyntax](#CommentSyntax)                  | No       | detects bad ERB comment syntax |
 
 ### DeprecatedClasses
 
@@ -487,6 +487,27 @@ Linter-Specific Option    | Description
 `allowed_types`           | An array of allowed types. Defaults to `["text/javascript"]`.
 `allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag. Defaults to `true`.
 `disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
+
+## CommentSyntax
+
+This linter enforces the use of the correct ERB comment syntax, since Ruby comments (`<% # comment %>` with a space) are not technically valid ERB comments.
+
+```erb
+Bad ❌
+<% # This is a Ruby comment %>
+Good ✅
+<%# This is an ERB comment %>
+
+Bad ❌
+<% # This is a Ruby comment; it can fail to parse. %>
+Good ✅
+<%# This is an ERB comment; it is parsed correctly. %>
+
+Good ✅
+<%
+  # This is a multi-line ERB comment.
+%>
+```
 
 ## Custom Linters
 
