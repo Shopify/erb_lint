@@ -625,7 +625,10 @@ File names pruned from the cache will be logged
 No errors were found in ERB files
 ```
 
-When the cache is on, lint results are stored in the `.erb-lint-cache` directory, in files with a filename computed with a hash of information about the file and `erb-lint` that should change when necessary. These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes necessary to restore the results of running `erb-lint` for output. The cache also automatically prunes outdated files each time it's run.
+Cached lint results are stored in the `.erb-lint-cache` directory by default, though a custom directory can be provided
+via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file and `erb-lint` settings.
+These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes
+necessary to restore the results of running `erb-lint` for output. The cache also automatically prunes outdated files each time it's run.
 
 You can also use the --clear-cache option to delete the cache file directory.
 
