@@ -148,6 +148,19 @@ describe ERBLint::CLI do
       end
     end
 
+    context "with custom --cache-dir" do
+      let(:args) { ["--lint-all", "--enable-linter", "linter_with_errors", "--clear-cache", "--cache-dir", cache_dir] }
+      let(:cache_dir) { "tmp/erb_lint" }
+
+      before do
+        FileUtils.mkdir_p(cache_dir)
+      end
+
+      it "uses the specified directory" do
+        expect { subject }.to(output(/cache directory cleared/).to_stdout)
+      end
+    end
+
     context "with file as argument" do
       context "when file does not exist" do
         let(:linted_file) { "/path/to/myfile.html.erb" }

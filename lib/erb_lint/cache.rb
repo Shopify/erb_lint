@@ -4,9 +4,9 @@ module ERBLint
   class Cache
     CACHE_DIRECTORY = ".erb-lint-cache"
 
-    def initialize(config, file_loader = nil)
+    def initialize(config, cache_dir = nil)
       @config = config
-      @file_loader = file_loader
+      @cache_dir = cache_dir || CACHE_DIRECTORY
       @hits = []
       @new_results = []
       puts "Cache mode is on"
@@ -16,7 +16,7 @@ module ERBLint
       file_checksum = checksum(filename, file_content)
       begin
         cache_file_contents_as_offenses = JSON.parse(
-          File.read(File.join(CACHE_DIRECTORY, file_checksum))
+          File.read(File.join(@cache_dir, file_checksum))
         ).map do |offense_hash|
           ERBLint::CachedOffense.new(offense_hash)
         end
@@ -31,9 +31,9 @@ module ERBLint
       file_checksum = checksum(filename, file_content)
       @new_results.push(file_checksum)
 
-      FileUtils.mkdir_p(CACHE_DIRECTORY)
+      FileUtils.mkdir_p(@cache_dir)
 
-      File.open(File.join(CACHE_DIRECTORY, file_checksum), "wb") do |f|
+      File.open(File.join(@cache_dir, file_checksum), "wb") do |f|
         f.write(offenses_as_json)
       end
     end
@@ -48,23 +48,23 @@ module ERBLint
         return
       end
 
-      cache_files = Dir.new(CACHE_DIRECTORY).children
+      cache_files = Dir.new(@cache_dir).children
       cache_files.each do |cache_file|
         next if hits.include?(cache_file) || new_results.include?(cache_file)
 
-        File.delete(File.join(CACHE_DIRECTORY, cache_file))
+        File.delete(File.join(@cache_dir, cache_file))
       end
     end
 
     def cache_dir_exists?
-      File.directory?(CACHE_DIRECTORY)
+      File.directory?(@cache_dir)
     end
 
     def clear
       return unless cache_dir_exists?
 
       puts "Clearing cache by deleting cache directory"
-      FileUtils.rm_r(CACHE_DIRECTORY)
+      FileUtils.rm_r(@cache_dir)
     end
 
     private

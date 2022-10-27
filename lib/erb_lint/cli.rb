@@ -39,7 +39,8 @@ module ERBLint
 
       load_config
 
-      @cache = Cache.new(@config, file_loader) if cache? || clear_cache?
+      cache_dir = @options[:cache_dir]
+      @cache = Cache.new(@config, cache_dir) if cache? || clear_cache?
 
       if clear_cache?
         if cache.cache_dir_exists?
@@ -336,6 +337,10 @@ module ERBLint
 
         opts.on("--cache", "Enable caching") do |config|
           @options[:cache] = config
+        end
+
+        opts.on("--cache-dir DIR", "Set the cache directory") do |dir|
+          @options[:cache_dir] = dir
         end
 
         opts.on("--clear-cache", "Clear cache") do |config|

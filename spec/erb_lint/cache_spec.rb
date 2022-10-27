@@ -9,10 +9,10 @@ describe ERBLint::Cache do
   include FakeFS::SpecHelpers
 
   let(:linter_config) { ERBLint::LinterConfig.new }
-  let(:cache) { described_class.new(linter_config) }
+  let(:cache) { described_class.new(linter_config, cache_dir) }
   let(:linted_file_path) { "app/components/elements/image_component/image_component.html.erb" }
   let(:checksum) { "2dc3e17183b87889cc783b0157723570d4bbb90a" }
-  let(:cache_dir) { ERBLint::Cache::CACHE_DIRECTORY }
+  let(:cache_dir) { "tmp/erb_lint" }
   let(:rubocop_yml) { %(SpaceAroundErbTag:\n  Enabled: true\n) }
   let(:cache_file_content) do
     FakeFS.deactivate!
@@ -74,6 +74,7 @@ describe ERBLint::Cache do
     it "returns true if the cache dir exists" do
       expect(cache.cache_dir_exists?).to(be(true))
     end
+
     it "returns false if the cache dir does not exist" do
       FileUtils.rm_rf(cache_dir)
       expect(cache.cache_dir_exists?).to(be(false))
