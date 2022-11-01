@@ -2,4 +2,4 @@
 
 eval_gemfile "../Gemfile"
 
-gem "rubocop", ">= 0.87"
+gem "rubocop", "~> 1.37.1"
