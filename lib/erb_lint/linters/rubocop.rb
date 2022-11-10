@@ -131,11 +131,17 @@ module ERBLint
       end
 
       def rubocop_processed_source(content, filename)
-        ::RuboCop::ProcessedSource.new(
+        source = ::RuboCop::ProcessedSource.new(
           content,
           @rubocop_config.target_ruby_version,
           filename
         )
+        if ::RuboCop::Version::STRING.to_f >= 1.38
+          registry = RuboCop::Cop::Registry.global
+          source.registry = registry
+          source.config = @rubocop_config
+        end
+        source
       end
 
       def cop_classes
