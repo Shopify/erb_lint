@@ -39,7 +39,7 @@ GEM
     fakefs (1.5.1)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
-    loofah (2.19.0)
+    loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mini_portile2 (2.8.0)
