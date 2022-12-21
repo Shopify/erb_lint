@@ -624,6 +624,25 @@ app/views/users/_graph.html.erb:27:37: Extra space detected where there should b
 2 error(s) were found in ERB files
 ```
 
+### JUnit.xml
+
+```sh
+erblint --format junit
+<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="erblint" tests="2" failures="2">\n<properties>\n<property name="erb_lint_version" value="0.3.1" />\n<property name="ruby_engine" value="ruby" />\n<property name="ruby_version" value="3.1.2" />\n<property name="ruby_patchlevel" value="20" />\n<property name="ruby_platform" value="arm64-darwin21" />\n</properties>\n<testcase name="app.views.index.html.erb" file="app/views/index.html.erb">\n</testcase>\n<testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">\n<failure message="Extra space detected where there should be no space." type="SpaceInHtmlTag">\nExtra space detected where there should be no space.\n</failure>\n</testcase>\n<testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">\n<failure message="Remove newline before `%&gt;` to match start of tag." type="ClosingErbTagIndent">\nRemove newline before `%&gt;` to match start of tag.\n</failure>\n</testcase>\n</testsuite>\n
+```
+
+Use it with [GitlabCI](https://gitlab.com):
+
+```yml
+erblint:
+  stage: lint
+  script:
+    - bundle exec erblint --lint-all --format junit > erblint-junit.xml
+  artifacts:
+    reports:
+      junit: erblint-junit.xml
+```
+
 ## Caching
 
 The cache is currently opt-in - to turn it on, use the `--cache` option:
