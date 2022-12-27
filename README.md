@@ -614,7 +614,7 @@ app/views/users/_graph.html.erb:27:37: Extra space detected where there should b
 
 ## Caching
 
-The cache is currently opt-in - to turn it on, use the --cache option:
+The cache is currently opt-in - to turn it on, use the `--cache` option:
 
 ```sh
 erblint --cache ./app
@@ -630,7 +630,7 @@ via the `--cache-dir` option. Cache filenames are computed with a hash of inform
 These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes
 necessary to restore the results of running `erb-lint` for output. The cache also automatically prunes outdated files each time it's run.
 
-You can also use the --clear-cache option to delete the cache file directory.
+You can also use the `--clear-cache` option to delete the cache file directory.
 
 ## License
 
