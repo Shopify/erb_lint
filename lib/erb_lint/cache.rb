@@ -9,6 +9,8 @@ module ERBLint
       @cache_dir = cache_dir || CACHE_DIRECTORY
       @hits = []
       @new_results = []
+      @gemfile_lock = File.read("Gemfile.lock") if File.exist?("Gemfile.lock")
+      @rubocop_config = File.read(".rubocop.yml") if File.exist?(".rubocop.yml")
       puts "Cache mode is on"
     end
 
@@ -76,7 +78,7 @@ module ERBLint
       mode = File.stat(filename).mode
 
       digester.update(
-        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{file_content}",
+        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{@rubocop_config}#{@gemfile_lock}#{file_content}",
       )
       digester.hexdigest
     rescue Errno::ENOENT
