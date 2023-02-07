@@ -221,7 +221,7 @@ module ERBLint
     rescue Psych::SyntaxError => e
       failure!("error parsing config: #{e.message}")
     ensure
-      @config.merge!(runner_config_override)
+      @config&.merge!(runner_config_override)
     end
 
     def file_loader

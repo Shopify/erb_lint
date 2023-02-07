@@ -146,6 +146,17 @@ describe ERBLint::CLI do
           expect(subject).to(be(true))
         end
       end
+
+      context "when file has a syntax error" do
+        before { FakeFS::FileSystem.clone(File.join(__dir__, "../fixtures"), "/") }
+
+        let(:args) { ["--config", "invalid-config.yml", "--lint-all"] }
+
+        it { expect { subject }.to(output(/error parsing config:/).to_stderr) }
+        it "is not successful" do
+          expect(subject).to(be(false))
+        end
+      end
     end
 
     context "with custom --cache-dir" do
