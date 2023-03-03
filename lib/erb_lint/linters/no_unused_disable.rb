@@ -12,6 +12,7 @@ module ERBLint
         processed_source.source_buffer.source_lines.each_with_index do |line, index|
           rule_disable = disable_comment(line)
           next unless rule_disable
+
           rule_disable.split(",").each do |rule|
             disabled_rules_and_line_number[rule.strip] =
               (disabled_rules_and_line_number[rule.strip] ||= []).push(index + 1)
@@ -22,6 +23,7 @@ module ERBLint
           rule_name = offense.linter.class.simple_name
           line_numbers = disabled_rules_and_line_number[rule_name]
           next unless line_numbers
+
           line_numbers.reject do |line_number|
             if (offense.source_range.line_span.first..offense.source_range.line_span.last).include?(line_number)
               disabled_rules_and_line_number[rule_name].delete(line_number)
