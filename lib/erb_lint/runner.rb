@@ -63,11 +63,5 @@ module ERBLint
         @offenses.concat(@no_unused_disable.offenses)
       end
     end
-
-    def clear_offenses
-      @offenses = []
-      @linters.each(&:clear_offenses)
-      @no_unused_disable.clear_offenses if @no_unused_disable
-    end
   end
 end
