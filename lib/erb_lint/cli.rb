@@ -126,6 +126,8 @@ module ERBLint
 
       if cache? && !autocorrect?
         run_using_cache(runner, filename, file_content)
+      elsif insert_inline_disable?
+        file_content = run_with_inline_disable_insertion(runner, filename, file_content)
       else
         file_content = run_with_corrections(runner, filename, file_content)
       end
@@ -145,6 +147,10 @@ module ERBLint
 
     def autocorrect?
       @options[:autocorrect]
+    end
+
+    def insert_inline_disable?
+      @options[:insert_inline_disables]
     end
 
     def cache?
@@ -181,6 +187,32 @@ module ERBLint
       file_content
     end
 
+    def run_and_insert_inline_disable(runner, filename, file_content)
+      7.times do
+        processed_source = ERBLint::ProcessedSource.new(filename, file_content)
+        runner.run(processed_source)
+        break unless autocorrect? && runner.offenses.any?
+
+        inline_disable_insertion = inline_disable_insertion(processed_source, runner.offenses)
+        break if inline_disable_insertion.corrections.empty?
+        break if processed_source.file_content == inline_disable_insertion.corrected_content
+
+        # @stats.corrected += corrector.corrections.size
+
+        # Don't overwrite the file if the input comes from stdin
+        unless stdin?
+          File.open(filename, "wb") do |file|
+            file.write(inline_disable_insertion.corrected_content)
+          end
+        end
+
+        file_content = inline_disable_insertion.corrected_content
+        runner.clear_offenses
+      end
+
+      file_content
+    end
+
     def log_offense_stats(runner, filename)
       offenses_filename = relative_filename(filename)
       offenses = runner.offenses || []
@@ -204,6 +236,19 @@ module ERBLint
     def correct(processed_source, offenses)
       corrector = ERBLint::Corrector.new(processed_source, offenses)
       failure!(corrector.diagnostics.join(", ")) if corrector.diagnostics.any?
+      corrector
+    end
+
+    # WIP
+    def insert_inline_disable(processed_source, offenses)
+      corrector = ERBLint::Corrector.new(processed_source, offenses)
+      offenses.each do |offense|
+        # TODO, when multiple rules
+        corrector.corrector.insert_after(
+          offense.source_range, # TODO: This should be the end of the offense lines.
+          "<%# erblint:disable #{offense.linter.class.simple_name} %>"
+        )
+      end
       corrector
     end
 
@@ -377,6 +422,10 @@ module ERBLint
 
         opts.on("--disable-inline-config", "Report all offenses while ignoring inline disable comments") do
           @options[:disable_inline_config] = true
+        end
+
+        opts.on("--insert-inline-disables", "Add inline disables to ignore reported offense") do
+          @options[:insert_inline_disables] = true
         end
 
         opts.on(
