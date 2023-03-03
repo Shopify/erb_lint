@@ -84,6 +84,8 @@ Comment on offending lines
 
 To raise an error when there is a useless disable comment, enable `NoUnusedDisable`.
 
+To disable inline comments and report all offenses, set `--no-inline-disable` option.
+
 ## Exclude
 
 You can specify the exclude patterns both of global and lint-local.
