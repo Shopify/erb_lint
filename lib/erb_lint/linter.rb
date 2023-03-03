@@ -53,9 +53,11 @@ module ERBLint
       raise NotImplementedError, "must implement ##{__method__}"
     end
 
-    def run_and_update_offense_status(processed_source)
+    def run_and_update_offense_status(processed_source, enable_inline_config = true)
       run(processed_source)
-      update_offense_status(processed_source) if @offenses.any?
+      if @offenses.any? && enable_inline_config
+        update_offense_status(processed_source)
+      end
     end
 
     def add_offense(source_range, message, context = nil, severity = nil)

@@ -5,7 +5,7 @@ module ERBLint
   class Runner
     attr_reader :offenses
 
-    def initialize(file_loader, config)
+    def initialize(file_loader, config, disable_inline_config = false)
       @file_loader = file_loader
       @config = config || RunnerConfig.default
       raise ArgumentError, "expect `config` to be a RunnerConfig instance" unless @config.is_a?(RunnerConfig)
@@ -17,6 +17,7 @@ module ERBLint
         linter_class.new(@file_loader, @config.for_linter(linter_class))
       end
       @no_unused_disable = nil
+      @disable_inline_config = disable_inline_config
       @offenses = []
     end
 
@@ -24,7 +25,7 @@ module ERBLint
       @linters
         .reject { |linter| linter.excludes_file?(processed_source.filename) }
         .each do |linter|
-        linter.run_and_update_offense_status(processed_source)
+        linter.run_and_update_offense_status(processed_source, enable_inline_config?)
         @offenses.concat(linter.offenses)
       end
       report_unused_disable(processed_source)
@@ -43,13 +44,17 @@ module ERBLint
 
     private
 
+    def enable_inline_config?
+      !@disable_inline_config
+    end
+
     def no_unused_disable_enabled?
       LinterRegistry.linters.include?(ERBLint::Linters::NoUnusedDisable) &&
         @config.for_linter(ERBLint::Linters::NoUnusedDisable).enabled?
     end
 
     def report_unused_disable(processed_source)
-      if no_unused_disable_enabled?
+      if no_unused_disable_enabled? && enable_inline_config?
         @no_unused_disable = ERBLint::Linters::NoUnusedDisable.new(
           @file_loader,
           @config.for_linter(ERBLint::Linters::NoUnusedDisable)
