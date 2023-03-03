@@ -25,21 +25,11 @@ describe ERBLint::Runner do
     end
   end
 
-  let(:file_loader) { ERBLint::FileLoader.new(".") }
-  let(:runner) { described_class.new(file_loader, config) }
-
   describe "#run" do
-    before do
-      allow(ERBLint::LinterRegistry).to(receive(:linters)
-        .and_return([ERBLint::Linters::FakeLinter1,
-                     ERBLint::Linters::FakeLinter2,
-                     ERBLint::Linters::FinalNewline,]))
-      runner.run(processed_source)
-    end
-
     let(:file) { "DummyFileContent" }
     let(:filename) { "/root/directory/somefolder/otherfolder/dummyfile.html.erb" }
     let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
+    before { runner.run(processed_source) }
     subject { runner.offenses }
 
     context "when all linters are enabled" do
