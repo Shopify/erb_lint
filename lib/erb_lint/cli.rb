@@ -77,7 +77,7 @@ module ERBLint
       reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
       reporter.preview
 
-      runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_config] || false)
+      runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_config])
       file_content = nil
 
       lint_files.each do |filename|
