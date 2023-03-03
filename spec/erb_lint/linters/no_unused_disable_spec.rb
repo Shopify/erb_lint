@@ -55,7 +55,7 @@ describe ERBLint::Linters::NoUnusedDisable do
         linter.run(processed_source, [offense])
       end
 
-      it "reports the unused rule" do
+      it "reports the unused inline comment" do
         expect(subject.size).to(eq(1))
         expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake"))
       end
@@ -70,7 +70,7 @@ describe ERBLint::Linters::NoUnusedDisable do
         linter.run(processed_source, [offense])
       end
 
-      it "reports the unused rule" do
+      it "reports the unused inline comment" do
         expect(subject.size).to(eq(1))
         expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake2"))
       end
@@ -92,7 +92,7 @@ describe ERBLint::Linters::NoUnusedDisable do
         linter.run(processed_source, [offense])
       end
 
-      it "reports the unused rule" do
+      it "reports the unused inline comment" do
         expect(subject.size).to(eq(1))
         expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake"))
       end
