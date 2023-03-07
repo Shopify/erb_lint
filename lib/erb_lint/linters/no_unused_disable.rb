@@ -34,16 +34,14 @@ module ERBLint
         disabled_rules_and_line_number.each do |rule, line_numbers|
           line_numbers.each do |line_number|
             add_offense(processed_source.source_buffer.line_range(line_number),
-              "Unused erblint:disable comment for #{rule}")
+              "Unused erblint:disable-line comment for #{rule}")
           end
         end
       end
 
-      private
-
-      def disable_comment(line)
-        line.match(/<%# erblint:disable (?<rules>.*) %>/)&.named_captures&.fetch("rules")
-      end
+      # def disable_comment(line)
+      #   line.match(/# erblint:disable-line (?<rules>.*) %>/)&.named_captures&.fetch("rules")
+      # end
     end
   end
 end
