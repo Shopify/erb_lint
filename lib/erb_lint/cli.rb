@@ -375,7 +375,7 @@ module ERBLint
           @options[:allow_no_files] = config
         end
 
-        opts.on("--disable-inline-config", "Report all offenses while ignoring inline disable comments") do
+        opts.on("--disable-inline-configs", "Report all offenses while ignoring inline disable comments") do
           @options[:disable_inline_config] = true
         end
 

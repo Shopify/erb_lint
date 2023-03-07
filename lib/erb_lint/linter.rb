@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "erb_lint/utils/inline_disables"
+require "erb_lint/utils/inline_configs"
 
 module ERBLint
   # Defines common functionality available to all linters.
@@ -77,7 +77,7 @@ module ERBLint
         offense_line_range = offense.source_range.line_range
         offense_lines = source_for_line_range(processed_source, offense_line_range)
 
-        if Utils::InlineDisables.new.rule_disable_comment_for_lines?(self.class.simple_name, offense_lines)
+        if Utils::InlineConfigs.new.rule_disable_comment_for_lines?(self.class.simple_name, offense_lines)
           offense.disabled = true
         end
       end

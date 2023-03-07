@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe ERBLint::Utils::InlineDisables do
+describe ERBLint::Utils::InlineConfigs do
   let(:utils) { described_class.new }
 
   context "rule_disable_comment_for_lines?" do
@@ -38,7 +38,12 @@ describe ERBLint::Utils::InlineDisables do
   context "disabled_rules" do
     it "returns rule in ERB" do
       lines = '<a href="#"></a><%# erblint:disable-line AnchorRule %>'
-      expect(utils.disabled_rule(lines)).to(eq(true))
+      expect(utils.disabled_rules(lines)).to(eq('AnchorRule'))
+    end
+
+		it "returns rules in ERB" do
+      lines = '<a href="#"></a><%# erblint:disable-line Rule1, Rule2, Rule3 %>'
+      expect(utils.disabled_rules(lines)).to(eq('Rule1, Rule2, Rule3'))
     end
   end
 end

@@ -38,10 +38,6 @@ module ERBLint
           end
         end
       end
-
-      # def disable_comment(line)
-      #   line.match(/# erblint:disable-line (?<rules>.*) %>/)&.named_captures&.fetch("rules")
-      # end
     end
   end
 end

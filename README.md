@@ -84,7 +84,7 @@ Comment on offending lines
 
 To raise an error when there is a useless disable comment, enable `NoUnusedDisable`.
 
-To disable inline comments and report all offenses, set `--no-inline-disable` option.
+To disable inline comments and report all offenses, set `--disable-inline-configs` option.
 
 ## Exclude
 
