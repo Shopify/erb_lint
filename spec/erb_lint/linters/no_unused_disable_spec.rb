@@ -33,7 +33,8 @@ describe ERBLint::Linters::NoUnusedDisable do
       let(:file) { "<span></span><%# erblint:disable-line Fake %>" }
       before do
         offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
-          processed_source.to_source_range(source_range_for_code(file, "<span></span>")), "some fake linter message")
+          source_range_for_code(file, processed_source, "<span></span>"),
+          "some fake linter message")
         offense.disabled = true
         linter.run(processed_source, [offense])
       end
@@ -49,8 +50,11 @@ describe ERBLint::Linters::NoUnusedDisable do
         <span>bad content</span>
       FILE
       before do
-        offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
-          processed_source.to_source_range(28..52), "some fake linter message")
+        offense = ERBLint::Offense.new(
+          ERBLint::Linters::Fake.new(file_loader, linter_config),
+          source_range_for_code(file, processed_source, "<span>bad content</span>"),
+          "some fake linter message"
+        )
         offense.disabled = true
         linter.run(processed_source, [offense])
       end
@@ -64,8 +68,11 @@ describe ERBLint::Linters::NoUnusedDisable do
     context "when file has disable comment for multiple rules" do
       let(:file) { "<span></span><%# erblint:disable-line Fake, Fake2 %>" }
       before do
-        offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
-          processed_source.to_source_range(1..6), "some fake linter message")
+        offense = ERBLint::Offense.new(
+          ERBLint::Linters::Fake.new(file_loader, linter_config),
+          source_range_for_code(file, processed_source, "<span></span>"),
+          "some fake linter message"
+        )
         offense.disabled = true
         linter.run(processed_source, [offense])
       end
@@ -82,10 +89,9 @@ describe ERBLint::Linters::NoUnusedDisable do
         <span></span><%# erblint:disable-line Fake %>
       ERB
       before do
-        second_line_range = processed_source.source_buffer.line_range(2).to_range
         offense = ERBLint::Offense.new(
           ERBLint::Linters::Fake.new(file_loader, linter_config),
-          processed_source.to_source_range(second_line_range),
+          source_range_for_code(file, processed_source, "<span></span>"),
           "some fake linter message"
         )
         offense.disabled = true

@@ -38,12 +38,12 @@ describe ERBLint::Utils::InlineConfigs do
   context "disabled_rules" do
     it "returns rule in ERB" do
       lines = '<a href="#"></a><%# erblint:disable-line AnchorRule %>'
-      expect(utils.disabled_rules(lines)).to(eq('AnchorRule'))
+      expect(utils.disabled_rules(lines)).to(eq("AnchorRule"))
     end
 
-		it "returns rules in ERB" do
+    it "returns rules in ERB" do
       lines = '<a href="#"></a><%# erblint:disable-line Rule1, Rule2, Rule3 %>'
-      expect(utils.disabled_rules(lines)).to(eq('Rule1, Rule2, Rule3'))
+      expect(utils.disabled_rules(lines)).to(eq("Rule1, Rule2, Rule3"))
     end
   end
 end
