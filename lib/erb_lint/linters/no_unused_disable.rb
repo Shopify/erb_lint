@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "erb_lint/utils/inline_configs"
+
 module ERBLint
   module Linters
     # Checks for unused disable comments.
@@ -10,10 +12,10 @@ module ERBLint
         disabled_rules_and_line_number = {}
 
         processed_source.source_buffer.source_lines.each_with_index do |line, index|
-          rule_disable = disable_comment(line)
-          next unless rule_disable
+          rule_disables = Utils::InlineConfigs.disabled_rules(line)
+          next unless rule_disables
 
-          rule_disable.split(",").each do |rule|
+          rule_disables.split(",").each do |rule|
             disabled_rules_and_line_number[rule.strip] =
               (disabled_rules_and_line_number[rule.strip] ||= []).push(index + 1)
           end

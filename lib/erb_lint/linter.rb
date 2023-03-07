@@ -77,7 +77,7 @@ module ERBLint
         offense_line_range = offense.source_range.line_range
         offense_lines = source_for_line_range(processed_source, offense_line_range)
 
-        if Utils::InlineConfigs.new.rule_disable_comment_for_lines?(self.class.simple_name, offense_lines)
+        if Utils::InlineConfigs.rule_disable_comment_for_lines?(self.class.simple_name, offense_lines)
           offense.disabled = true
         end
       end
