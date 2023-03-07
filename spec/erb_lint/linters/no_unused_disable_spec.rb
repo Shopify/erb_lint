@@ -21,16 +21,16 @@ describe ERBLint::Linters::NoUnusedDisable do
   describe "offenses" do
     subject { offenses }
     context "when file has unused disable comment" do
-      let(:file) { "<span></span><%# erblint:disable Fake %>" }
+      let(:file) { "<span></span><%# erblint:disable-line Fake %>" }
       before { linter.run(processed_source, []) }
       it do
         expect(subject.size).to(eq(1))
-        expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake"))
+        expect(subject.first.message).to(eq("Unused erblint:disable-line comment for Fake"))
       end
     end
 
     context "when file has a disable comment and a corresponding offense" do
-      let(:file) { "<span></span><%# erblint:disable Fake %>" }
+      let(:file) { "<span></span><%# erblint:disable-line Fake %>" }
       before do
         offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
           processed_source.to_source_range(1..6), "some fake linter message")
@@ -45,7 +45,7 @@ describe ERBLint::Linters::NoUnusedDisable do
 
     context "when file has a disable comment in wrong place and a corresponding offense" do
       let(:file) { <<~FILE }
-        <%# erblint:disable Fake %>
+        <%# erblint:disable-line Fake %>
         <span>bad content</span>
       FILE
       before do
@@ -57,12 +57,12 @@ describe ERBLint::Linters::NoUnusedDisable do
 
       it "reports the unused inline comment" do
         expect(subject.size).to(eq(1))
-        expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake"))
+        expect(subject.first.message).to(eq("Unused erblint:disable-line comment for Fake"))
       end
     end
 
     context "when file has disable comment for multiple rules" do
-      let(:file) { "<span></span><%# erblint:disable Fake, Fake2 %>" }
+      let(:file) { "<span></span><%# erblint:disable-line Fake, Fake2 %>" }
       before do
         offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
           processed_source.to_source_range(1..6), "some fake linter message")
@@ -72,14 +72,14 @@ describe ERBLint::Linters::NoUnusedDisable do
 
       it "reports the unused inline comment" do
         expect(subject.size).to(eq(1))
-        expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake2"))
+        expect(subject.first.message).to(eq("Unused erblint:disable-line comment for Fake2"))
       end
     end
 
     context "when file has multiple disable comments for one offense" do
       let(:file) { <<~ERB }
-        <%# erblint:disable Fake %>
-        <span></span><%# erblint:disable Fake %>
+        <%# erblint:disable-line Fake %>
+        <span></span><%# erblint:disable-line Fake %>
       ERB
       before do
         second_line_range = processed_source.source_buffer.line_range(2).to_range
@@ -94,7 +94,7 @@ describe ERBLint::Linters::NoUnusedDisable do
 
       it "reports the unused inline comment" do
         expect(subject.size).to(eq(1))
-        expect(subject.first.message).to(eq("Unused erblint:disable comment for Fake"))
+        expect(subject.first.message).to(eq("Unused erblint:disable-line comment for Fake"))
       end
     end
   end
