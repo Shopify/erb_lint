@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe ERBLint::Utils::InlineConfigs do
-  let(:utils) { described_class.new }
+  let(:utils) { described_class }
 
   context "rule_disable_comment_for_lines?" do
     it "true when lines contain a erblint:disable-line comment for rule in ERB" do

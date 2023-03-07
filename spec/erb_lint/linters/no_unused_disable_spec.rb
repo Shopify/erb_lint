@@ -33,7 +33,7 @@ describe ERBLint::Linters::NoUnusedDisable do
       let(:file) { "<span></span><%# erblint:disable-line Fake %>" }
       before do
         offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
-          processed_source.to_source_range(1..6), "some fake linter message")
+          processed_source.to_source_range(source_range_for_code(file, "<span></span>")), "some fake linter message")
         offense.disabled = true
         linter.run(processed_source, [offense])
       end
