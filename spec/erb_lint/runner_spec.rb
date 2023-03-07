@@ -138,8 +138,7 @@ describe ERBLint::Runner do
       module Linters
         class FakeLinter3 < Linter
           def run(processed_source)
-            second_line_range = processed_source.source_buffer.line_range(2).to_range # reports second line of file
-            add_offense(processed_source.to_source_range(second_line_range), "#{self.class.name} error")
+            add_offense(source_range_for_code(processed_source, "<span>bad content</span>"), "#{self.class.name} error")
           end
         end
 
