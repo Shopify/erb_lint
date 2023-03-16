@@ -12,13 +12,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (7.0.4.1)
-      activesupport (= 7.0.4.1)
+    actionview (7.0.4.3)
+      activesupport (= 7.0.4.3)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (7.0.4.1)
+    activesupport (7.0.4.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -32,7 +32,7 @@ GEM
       parser (>= 2.4)
       smart_properties
     builder (3.2.4)
-    concurrent-ruby (1.1.10)
+    concurrent-ruby (1.2.2)
     crass (1.0.6)
     diff-lcs (1.5.0)
     erubi (1.11.0)
@@ -43,7 +43,7 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mini_portile2 (2.8.0)
-    minitest (5.17.0)
+    minitest (5.18.0)
     nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
@@ -88,7 +88,7 @@ GEM
       rubocop (~> 1.30)
     ruby-progressbar (1.11.0)
     smart_properties (1.17.0)
-    tzinfo (2.0.5)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
 
