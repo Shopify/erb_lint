@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "spec_utils"
 require "erb_lint/cli"
 require "erb_lint/cache"
 require "pp"
@@ -103,7 +104,7 @@ describe ERBLint::CLI do
         module Linters
           class FakeLinter < Linter
             def run(processed_source)
-              add_offense(source_range_for_code(processed_source, "<violation></violation>"),
+              add_offense(SpecUtils.source_range_for_code(processed_source, "<violation></violation>"),
                 "#{self.class.name} error")
             end
           end

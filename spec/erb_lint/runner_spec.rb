@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "spec_utils"
 
 describe ERBLint::Runner do
   let(:file_loader) { ERBLint::FileLoader.new("/root/directory") }
@@ -138,7 +139,8 @@ describe ERBLint::Runner do
       module Linters
         class FakeLinter3 < Linter
           def run(processed_source)
-            add_offense(source_range_for_code(processed_source, "<span>bad content</span>"), "#{self.class.name} error")
+            add_offense(SpecUtils.source_range_for_code(processed_source, "<span>bad content</span>"),
+              "#{self.class.name} error")
           end
         end
 
