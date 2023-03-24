@@ -15,6 +15,7 @@ module ERBLint
       @message = message
       @context = context
       @severity = severity
+      @disabled = false
     end
 
     def to_cached_offense_hash
@@ -42,6 +43,12 @@ module ERBLint
 
     def line_number
       line_range.begin
+    end
+
+    attr_writer :disabled
+
+    def disabled?
+      @disabled
     end
 
     def column

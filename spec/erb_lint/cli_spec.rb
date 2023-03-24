@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "spec_utils"
 require "erb_lint/cli"
 require "erb_lint/cache"
 require "pp"
@@ -95,6 +96,33 @@ describe ERBLint::CLI do
 
       it "is successful" do
         expect(subject).to(be(true))
+      end
+    end
+
+    context "with --disable-inline-configs" do
+      module ERBLint
+        module Linters
+          class FakeLinter < Linter
+            def run(processed_source)
+              add_offense(SpecUtils.source_range_for_code(processed_source, "<violation></violation>"),
+                "#{self.class.name} error")
+            end
+          end
+        end
+      end
+      let(:linted_file) { "app/views/template.html.erb" }
+      let(:args) { ["--disable-inline-configs", "--enable-linter", "fake_linter", linted_file] }
+      let(:file_content) { "<violation></violation> <%# erblint:disable FakeLinter %>" }
+
+      before do
+        allow(ERBLint::LinterRegistry).to(receive(:linters)
+          .and_return([ERBLint::Linters::FakeLinter]))
+        FileUtils.mkdir_p(File.dirname(linted_file))
+        File.write(linted_file, file_content)
+      end
+
+      it "shows all errors regardless of inline disables " do
+        expect { subject }.to(output(/ERBLint::Linters::FakeLinter error/).to_stdout)
       end
     end
 

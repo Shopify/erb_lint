@@ -69,6 +69,7 @@ module ERBLint
 
       @options[:format] ||= :multiline
       @options[:fail_level] ||= severity_level_for_name(:refactor)
+      @options[:disable_inline_configs] ||= false
       @stats.files = lint_files.size
       @stats.linters = enabled_linter_classes.size
       @stats.autocorrectable_linters = enabled_linter_classes.count(&:support_autocorrect?)
@@ -76,7 +77,7 @@ module ERBLint
       reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
       reporter.preview
 
-      runner = ERBLint::Runner.new(file_loader, @config)
+      runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_configs])
       file_content = nil
 
       lint_files.each do |filename|
@@ -372,6 +373,10 @@ module ERBLint
 
         opts.on("--allow-no-files", "When no matching files found, exit successfully (default: false)") do |config|
           @options[:allow_no_files] = config
+        end
+
+        opts.on("--disable-inline-configs", "Report all offenses while ignoring inline disable comments") do
+          @options[:disable_inline_configs] = true
         end
 
         opts.on(
