@@ -112,7 +112,7 @@ describe ERBLint::CLI do
       end
       let(:linted_file) { "app/views/template.html.erb" }
       let(:args) { ["--disable-inline-configs", "--enable-linter", "fake_linter", linted_file] }
-      let(:file_content) { "<violation></violation> <%# erblint:disable-line FakeLinter %>" }
+      let(:file_content) { "<violation></violation> <%# erblint:disable FakeLinter %>" }
 
       before do
         allow(ERBLint::LinterRegistry).to(receive(:linters)

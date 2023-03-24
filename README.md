@@ -79,7 +79,7 @@ You can disable a rule by placing a disable comment in the following format:
 
 Comment on offending lines
 ```.erb
-<hr /> <%# erblint:disable-line SelfClosingTag %>
+<hr /> <%# erblint:disable SelfClosingTag %>
 ```
 
 To raise an error when there is a useless disable comment, enable `NoUnusedDisable`.

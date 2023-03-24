@@ -4,11 +4,11 @@ module ERBLint
   module Utils
     class InlineConfigs
       def self.rule_disable_comment_for_lines?(rule, lines)
-        lines.match?(/# erblint:disable-line (?<rules>.*#{rule}).*/)
+        lines.match?(/# erblint:disable (?<rules>.*#{rule}).*/)
       end
 
       def self.disabled_rules(line)
-        line.match(/# erblint:disable-line (?<rules>.*) %>/)&.named_captures&.fetch("rules")
+        line.match(/# erblint:disable (?<rules>.*) %>/)&.named_captures&.fetch("rules")
       end
     end
   end
