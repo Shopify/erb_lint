@@ -628,7 +628,27 @@ app/views/users/_graph.html.erb:27:37: Extra space detected where there should b
 
 ```sh
 erblint --format junit
-<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="erblint" tests="2" failures="2">\n<properties>\n<property name="erb_lint_version" value="0.3.1" />\n<property name="ruby_engine" value="ruby" />\n<property name="ruby_version" value="3.1.2" />\n<property name="ruby_patchlevel" value="20" />\n<property name="ruby_platform" value="arm64-darwin21" />\n</properties>\n<testcase name="app.views.index.html.erb" file="app/views/index.html.erb">\n</testcase>\n<testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">\n<failure message="Extra space detected where there should be no space." type="SpaceInHtmlTag">\nExtra space detected where there should be no space.\n</failure>\n</testcase>\n<testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">\n<failure message="Remove newline before `%&gt;` to match start of tag." type="ClosingErbTagIndent">\nRemove newline before `%&gt;` to match start of tag.\n</failure>\n</testcase>\n</testsuite>\n
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="erblint" tests="2" failures="2">
+  <properties>
+    <property name="erb_lint_version" value="0.3.1"/>
+    <property name="ruby_engine" value="ruby"/>
+    <property name="ruby_version" value="3.1.2"/>
+    <property name="ruby_patchlevel" value="20"/>
+    <property name="ruby_platform" value="arm64-darwin21"/>
+  </properties>
+  <testcase name="app.views.index.html.erb" file="app/views/index.html.erb"/>
+  <testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">
+    <failure message="Extra space detected where there should be no space." type="SpaceInHtmlTag">
+      Extra space detected where there should be no space.
+    </failure>
+  </testcase>
+  <testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">
+    <failure message="Remove newline before `%&gt;` to match start of tag." type="ClosingErbTagIndent">
+      Remove newline before `%&gt;` to match start of tag.
+    </failure>
+  </testcase>
+</testsuite>
 ```
 
 Use it with [GitlabCI](https://gitlab.com):
