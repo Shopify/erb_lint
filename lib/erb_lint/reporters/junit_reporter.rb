@@ -82,6 +82,7 @@ module ERBLint
         testcase_element = REXML::Element.new("testcase")
         testcase_element.add_attribute("name", name.to_s)
         testcase_element.add_attribute("file", file.to_s)
+        testcase_element.add_attribute("lineno", offense.line_number.to_s) if offense
         testsuite_element.add_element(testcase_element)
 
         yield testcase_element if block_given?

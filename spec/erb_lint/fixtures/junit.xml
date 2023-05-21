@@ -8,12 +8,12 @@
     <property name="ruby_platform" value="%{ruby_platform}"/>
   </properties>
   <testcase name="app.views.index.html.erb" file="app/views/index.html.erb"/>
-  <testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">
+  <testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="1">
     <failure message="Extra space detected where there should be no space." type="SpaceInHtmlTag">
       Extra space detected where there should be no space.
     </failure>
   </testcase>
-  <testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb">
+  <testcase name="app.views.subscriptions._loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="52">
     <failure message="Remove newline before `%%&gt;` to match start of tag." type="ClosingErbTagIndent">
       Remove newline before `%%&gt;` to match start of tag.
     </failure>
