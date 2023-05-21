@@ -43,7 +43,15 @@ describe ERBLint::Reporters::JunitReporter do
     end
 
     let(:expected_xml) do
-      File.read(File.expand_path("./spec/erb_lint/fixtures/junit.xml"))
+      content = File.read(File.expand_path("./spec/erb_lint/fixtures/junit.xml"))
+      format(
+        content,
+        erb_lint_version: ERBLint::VERSION,
+        ruby_engine: RUBY_ENGINE,
+        ruby_version: RUBY_VERSION,
+        ruby_patchlevel: RUBY_PATCHLEVEL.to_s,
+        ruby_platform: RUBY_PLATFORM
+      )
     end
 
     it "displays formatted offenses output" do
