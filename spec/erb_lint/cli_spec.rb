@@ -90,7 +90,9 @@ describe ERBLint::CLI do
 
       it "shows format instructions" do
         expect { subject }.to(
-          output(/Report offenses in the given format: \(compact, json, multiline\) \(default: multiline\)/).to_stdout
+          output(Regexp.new("Report offenses in the given format: " \
+            "\\(compact, json, junit, multiline\\) " \
+            "\\(default: multiline\\)")).to_stdout
         )
       end
 
@@ -503,6 +505,7 @@ describe ERBLint::CLI do
                 nonexistentformat: is not a valid format. Available formats:
                   - compact
                   - json
+                  - junit
                   - multiline
               EOF
             end
