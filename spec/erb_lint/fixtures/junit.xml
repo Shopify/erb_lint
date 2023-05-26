@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="erblint" tests="2" failures="2">
+  <properties>
+    <property name="erb_lint_version" value="%{erb_lint_version}"/>
+    <property name="ruby_engine" value="%{ruby_engine}"/>
+    <property name="ruby_version" value="%{ruby_version}"/>
+    <property name="ruby_patchlevel" value="%{ruby_patchlevel}"/>
+    <property name="ruby_platform" value="%{ruby_platform}"/>
+  </properties>
+  <testcase name="app/views/subscriptions/_loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="1">
+    <failure message="SpaceInHtmlTag: Extra space detected where there should be no space." type="SpaceInHtmlTag">
+      <![CDATA[app/views/subscriptions/_loader.html.erb:1:7]]>
+    </failure>
+  </testcase>
+  <testcase name="app/views/subscriptions/_loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="52">
+    <failure message="ClosingErbTagIndent: Remove newline before `%%&gt;` to match start of tag." type="ClosingErbTagIndent">
+      <![CDATA[app/views/subscriptions/_loader.html.erb:52:10]]>
+    </failure>
+  </testcase>
+  <testcase name="app/views/application/index.html.erb" file="app/views/application/index.html.erb"/>
+</testsuite>

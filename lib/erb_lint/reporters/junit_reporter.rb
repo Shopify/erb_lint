@@ -47,6 +47,8 @@ module ERBLint
             testcase_element = REXML::Element.new("testcase", nil, CONTEXT)
             testcase_element.add_attribute("name", filename.to_s)
             testcase_element.add_attribute("file", filename.to_s)
+
+            testsuite_element.add_element(testcase_element)
           end
 
           offenses.each do |offense|
