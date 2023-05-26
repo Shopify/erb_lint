@@ -624,6 +624,28 @@ app/views/users/_graph.html.erb:27:37: Extra space detected where there should b
 2 error(s) were found in ERB files
 ```
 
+### JUnit
+
+```sh
+erblint --format junit
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="erblint" tests="2" failures="2">
+  <properties>
+    <property name="erb_lint_version" value="%{erb_lint_version}"/>
+    <property name="ruby_engine" value="%{ruby_engine}"/>
+    <property name="ruby_version" value="%{ruby_version}"/>
+    <property name="ruby_patchlevel" value="%{ruby_patchlevel}"/>
+    <property name="ruby_platform" value="%{ruby_platform}"/>
+  </properties>
+  <testcase name="app/views/subscriptions/_loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="1">
+    <failure message="SpaceInHtmlTag: Extra space detected where there should be no space." type="SpaceInHtmlTag">
+      <![CDATA[app/views/subscriptions/_loader.html.erb:1:7]]>
+    </failure>
+  </testcase>
+  <testcase name="app/views/application/index.html.erb" file="app/views/subscriptions/_menu.html.erb"/>
+</testsuite>
+```
+
 ## Caching
 
 The cache is currently opt-in - to turn it on, use the `--cache` option:
