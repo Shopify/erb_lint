@@ -102,7 +102,7 @@ module ERBLint
         failure_element.add_attribute("message", "#{type}: #{message}")
         failure_element.add_attribute("type", type.to_s)
 
-        cdata_element = REXML::CData.new("#{filename}:#{offense.line_number}:#{offense.column}")
+        cdata_element = REXML::CData.new("#{type}: #{message} at #{filename}:#{offense.line_number}:#{offense.column}")
         failure_element.add_text(cdata_element)
 
         failure_element

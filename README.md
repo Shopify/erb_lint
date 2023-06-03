@@ -639,7 +639,7 @@ erblint --format junit
   </properties>
   <testcase name="app/views/subscriptions/_loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="1">
     <failure message="SpaceInHtmlTag: Extra space detected where there should be no space." type="SpaceInHtmlTag">
-      <![CDATA[app/views/subscriptions/_loader.html.erb:1:7]]>
+      <![CDATA[SpaceInHtmlTag: Extra space detected where there should be no space. at app/views/subscriptions/_loader.html.erb:1:7]]>
     </failure>
   </testcase>
   <testcase name="app/views/application/index.html.erb" file="app/views/subscriptions/_menu.html.erb"/>
