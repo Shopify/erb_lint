@@ -1,0 +1,11 @@
+<%if variable %>
+	<div>
+		<div class="relative">
+			 <%= render_image %>
+		<div class="relative top-2">
+			<%= link_to "Hello World", root_path %>
+		</div>
+	</div>
+<% else%>
+	<%= render_image %>
+<% end %>

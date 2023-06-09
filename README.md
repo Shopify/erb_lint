@@ -74,6 +74,18 @@ Make sure to add `**/` to exclude patterns; it matches the target files' absolut
 ## Enable or disable default linters
 `EnableDefaultLinters`: enables or disables default linters. [Default linters](#Linters) are enabled by default.
 
+## Disable rule at offense-level
+You can disable a rule by placing a disable comment in the following format:
+
+Comment on offending lines
+```.erb
+<hr /> <%# erblint:disable SelfClosingTag %>
+```
+
+To raise an error when there is a useless disable comment, enable `NoUnusedDisable`.
+
+To disable inline comments and report all offenses, set `--disable-inline-configs` option.
+
 ## Exclude
 
 You can specify the exclude patterns both of global and lint-local.
@@ -94,6 +106,7 @@ linters:
 |-------------------------------------------------------|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------|
 | [AllowedScriptType](#AllowedScriptType)               | Yes     | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values                       |
 | ClosingErbTagIndent                                   | Yes     |                                                                                                                                           |
+| [CommentSyntax](#CommentSyntax)                       | Yes     | detects bad ERB comment syntax                                                                                                            |
 | ExtraNewline                                          | Yes     |                                                                                                                                           |
 | [FinalNewline](#FinalNewline)                         | Yes     | warns about missing newline at the end of a ERB template                                                                                  |
 | [NoJavascriptTagHelper](#NoJavascriptTagHelper)       | Yes     | prevents the usage of Rails' `javascript_tag`                                                                                             |
@@ -110,8 +123,7 @@ linters:
 | [ErbSafety](#ErbSafety)                               | No      | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`.             |
 | [Rubocop](#Rubocop)                                   | No      | runs RuboCop rules on ruby statements found in ERB templates                                                                              |
 | [RequireScriptNonce](#RequireScriptNonce)             | No      | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
-| [HardCodedString](#HardCodedString)                   | No      | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)               |
-
+| [HardCodedString](#HardCodedString)                   | No      | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
 
 ### DeprecatedClasses
 
@@ -489,6 +501,7 @@ Linter-Specific Option    | Description
 `allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag. Defaults to `true`.
 `disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
 
+
 ### HardCodedString
 
 `HardCodedStrings` warns if there is a visible hardcoded string in the DOM. It does not check for a hardcoded string nested inside a JavaScript tag.
@@ -528,6 +541,26 @@ class I18nCorrector
     end
   end
 end
+
+## CommentSyntax
+
+This linter enforces the use of the correct ERB comment syntax, since Ruby comments (`<% # comment %>` with a space) are not technically valid ERB comments.
+
+```erb
+Bad ❌
+<% # This is a Ruby comment %>
+Good ✅
+<%# This is an ERB comment %>
+
+Bad ❌
+<% # This is a Ruby comment; it can fail to parse. %>
+Good ✅
+<%# This is an ERB comment; it is parsed correctly. %>
+
+Good ✅
+<%
+  # This is a multi-line ERB comment.
+%>
 ```
 
 ## Custom Linters
@@ -632,6 +665,48 @@ app/views/users/show.html.erb:95:0: Remove multiple trailing newline at the end 
 app/views/users/_graph.html.erb:27:37: Extra space detected where there should be no space
 2 error(s) were found in ERB files
 ```
+
+### JUnit
+
+```sh
+erblint --format junit
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="erblint" tests="2" failures="2">
+  <properties>
+    <property name="erb_lint_version" value="%{erb_lint_version}"/>
+    <property name="ruby_engine" value="%{ruby_engine}"/>
+    <property name="ruby_version" value="%{ruby_version}"/>
+    <property name="ruby_patchlevel" value="%{ruby_patchlevel}"/>
+    <property name="ruby_platform" value="%{ruby_platform}"/>
+  </properties>
+  <testcase name="app/views/subscriptions/_loader.html.erb" file="app/views/subscriptions/_loader.html.erb" lineno="1">
+    <failure message="SpaceInHtmlTag: Extra space detected where there should be no space." type="SpaceInHtmlTag">
+      <![CDATA[SpaceInHtmlTag: Extra space detected where there should be no space. at app/views/subscriptions/_loader.html.erb:1:7]]>
+    </failure>
+  </testcase>
+  <testcase name="app/views/application/index.html.erb" file="app/views/subscriptions/_menu.html.erb"/>
+</testsuite>
+```
+
+## Caching
+
+The cache is currently opt-in - to turn it on, use the `--cache` option:
+
+```sh
+erblint --cache ./app
+Cache mode is on
+Linting 413 files with 15 linters...
+File names pruned from the cache will be logged
+
+No errors were found in ERB files
+```
+
+Cached lint results are stored in the `.erb-lint-cache` directory by default, though a custom directory can be provided
+via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file and `erb-lint` settings.
+These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes
+necessary to restore the results of running `erb-lint` for output. The cache also automatically prunes outdated files each time it's run.
+
+You can also use the `--clear-cache` option to delete the cache file directory.
 
 ## License
 

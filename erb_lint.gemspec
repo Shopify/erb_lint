@@ -7,8 +7,8 @@ require "erb_lint/version"
 Gem::Specification.new do |s|
   s.name = "erb_lint"
   s.version = ERBLint::VERSION
-  s.authors = ["Justin Chan"]
-  s.email = ["justin.the.c@gmail.com"]
+  s.authors = ["Justin Chan", "Shopify Developers"]
+  s.email = ["ruby@shopify.com"]
   s.summary = "ERB lint tool"
   s.description = "ERB Linter tool."
   s.homepage = "https://github.com/Shopify/erb-lint"

@@ -56,14 +56,14 @@ module ERBLint
 
       def format_offense(offense)
         {
-          linter: offense.linter.class.simple_name,
+          linter: offense.simple_name,
           message: offense.message.to_s,
           location: {
             start_line: offense.line_number,
             start_column: offense.column,
-            last_line: offense.source_range.last_line,
-            last_column: offense.source_range.last_column,
-            length: offense.source_range.length,
+            last_line: offense.last_line,
+            last_column: offense.last_column,
+            length: offense.length,
           },
         }
       end

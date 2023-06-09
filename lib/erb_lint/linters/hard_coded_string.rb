@@ -17,7 +17,7 @@ module ERBLint
       ALLOWED_CORRECTORS = ["I18nCorrector", "RuboCop::Corrector::I18n::HardCodedString"]
 
       NON_TEXT_TAGS = Set.new(["script", "style", "xmp", "iframe", "noembed", "noframes", "listing"])
-      TEXT_NOT_ALLOWED = Set.new([
+      NO_TRANSLATION_NEEDED = Set.new([
         "&nbsp;",
         "&amp;",
         "&lt;",
@@ -40,6 +40,7 @@ module ERBLint
         "&ensp;",
         "&emsp;",
         "&thinsp;",
+        "&times;",
       ])
 
       class ConfigSchema < LinterConfig
@@ -96,7 +97,7 @@ module ERBLint
 
       def check_string?(str)
         string = str.gsub(/\s*/, "")
-        string.length > 1 && !TEXT_NOT_ALLOWED.include?(string)
+        string.length > 1 && !NO_TRANSLATION_NEEDED.include?(string)
       end
 
       def load_corrector

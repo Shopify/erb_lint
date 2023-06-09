@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "spec_utils"
 require "erb_lint/cli"
+require "erb_lint/cache"
 require "pp"
 require "fakefs"
 require "fakefs/spec_helpers"
@@ -88,12 +90,69 @@ describe ERBLint::CLI do
 
       it "shows format instructions" do
         expect { subject }.to(
-          output(/Report offenses in the given format: \(compact, json, multiline\) \(default: multiline\)/).to_stdout
+          output(Regexp.new("Report offenses in the given format: " \
+            "\\(compact, json, junit, multiline\\) " \
+            "\\(default: multiline\\)")).to_stdout
         )
       end
 
       it "is successful" do
         expect(subject).to(be(true))
+      end
+    end
+
+    context "with --disable-inline-configs" do
+      module ERBLint
+        module Linters
+          class FakeLinter < Linter
+            def run(processed_source)
+              add_offense(SpecUtils.source_range_for_code(processed_source, "<violation></violation>"),
+                "#{self.class.name} error")
+            end
+          end
+        end
+      end
+      let(:linted_file) { "app/views/template.html.erb" }
+      let(:args) { ["--disable-inline-configs", "--enable-linter", "fake_linter", linted_file] }
+      let(:file_content) { "<violation></violation> <%# erblint:disable FakeLinter %>" }
+
+      before do
+        allow(ERBLint::LinterRegistry).to(receive(:linters)
+          .and_return([ERBLint::Linters::FakeLinter]))
+        FileUtils.mkdir_p(File.dirname(linted_file))
+        File.write(linted_file, file_content)
+      end
+
+      it "shows all errors regardless of inline disables " do
+        expect { subject }.to(output(/ERBLint::Linters::FakeLinter error/).to_stdout)
+      end
+    end
+
+    context "with --clear-cache" do
+      let(:args) { ["--clear-cache"] }
+      context "without a cache folder" do
+        it { expect { subject }.to(output(/cache directory doesn't exist, skipping deletion/).to_stderr) }
+        it "shows cache not cleared message if cache is empty and fails" do
+          expect(subject).to(be(false))
+        end
+      end
+
+      context "with a cache folder" do
+        before do
+          FileUtils.mkdir_p(ERBLint::Cache::CACHE_DIRECTORY)
+        end
+        it {
+          expect do
+            subject
+          end.to(output(<<~EOF).to_stdout)
+            Cache mode is on
+            Clearing cache by deleting cache directory
+            cache directory cleared
+          EOF
+        }
+        it "is successful and empties the cache if there are cache file" do
+          expect(subject).to(be(true))
+        end
       end
     end
 
@@ -116,6 +175,30 @@ describe ERBLint::CLI do
         it "is successful" do
           expect(subject).to(be(true))
         end
+      end
+
+      context "when file has a syntax error" do
+        before { FakeFS::FileSystem.clone(File.join(__dir__, "../fixtures"), "/") }
+
+        let(:args) { ["--config", "invalid-config.yml", "--lint-all"] }
+
+        it { expect { subject }.to(output(/error parsing config:/).to_stderr) }
+        it "is not successful" do
+          expect(subject).to(be(false))
+        end
+      end
+    end
+
+    context "with custom --cache-dir" do
+      let(:args) { ["--lint-all", "--enable-linter", "linter_with_errors", "--clear-cache", "--cache-dir", cache_dir] }
+      let(:cache_dir) { "tmp/erb_lint" }
+
+      before do
+        FileUtils.mkdir_p(cache_dir)
+      end
+
+      it "uses the specified directory" do
+        expect { subject }.to(output(/cache directory cleared/).to_stdout)
       end
     end
 
@@ -170,7 +253,7 @@ describe ERBLint::CLI do
           end
         end
 
-        context "when only errors with serverity info are found" do
+        context "when only errors with severity info are found" do
           let(:args) { ["--enable-linter", "linter_with_info_errors", linted_file] }
 
           it "shows all error messages and line numbers" do
@@ -216,6 +299,19 @@ describe ERBLint::CLI do
           it "is not able to find the file" do
             expect { subject }.to(output(/no files found\.\.\./).to_stderr)
             expect(subject).to(be(false))
+          end
+        end
+
+        context "with cache" do
+          let(:args) { ["--enable-linter", "linter_without_errors", "--cache", linted_file] }
+
+          it "lints the file and adds it to the cache" do
+            expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
+
+            expect { subject }.to(output(/Cache mode is on/).to_stdout)
+            expect(subject).to(be(true))
+
+            expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
           end
         end
       end
@@ -409,6 +505,7 @@ describe ERBLint::CLI do
                 nonexistentformat: is not a valid format. Available formats:
                   - compact
                   - json
+                  - junit
                   - multiline
               EOF
             end
@@ -427,6 +524,19 @@ describe ERBLint::CLI do
 
             it "is successful" do
               expect(subject).to(be(true))
+            end
+
+            context "with cache" do
+              let(:args) { ["--enable-linter", "linter_without_errors", "--cache", linted_dir] }
+
+              it "lints the file and adds it to the cache" do
+                expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
+
+                expect { subject }.to(output(/Cache mode is on/).to_stdout)
+                expect(subject).to(be(true))
+
+                expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
+              end
             end
           end
         end
@@ -529,6 +639,17 @@ describe ERBLint::CLI do
 
             it "outputs the corrected ERB" do
               expect { subject }.to(output(/#{file_content}\n/).to_stdout)
+            end
+          end
+
+          context "when autocorrecting and caching are turned on" do
+            # We assume that linter_with_errors is not autocorrectable...
+            let(:args) do
+              ["--enable-linter", "linter_without_errors", "--stdin", linted_file, "--autocorrect", "--cache"]
+            end
+
+            it "throws an error saying the two modes cannot be used together" do
+              expect { subject }.to(output(/cannot run autocorrect mode with cache/).to_stderr)
             end
           end
         end

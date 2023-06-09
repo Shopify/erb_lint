@@ -30,9 +30,26 @@ module ERBLint
     def run(args = ARGV)
       dupped_args = args.dup
       load_options(dupped_args)
+
+      if cache? && autocorrect?
+        failure!("cannot run autocorrect mode with cache")
+      end
+
       @files = @options[:stdin] || dupped_args
 
       load_config
+
+      cache_dir = @options[:cache_dir]
+      @cache = Cache.new(@config, cache_dir) if cache? || clear_cache?
+
+      if clear_cache?
+        if cache.cache_dir_exists?
+          cache.clear
+          success!("cache directory cleared")
+        else
+          failure!("cache directory doesn't exist, skipping deletion.")
+        end
+      end
 
       if !@files.empty? && lint_files.empty?
         if allow_no_files?
@@ -52,6 +69,7 @@ module ERBLint
 
       @options[:format] ||= :multiline
       @options[:fail_level] ||= severity_level_for_name(:refactor)
+      @options[:disable_inline_configs] ||= false
       @stats.files = lint_files.size
       @stats.linters = enabled_linter_classes.size
       @stats.autocorrectable_linters = enabled_linter_classes.count(&:support_autocorrect?)
@@ -59,13 +77,13 @@ module ERBLint
       reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
       reporter.preview
 
-      runner = ERBLint::Runner.new(file_loader, @config)
+      runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_configs])
       file_content = nil
 
       lint_files.each do |filename|
         runner.clear_offenses
         begin
-          file_content = run_with_corrections(runner, filename)
+          file_content = run_on_file(runner, filename)
         rescue => e
           @stats.exceptions += 1
           puts "Exception occurred when processing: #{relative_filename(filename)}"
@@ -76,6 +94,8 @@ module ERBLint
           puts
         end
       end
+
+      cache&.close
 
       reporter.show
 
@@ -99,13 +119,43 @@ module ERBLint
 
     private
 
+    attr_reader :cache, :config
+
+    def run_on_file(runner, filename)
+      file_content = read_content(filename)
+
+      if cache? && !autocorrect?
+        run_using_cache(runner, filename, file_content)
+      else
+        file_content = run_with_corrections(runner, filename, file_content)
+      end
+
+      log_offense_stats(runner, filename)
+      file_content
+    end
+
+    def run_using_cache(runner, filename, file_content)
+      if (cache_result_offenses = cache.get(filename, file_content))
+        runner.restore_offenses(cache_result_offenses)
+      else
+        run_with_corrections(runner, filename, file_content)
+        cache.set(filename, file_content, runner.offenses.map(&:to_cached_offense_hash).to_json)
+      end
+    end
+
     def autocorrect?
       @options[:autocorrect]
     end
 
-    def run_with_corrections(runner, filename)
-      file_content = read_content(filename)
+    def cache?
+      @options[:cache]
+    end
 
+    def clear_cache?
+      @options[:clear_cache]
+    end
+
+    def run_with_corrections(runner, filename, file_content)
       7.times do
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
         runner.run(processed_source)
@@ -127,6 +177,11 @@ module ERBLint
         file_content = corrector.corrected_content
         runner.clear_offenses
       end
+
+      file_content
+    end
+
+    def log_offense_stats(runner, filename)
       offenses_filename = relative_filename(filename)
       offenses = runner.offenses || []
 
@@ -138,8 +193,6 @@ module ERBLint
 
       @stats.processed_files[offenses_filename] ||= []
       @stats.processed_files[offenses_filename] |= offenses
-
-      file_content
     end
 
     def read_content(filename)
@@ -169,7 +222,7 @@ module ERBLint
     rescue Psych::SyntaxError => e
       failure!("error parsing config: #{e.message}")
     ensure
-      @config.merge!(runner_config_override)
+      @config&.merge!(runner_config_override)
     end
 
     def file_loader
@@ -283,6 +336,18 @@ module ERBLint
           @options[:enabled_linters] = known_linter_names
         end
 
+        opts.on("--cache", "Enable caching") do |config|
+          @options[:cache] = config
+        end
+
+        opts.on("--cache-dir DIR", "Set the cache directory") do |dir|
+          @options[:cache_dir] = dir
+        end
+
+        opts.on("--clear-cache", "Clear cache") do |config|
+          @options[:clear_cache] = config
+        end
+
         opts.on("--enable-linters LINTER[,LINTER,...]", Array,
           "Only use specified linter", "Known linters are: #{known_linter_names.join(", ")}") do |linters|
           linters.each do |linter|
@@ -308,6 +373,10 @@ module ERBLint
 
         opts.on("--allow-no-files", "When no matching files found, exit successfully (default: false)") do |config|
           @options[:allow_no_files] = config
+        end
+
+        opts.on("--disable-inline-configs", "Report all offenses while ignoring inline disable comments") do
+          @options[:disable_inline_configs] = true
         end
 
         opts.on(
