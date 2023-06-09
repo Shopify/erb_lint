@@ -507,7 +507,6 @@ linters:
 ```
 
 This linter requires a `corrector` option. Without a `corrector` option, the strings won't be translated.
-c
 Linter-Specific Option    | Description
 --------------------------|---------------------------------------------------------
 path | a string pointing to the path to the corrector file
