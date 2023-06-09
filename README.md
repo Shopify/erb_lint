@@ -504,7 +504,7 @@ Linter-Specific Option    | Description
 
 ### HardCodedString
 
-`HardCodedStrings` warns if there is a visible hardcoded string in the DOM. It does not check for a hardcoded string nested inside a JavaScript tag.
+`HardCodedString` warns if there is a visible hardcoded string in the DOM. It does not check for a hardcoded string nested inside a JavaScript tag.
 
 Example configuration:
 
