@@ -511,7 +511,7 @@ Example configuration:
 ```yaml
 ---
 linters:
-  HardCodedString
+  HardCodedString:
     enabled: true
     corrector:
       path: path/to/corrector_file.rb
