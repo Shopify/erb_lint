@@ -7,11 +7,7 @@ module ERBLint
     class RubocopText < Rubocop
       include LinterRegistry
 
-      class ConfigSchema < LinterConfig
-        property :only, accepts: array_of?(String)
-        property :rubocop_config, accepts: Hash
-        property :config_file_path, accepts: String
-      end
+      ConfigSchema = Class.new(Rubocop::ConfigSchema)
 
       self.config_schema = ConfigSchema
 
