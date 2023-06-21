@@ -14,6 +14,7 @@ module ERBLint
         property :only, accepts: array_of?(String)
         property :rubocop_config, accepts: Hash, default: -> { {} }
         property :config_file_path, accepts: String
+        property :debug, accepts: [true, false], default: false, reader: :debug?
       end
 
       self.config_schema = ConfigSchema
@@ -162,6 +163,7 @@ module ERBLint
           autocorrect: true,
           auto_correct: true,
           stdin: "",
+          debug: @config.debug?,
         )
       end
 
