@@ -83,7 +83,7 @@ module ERBLint
     def config_hash_for_linter(klass_name)
       config_hash = linters_config[klass_name] || {}
       config_hash["exclude"] ||= []
-      config_hash["exclude"].concat(global_exclude) if config_hash["exclude"].is_a?(Array)
+      config_hash["exclude"].concat(global_exclude).uniq! if config_hash["exclude"].is_a?(Array)
       config_hash
     end
 
