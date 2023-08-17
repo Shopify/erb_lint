@@ -235,10 +235,10 @@ describe ERBLint::CLI do
           it "shows all error messages and line numbers" do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
 
-              fake message from a fake linter
+              LinterWithErrors: fake message from a fake linter
               In file: /app/views/template.html.erb:1
 
-              Missing a trailing newline at the end of the file.
+              FinalNewline: Missing a trailing newline at the end of the file.
               In file: /app/views/template.html.erb:1
 
             EOF
@@ -259,7 +259,7 @@ describe ERBLint::CLI do
           it "shows all error messages and line numbers" do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
 
-              fake info message from a fake linter
+              LinterWithInfoErrors: fake info message from a fake linter
               In file: /app/views/template.html.erb:1
 
             EOF
@@ -360,7 +360,7 @@ describe ERBLint::CLI do
           it "shows all error messages and line numbers" do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
 
-              fake info message from a fake linter
+              LinterWithInfoErrors: fake info message from a fake linter
               In file: /app/views/template.html.erb:1
 
             EOF
@@ -383,7 +383,7 @@ describe ERBLint::CLI do
           it "shows all error messages and line numbers" do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
 
-              fake info message from a fake linter
+              LinterWithInfoErrors: fake info message from a fake linter
               In file: /app/views/template.html.erb:1
 
             EOF
@@ -452,10 +452,10 @@ describe ERBLint::CLI do
             it "shows all error messages and line numbers" do
               expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
 
-                fake message from a fake linter
+                LinterWithErrors: fake message from a fake linter
                 In file: /app/views/template.html.erb:1
 
-                Missing a trailing newline at the end of the file.
+                FinalNewline: Missing a trailing newline at the end of the file.
                 In file: /app/views/template.html.erb:1
 
               EOF
@@ -606,10 +606,10 @@ describe ERBLint::CLI do
           it "shows all error messages and line numbers" do
             expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
 
-              fake message from a fake linter
+              LinterWithErrors: fake message from a fake linter
               In file: /app/views/template.html.erb:1
 
-              Missing a trailing newline at the end of the file.
+              FinalNewline: Missing a trailing newline at the end of the file.
               In file: /app/views/template.html.erb:1
 
             EOF
