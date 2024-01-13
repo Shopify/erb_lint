@@ -23,9 +23,10 @@ module ERBLint
         .sort
     end
 
-    def initialize(stats, autocorrect)
+    def initialize(stats, autocorrect, show_linter_names = false)
       @stats = stats
       @autocorrect = autocorrect
+      @show_linter_names = show_linter_names
     end
 
     def preview; end
@@ -34,7 +35,7 @@ module ERBLint
 
     private
 
-    attr_reader :stats, :autocorrect
+    attr_reader :stats, :autocorrect, :show_linter_names
 
     delegate :processed_files, to: :stats
   end
