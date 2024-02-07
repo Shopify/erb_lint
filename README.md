@@ -643,6 +643,42 @@ erblint --format junit
 </testsuite>
 ```
 
+### GitLab
+
+Used by [GitLab Code
+Quality](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool).
+
+```json
+[
+   {
+      "description":"Extra space detected where there should be no space.",
+      "check_name":"SpaceInHtmlTag",
+      "fingerprint":"5a259c7cafa2c9ca229dfd7d21536698",
+      "severity":"info",
+      "location":{
+         "path":"app/views/subscriptions/_loader.html.erb",
+         "lines":{
+            "begin":1,
+            "end":1
+         }
+      }
+   },
+   {
+      "description":"Remove newline before `%\u003e` to match start of tag.",
+      "check_name":"ClosingErbTagIndent",
+      "fingerprint":"60b4ed2120c7abeebebb43fba4a19559",
+      "severity":"warning",
+      "location":{
+         "path":"app/views/subscriptions/_loader.html.erb",
+         "lines":{
+            "begin":52,
+            "end":54
+         }
+      }
+   }
+]
+```
+
 ## Caching
 
 The cache is currently opt-in - to turn it on, use the `--cache` option:
