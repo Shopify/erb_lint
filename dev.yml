@@ -1,7 +1,7 @@
 name: erb-lint
 
 up:
-  - ruby
+  - ruby: '3.2.2'
   - bundler
 
 commands:
