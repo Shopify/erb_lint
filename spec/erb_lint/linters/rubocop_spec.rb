@@ -32,6 +32,9 @@ describe ERBLint::Linters::Rubocop do
   before { linter.run(processed_source) }
 
   context "config is valid when rubocop_config is not explicitly provided" do
+    before(:all) { File.rename(".ruby-version", ".ruby-version.bak") }
+    after(:all) { File.rename(".ruby-version.bak", ".ruby-version") }
+
     let(:linter_config) do
       described_class.config_schema.new(only: ["NotALinter"])
     end
@@ -232,6 +235,9 @@ describe ERBLint::Linters::Rubocop do
   end
 
   context "supports config from a provided path" do
+    before(:all) { File.rename(".ruby-version", ".ruby-version.bak") }
+    after(:all) { File.rename(".ruby-version.bak", ".ruby-version") }
+
     after do
       config_file.close
       config_file.unlink
