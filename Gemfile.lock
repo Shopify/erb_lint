@@ -53,7 +53,7 @@ GEM
     parser (3.3.0.5)
       ast (~> 2.4.1)
       racc
-    racc (1.7.1)
+    racc (1.7.3)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -91,8 +91,8 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.2)
       parser (>= 3.3.0.4)
-    rubocop-shopify (2.7.0)
-      rubocop (~> 1.30)
+    rubocop-shopify (2.15.1)
+      rubocop (~> 1.51)
     ruby-progressbar (1.13.0)
     smart_properties (1.17.0)
     tzinfo (2.0.6)
