@@ -1,6 +1,9 @@
 inherit_gem:
   rubocop-shopify: rubocop.yml
 
+Style/ClassMethodsDefinitions:
+  Enabled: false
+
 AllCops:
   Exclude:
     - 'vendor/**/*'
