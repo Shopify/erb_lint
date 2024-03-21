@@ -25,13 +25,13 @@ module ERBLint
             add_offense(
               code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Remove newline before `%>` to match start of tag.",
-              " "
+              " ",
             )
           elsif start_with_newline && !end_with_newline
             add_offense(
               code_node.loc.end.adjust(begin_pos: -end_spaces.size),
               "Insert newline before `%>` to match start of tag.",
-              "\n"
+              "\n",
             )
           elsif start_with_newline && end_with_newline
             current_indent = end_spaces.split("\n", -1).last
@@ -39,7 +39,7 @@ module ERBLint
               add_offense(
                 code_node.loc.end.adjust(begin_pos: -current_indent.size),
                 "Indent `%>` on column #{erb_node.loc.column} to match start of tag.",
-                " " * erb_node.loc.column
+                " " * erb_node.loc.column,
               )
             end
           end

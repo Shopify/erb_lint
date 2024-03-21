@@ -4,6 +4,9 @@ inherit_gem:
 Style/ClassMethodsDefinitions:
   Enabled: false
 
+Style/ArrayIntersect:
+  Enabled: false
+
 AllCops:
   Exclude:
     - 'vendor/**/*'

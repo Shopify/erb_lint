@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe ERBLint::Utils::BlockMap do
-  include ::AST::Sexp
+  include AST::Sexp
 
   describe "map" do
     let(:processed_source) { ERBLint::ProcessedSource.new("file.rb", file) }

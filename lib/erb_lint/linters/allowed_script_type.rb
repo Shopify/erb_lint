@@ -12,7 +12,8 @@ module ERBLint
       include LinterRegistry
 
       class ConfigSchema < LinterConfig
-        property :allowed_types, accepts: array_of?(String),
+        property :allowed_types,
+          accepts: array_of?(String),
           default: -> { ["text/javascript"] }
         property :allow_blank, accepts: [true, false], default: true, reader: :allow_blank?
         property :disallow_inline_scripts, accepts: [true, false], default: false, reader: :disallow_inline_scripts?
@@ -30,8 +31,8 @@ module ERBLint
             name_node = tag_node.to_a[1]
             add_offense(
               name_node.loc,
-              "Avoid using inline `<script>` tags altogether. "\
-                "Instead, move javascript code into a static file."
+              "Avoid using inline `<script>` tags altogether. " \
+                "Instead, move javascript code into a static file.",
             )
             next
           end
@@ -44,14 +45,14 @@ module ERBLint
             add_offense(
               name_node.loc,
               "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.",
-              [type_attribute]
+              [type_attribute],
             )
           elsif type_present && !@config.allowed_types.include?(type_attribute.value)
             add_offense(
               type_attribute.loc,
-              "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. "\
-                "Must be one of: #{@config.allowed_types.join(", ")}"\
-                "#{" (or no type attribute)" if @config.allow_blank?}."
+              "Avoid using #{type_attribute.value.inspect} as type for `<script>` tag. " \
+                "Must be one of: #{@config.allowed_types.join(", ")}" \
+                "#{" (or no type attribute)" if @config.allow_blank?}.",
             )
           end
         end

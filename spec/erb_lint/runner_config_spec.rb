@@ -16,7 +16,7 @@ describe ERBLint::RunnerConfig do
       expect(
         described_class
           .default(default_enabled: false)
-          .for_linter("FinalNewline").enabled?
+          .for_linter("FinalNewline").enabled?,
       ).to(be(false))
     end
   end
@@ -235,11 +235,14 @@ describe ERBLint::RunnerConfig do
             .at_least(:once).with(gem_name).and_return(mock_spec))
         end
 
-        runner_config = described_class.new({
-          "inherit_gem" => {
-            "gemone" => "config/erb-lint.yml",
+        runner_config = described_class.new(
+          {
+            "inherit_gem" => {
+              "gemone" => "config/erb-lint.yml",
+            },
           },
-        }, ERBLint::FileLoader.new(Dir.pwd))
+          ERBLint::FileLoader.new(Dir.pwd),
+        )
 
         expect(runner_config.to_hash["MyCustomLinter"]).to(eq("my_option" => "custom value"))
       end
@@ -258,18 +261,21 @@ describe ERBLint::RunnerConfig do
             .at_least(:once).with(gem_name).and_return(mock_spec))
         end
 
-        runner_config = described_class.new({
-          "inherit_gem" => {
-            "gemone" => "config/erb-lint.yml",
+        runner_config = described_class.new(
+          {
+            "inherit_gem" => {
+              "gemone" => "config/erb-lint.yml",
+            },
+            "MyCustomLinter1" => {
+              "a" => "value for a",
+              "c" => "value for c",
+            },
+            "MyCustomLinter2" => {
+              "d" => "value for d",
+            },
           },
-          "MyCustomLinter1" => {
-            "a" => "value for a",
-            "c" => "value for c",
-          },
-          "MyCustomLinter2" => {
-            "d" => "value for d",
-          },
-        }, ERBLint::FileLoader.new(Dir.pwd))
+          ERBLint::FileLoader.new(Dir.pwd),
+        )
 
         config_hash = runner_config.to_hash
         expect(config_hash["MyCustomLinter1"]).to(eq("a" => "value for a", "b" => "value for b", "c" => "value for c"))
@@ -283,16 +289,19 @@ describe ERBLint::RunnerConfig do
             b: value for b
         YAML
 
-        runner_config = described_class.new({
-          "inherit_from" => "#{tmp_root}/erb-lint-default.yml",
-          "MyCustomLinter1" => {
-            "a" => "value for a",
-            "c" => "value for c",
+        runner_config = described_class.new(
+          {
+            "inherit_from" => "#{tmp_root}/erb-lint-default.yml",
+            "MyCustomLinter1" => {
+              "a" => "value for a",
+              "c" => "value for c",
+            },
+            "MyCustomLinter2" => {
+              "d" => "value for d",
+            },
           },
-          "MyCustomLinter2" => {
-            "d" => "value for d",
-          },
-        }, ERBLint::FileLoader.new(Dir.pwd))
+          ERBLint::FileLoader.new(Dir.pwd),
+        )
 
         config_hash = runner_config.to_hash
         expect(config_hash["MyCustomLinter1"]).to(eq("a" => "value for a", "b" => "value for b", "c" => "value for c"))

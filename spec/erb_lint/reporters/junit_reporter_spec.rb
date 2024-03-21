@@ -13,7 +13,7 @@ describe ERBLint::Reporters::JunitReporter do
           "app/views/subscriptions/_loader.html.erb" => offenses,
           "app/views/application/index.html.erb" => [],
         },
-        corrected: 1
+        corrected: 1,
       )
     end
 
@@ -50,7 +50,7 @@ describe ERBLint::Reporters::JunitReporter do
         ruby_engine: RUBY_ENGINE,
         ruby_version: RUBY_VERSION,
         ruby_patchlevel: RUBY_PATCHLEVEL.to_s,
-        ruby_platform: RUBY_PLATFORM
+        ruby_platform: RUBY_PLATFORM,
       )
     end
 

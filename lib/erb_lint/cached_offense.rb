@@ -38,7 +38,7 @@ module ERBLint
           last_line: offense.last_line,
           last_column: offense.last_column,
           length: offense.length,
-        }
+        },
       )
     end
 

@@ -11,8 +11,25 @@ module ERBLint
       end
       self.config_schema = ConfigSchema
 
-      SELF_CLOSING_TAGS = ["area", "base", "br", "col", "command", "embed", "hr", "input", "keygen", "link",
-                           "menuitem", "meta", "param", "source", "track", "wbr", "img",]
+      SELF_CLOSING_TAGS = [
+        "area",
+        "base",
+        "br",
+        "col",
+        "command",
+        "embed",
+        "hr",
+        "input",
+        "keygen",
+        "link",
+        "menuitem",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
+        "img",
+      ]
 
       def run(processed_source)
         processed_source.ast.descendants(:tag).each do |tag_node|
@@ -24,7 +41,7 @@ module ERBLint
             add_offense(
               start_solidus.loc,
               "Tag `#{tag.name}` is a void element, it must not start with `</`.",
-              ""
+              "",
             )
           end
 
@@ -32,7 +49,7 @@ module ERBLint
             add_offense(
               tag_node.loc.end.offset(-1),
               "Tag `#{tag.name}` is self-closing, it must end with `/>`.",
-              "/"
+              "/",
             )
           end
 
@@ -42,7 +59,7 @@ module ERBLint
           add_offense(
             end_solidus.loc,
             "Tag `#{tag.name}` is a void element, it must end with `>` and not `/>`.",
-            ""
+            "",
           )
         end
       end

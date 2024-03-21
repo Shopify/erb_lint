@@ -24,8 +24,8 @@ describe ERBLint::Linters::Rubocop do
   let(:inherit_from_filename) { "custom_rubocop.yml" }
   subject { offenses }
   before do
-    allow(::RuboCop::ConfigLoader).to(receive(:load_file).and_call_original)
-    allow(::RuboCop::ConfigLoader).to(
+    allow(RuboCop::ConfigLoader).to(receive(:load_file).and_call_original)
+    allow(RuboCop::ConfigLoader).to(
       receive(:load_file).with(a_string_ending_with(inherit_from_filename)).and_return(nested_config),
     )
   end
@@ -310,9 +310,9 @@ describe ERBLint::Linters::Rubocop do
         expect(subject[0].source_range.end_pos).to(eq(38))
         expect(subject[0].source_range.source).to(eq("checked: true"))
         expect(subject[0].line_range).to(eq(2..2))
-        expect(subject[0].message).to(\
-          eq("Layout/ArgumentAlignment: Use one level of indentation for "\
-            "arguments following the first line of a multi-line method call.")
+        expect(subject[0].message).to(
+          eq("Layout/ArgumentAlignment: Use one level of indentation for " \
+            "arguments following the first line of a multi-line method call."),
         )
       end
     end

@@ -33,9 +33,11 @@ describe ERBLint::Linters::NoUnusedDisable do
     context "when file has a disable comment and a corresponding offense" do
       let(:file) { "<span></span><%# erblint:disable Fake %>" }
       before do
-        offense = ERBLint::Offense.new(ERBLint::Linters::Fake.new(file_loader, linter_config),
+        offense = ERBLint::Offense.new(
+          ERBLint::Linters::Fake.new(file_loader, linter_config),
           SpecUtils.source_range_for_code(processed_source, "<span></span>"),
-          "some fake linter message")
+          "some fake linter message",
+        )
         offense.disabled = true
         linter.run(processed_source, [offense])
       end
@@ -54,7 +56,7 @@ describe ERBLint::Linters::NoUnusedDisable do
         offense = ERBLint::Offense.new(
           ERBLint::Linters::Fake.new(file_loader, linter_config),
           SpecUtils.source_range_for_code(processed_source, "<span>bad content</span>"),
-          "some fake linter message"
+          "some fake linter message",
         )
         offense.disabled = true
         linter.run(processed_source, [offense])
@@ -72,7 +74,7 @@ describe ERBLint::Linters::NoUnusedDisable do
         offense = ERBLint::Offense.new(
           ERBLint::Linters::Fake.new(file_loader, linter_config),
           SpecUtils.source_range_for_code(processed_source, "<span></span>"),
-          "some fake linter message"
+          "some fake linter message",
         )
         offense.disabled = true
         linter.run(processed_source, [offense])
@@ -93,7 +95,7 @@ describe ERBLint::Linters::NoUnusedDisable do
         offense = ERBLint::Offense.new(
           ERBLint::Linters::Fake.new(file_loader, linter_config),
           SpecUtils.source_range_for_code(processed_source, "<span></span>"),
-          "some fake linter message"
+          "some fake linter message",
         )
         offense.disabled = true
         linter.run(processed_source, [offense])

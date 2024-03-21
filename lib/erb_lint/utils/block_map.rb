@@ -60,7 +60,7 @@ module ERBLint
         end
 
         def inspect
-          "\#<#{self.class.name} type=#{type.inspect} nodes=#{nodes.inspect}>"
+          "#<#{self.class.name} type=#{type.inspect} nodes=#{nodes.inspect}>"
         end
 
         def &(other)
@@ -102,7 +102,7 @@ module ERBLint
             node.type,
             extract_map_locations(node)
               .map { |loc| find_entry(loc) }
-              .compact.map(&:node)
+              .compact.map(&:node),
           )
         end
 
@@ -111,7 +111,7 @@ module ERBLint
             :begin,
             (extract_map_locations(node) + rescue_locations(node))
               .map { |loc| find_entry(loc) }
-              .compact.map(&:node)
+              .compact.map(&:node),
           )
         end
 
@@ -120,7 +120,7 @@ module ERBLint
             node.type,
             (extract_map_locations(node) + when_locations(node))
               .map { |loc| find_entry(loc) }
-              .compact.map(&:node)
+              .compact.map(&:node),
           )
         end
 

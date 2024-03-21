@@ -15,7 +15,7 @@ module ERBLint
           add_offense(
             processed_source
               .to_source_range((matches.begin(index) + 2)...matches.end(index)),
-            "Extra blank line detected."
+            "Extra blank line detected.",
           )
         end
       end

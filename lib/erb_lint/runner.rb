@@ -57,7 +57,7 @@ module ERBLint
       if no_unused_disable_enabled? && enable_inline_configs?
         @no_unused_disable = ERBLint::Linters::NoUnusedDisable.new(
           @file_loader,
-          @config.for_linter(ERBLint::Linters::NoUnusedDisable)
+          @config.for_linter(ERBLint::Linters::NoUnusedDisable),
         )
         @no_unused_disable.run(processed_source, @offenses)
         @offenses.concat(@no_unused_disable.offenses)

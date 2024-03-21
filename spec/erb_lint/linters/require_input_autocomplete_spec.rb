@@ -29,11 +29,11 @@ describe ERBLint::Linters::RequireInputAutocomplete do
     ].freeze
   end
   let(:html_message) do
-    "Input tag is missing an autocomplete attribute. If no autocomplete behaviour "\
+    "Input tag is missing an autocomplete attribute. If no autocomplete behaviour " \
       "is desired, use the value `off` or `nope`."
   end
   let(:form_helper_message) do
-    "Input field helper is missing an autocomplete attribute. If no autocomplete "\
+    "Input field helper is missing an autocomplete attribute. If no autocomplete " \
       "behaviour is desired, use the value `off` or `nope`."
   end
   before { linter.run(processed_source) }
@@ -109,7 +109,7 @@ describe ERBLint::Linters::RequireInputAutocomplete do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      message
+      message,
     )
   end
 end

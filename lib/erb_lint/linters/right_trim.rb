@@ -19,7 +19,7 @@ module ERBLint
 
           add_offense(
             trim_node.loc,
-            "Prefer #{@config.enforced_style}%> instead of #{trim_node.loc.source}%> for trimming on the right."
+            "Prefer #{@config.enforced_style}%> instead of #{trim_node.loc.source}%> for trimming on the right.",
           )
         end
       end

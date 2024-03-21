@@ -22,10 +22,12 @@ describe ERBLint::CLI do
 
   before do
     allow(ERBLint::LinterRegistry).to(receive(:linters)
-      .and_return([ERBLint::Linters::LinterWithErrors,
-                   ERBLint::Linters::LinterWithInfoErrors,
-                   ERBLint::Linters::LinterWithoutErrors,
-                   ERBLint::Linters::FinalNewline,]))
+      .and_return([
+        ERBLint::Linters::LinterWithErrors,
+        ERBLint::Linters::LinterWithInfoErrors,
+        ERBLint::Linters::LinterWithoutErrors,
+        ERBLint::Linters::FinalNewline,
+      ]))
   end
 
   module ERBLint
@@ -34,7 +36,7 @@ describe ERBLint::CLI do
         def run(processed_source)
           add_offense(
             processed_source.to_source_range(1..1),
-            "fake message from a fake linter"
+            "fake message from a fake linter",
           )
         end
       end
@@ -67,7 +69,7 @@ describe ERBLint::CLI do
 
       it "shows all known linters in stderr" do
         expect { subject }.to(output(
-          /Known linters are: linter_with_errors, linter_with_info_errors, linter_without_errors, final_newline/
+          /Known linters are: linter_with_errors, linter_with_info_errors, linter_without_errors, final_newline/,
         ).to_stderr)
       end
 
@@ -92,7 +94,7 @@ describe ERBLint::CLI do
         expect { subject }.to(
           output(Regexp.new("Report offenses in the given format: " \
             "\\(compact, gitlab, json, junit, multiline\\) " \
-            "\\(default: multiline\\)")).to_stdout
+            "\\(default: multiline\\)")).to_stdout,
         )
       end
 
@@ -106,8 +108,10 @@ describe ERBLint::CLI do
         module Linters
           class FakeLinter < Linter
             def run(processed_source)
-              add_offense(SpecUtils.source_range_for_code(processed_source, "<violation></violation>"),
-                "#{self.class.name} error")
+              add_offense(
+                SpecUtils.source_range_for_code(processed_source, "<violation></violation>"),
+                "#{self.class.name} error",
+              )
             end
           end
         end
@@ -473,8 +477,10 @@ describe ERBLint::CLI do
           context "with --format compact" do
             let(:args) do
               [
-                "--enable-linter", "linter_with_errors,final_newline",
-                "--format", "compact",
+                "--enable-linter",
+                "linter_with_errors,final_newline",
+                "--format",
+                "compact",
                 linted_dir,
               ]
             end
@@ -494,8 +500,10 @@ describe ERBLint::CLI do
           context "with invalid --format option" do
             let(:args) do
               [
-                "--enable-linter", "linter_with_errors,final_newline",
-                "--format", "nonexistentformat",
+                "--enable-linter",
+                "linter_with_errors,final_newline",
+                "--format",
+                "nonexistentformat",
                 linted_dir,
               ]
             end
@@ -560,7 +568,7 @@ describe ERBLint::CLI do
 
       it do
         expect { subject }.to(output(
-          /foo: not a valid linter name \(#{known_linters}\)/
+          /foo: not a valid linter name \(#{known_linters}\)/,
         ).to_stderr)
       end
 
@@ -687,9 +695,12 @@ describe ERBLint::CLI do
           context "allowing for no matching files" do
             let(:args) do
               [
-                "--config", config_file,
-                "--enable-linter", "linter_with_errors,final_newline",
-                "--stdin", linted_file,
+                "--config",
+                config_file,
+                "--enable-linter",
+                "linter_with_errors,final_newline",
+                "--stdin",
+                linted_file,
                 "--allow-no-files",
               ]
             end
