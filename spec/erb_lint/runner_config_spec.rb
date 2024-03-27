@@ -138,7 +138,7 @@ describe ERBLint::RunnerConfig do
         let(:config_hash) do
           {
             linters: {
-              "MyCustomLinter" => { exclude: ["foo/bar.rb"] },
+              "MyCustomLinter" => { exclude: linter_excludes },
             },
             exclude: [
               "**/node_modules/**",
@@ -146,8 +146,20 @@ describe ERBLint::RunnerConfig do
           }
         end
 
-        it "excluded files are merged" do
-          expect(subject.exclude).to(eq(["foo/bar.rb", "**/node_modules/**"]))
+        context "when linter excludes do not contain global excludes" do
+          let(:linter_excludes) { ["foo/bar.rb"] }
+
+          it "excluded files are merged" do
+            expect(subject.exclude).to(eq(["foo/bar.rb", "**/node_modules/**"]))
+          end
+        end
+
+        context "when linter excludes already contain global excludes" do
+          let(:linter_excludes) { ["foo/bar.rb", "**/node_modules/**"] }
+
+          it "does not duplicate the global excluded files" do
+            expect(subject.exclude).to(eq(["foo/bar.rb", "**/node_modules/**"]))
+          end
         end
       end
     end

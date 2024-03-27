@@ -72,7 +72,7 @@ linters:
 Make sure to add `**/` to exclude patterns; it matches the target files' absolute paths.
 
 ## Enable or disable default linters
-`EnableDefaultLinters`: enables or disables default linters. [Default linters](#Linters) are enabled by default.
+`EnableDefaultLinters`: enables or disables default linters. [Default linters](#linters) are enabled by default.
 
 ## Disable rule at offense-level
 You can disable a rule by placing a disable comment in the following format:
@@ -102,28 +102,28 @@ linters:
 
 ## Linters
 
-| Available Linters                                     | Default | Description                                                                                                                               |
-|-------------------------------------------------------|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------|
-| [AllowedScriptType](#AllowedScriptType)               | Yes     | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values                       |
-| ClosingErbTagIndent                                   | Yes     |                                                                                                                                           |
-| [CommentSyntax](#CommentSyntax)                       | Yes     | detects bad ERB comment syntax                                                                                                            |
-| ExtraNewline                                          | Yes     |                                                                                                                                           |
-| [FinalNewline](#FinalNewline)                         | Yes     | warns about missing newline at the end of a ERB template                                                                                  |
-| [NoJavascriptTagHelper](#NoJavascriptTagHelper)       | Yes     | prevents the usage of Rails' `javascript_tag`                                                                                             |
-| ParserErrors                                          | Yes     |                                                                                                                                           |
-| PartialInstanceVariable                               | No      | detects instance variables in partials                                                                                                    |
-| [RequireInputAutocomplete](#RequireInputAutocomplete) | Yes     | warns about missing autocomplete attributes in input tags                                                                                 |
-| [RightTrim](#RightTrim)                               | Yes     | enforces trimming at the right of an ERB tag                                                                                              |
-| [SelfClosingTag](#SelfClosingTag)                     | Yes     | enforces self closing tag styles for void elements                                                                                        |
-| [SpaceAroundErbTag](#SpaceAroundErbTag)               | Yes     | enforces a single space after `<%` and before `%>`                                                                                        |
-| SpaceIndentation                                      | Yes     |                                                                                                                                           |
-| SpaceInHtmlTag                                        | Yes     |                                                                                                                                           |
-| TrailingWhitespace                                    | Yes     |                                                                                                                                           |
-| [DeprecatedClasses](#DeprecatedClasses)               | No      | warns about deprecated css classes                                                                                                        |
-| [ErbSafety](#ErbSafety)                               | No      | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`.             |
-| [Rubocop](#Rubocop)                                   | No      | runs RuboCop rules on ruby statements found in ERB templates                                                                              |
-| [RequireScriptNonce](#RequireScriptNonce)             | No      | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
-| [HardCodedString](#HardCodedString)                   | No      | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
+| Available Linters                                | Default  | Description |
+| ------------------------------------------------ |:--------:|-------------|
+| [AllowedScriptType](#allowedscripttype)          | Yes      | prevents the addition of `<script>` tags that have `type` attributes that are not in a white-list of allowed values |
+| ClosingErbTagIndent                              | Yes      |             |
+| [CommentSyntax](#commentsyntax)                  | Yes      | detects bad ERB comment syntax |
+| ExtraNewline                                     | Yes      |             |
+| [FinalNewline](#finalnewline)                    | Yes      | warns about missing newline at the end of a ERB template |
+| [NoJavascriptTagHelper](#nojavascripttaghelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
+| ParserErrors                                     | Yes      |             |
+| PartialInstanceVariable                          | No       | detects instance variables in partials |
+| [RequireInputAutocomplete](#requireinputautocomplete)        | Yes       | warns about missing autocomplete attributes in input tags |
+| [RightTrim](#righttrim)                          | Yes      | enforces trimming at the right of an ERB tag |
+| [SelfClosingTag](#selfclosingtag)                | Yes      | enforces self closing tag styles for void elements |
+| [SpaceAroundErbTag](#spacearounderbtag)          | Yes      | enforces a single space after `<%` and before `%>`|
+| SpaceIndentation                                 | Yes      |             |
+| SpaceInHtmlTag                                   | Yes      |             |
+| TrailingWhitespace                               | Yes      |             |
+| [DeprecatedClasses](#deprecatedclasses)          | No       | warns about deprecated css classes |
+| [ErbSafety](#erbsafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
+| [Rubocop](#rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
+| [RequireScriptNonce](#requirescriptnonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
+| [HardCodedString](#HardCodedString)              | No       | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
 
 ### DeprecatedClasses
 
@@ -581,16 +581,13 @@ module ERBLint
       end
       self.config_schema = ConfigSchema
 
-      def offenses(processed_source)
-        errors = []
+      def run(processed_source)
         unless processed_source.file_content.include?('this file is fine')
-          errors << Offense.new(
-            self,
+          add_offense(
             processed_source.to_source_range(0 ... processed_source.file_content.size),
             "This file isn't fine. #{@config.custom_message}"
           )
         end
-        errors
       end
     end
   end
@@ -686,6 +683,42 @@ erblint --format junit
   </testcase>
   <testcase name="app/views/application/index.html.erb" file="app/views/subscriptions/_menu.html.erb"/>
 </testsuite>
+```
+
+### GitLab
+
+Used by [GitLab Code
+Quality](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool).
+
+```json
+[
+   {
+      "description":"Extra space detected where there should be no space.",
+      "check_name":"SpaceInHtmlTag",
+      "fingerprint":"5a259c7cafa2c9ca229dfd7d21536698",
+      "severity":"info",
+      "location":{
+         "path":"app/views/subscriptions/_loader.html.erb",
+         "lines":{
+            "begin":1,
+            "end":1
+         }
+      }
+   },
+   {
+      "description":"Remove newline before `%\u003e` to match start of tag.",
+      "check_name":"ClosingErbTagIndent",
+      "fingerprint":"60b4ed2120c7abeebebb43fba4a19559",
+      "severity":"warning",
+      "location":{
+         "path":"app/views/subscriptions/_loader.html.erb",
+         "lines":{
+            "begin":52,
+            "end":54
+         }
+      }
+   }
+]
 ```
 
 ## Caching
