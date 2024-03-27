@@ -516,10 +516,11 @@ linters:
     corrector:
       path: path/to/corrector_file.rb
       name: I18nCorrector
-      i18n_load_path: path/to/translator_file.rb
+      i18n_load_path: config/locales/en.yml
 ```
 
-This linter requires a `corrector` option. Without a `corrector` option, the strings won't be translated.
+To leverage this linter's autocorrect feature, you must define the configuration for its `corrector`, such that its path, class name, and `i18n_load_path` are resolvable.
+
 Linter-Specific Option    | Description
 --------------------------|---------------------------------------------------------
 path | a string pointing to the path to the corrector file
