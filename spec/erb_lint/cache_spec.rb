@@ -63,8 +63,8 @@ describe ERBLint::Cache do
       expect(File.exist?(
         File.join(
           cache_dir,
-          checksum
-        )
+          checksum,
+        ),
       )).to(be(true))
       expect(cache.send(:new_results)).to(include(checksum))
     end
@@ -101,8 +101,8 @@ describe ERBLint::Cache do
       expect(File.exist?(
         File.join(
           cache_dir,
-          checksum
-        )
+          checksum,
+        ),
       )).to(be(true))
     end
 
@@ -118,8 +118,8 @@ describe ERBLint::Cache do
       expect(File.exist?(
         File.join(
           cache_dir,
-          checksum
-        )
+          checksum,
+        ),
       )).to(be(true))
     end
 
@@ -138,8 +138,8 @@ describe ERBLint::Cache do
       expect(File.exist?(
         File.join(
           cache_dir,
-          "fake-checksum"
-        )
+          "fake-checksum",
+        ),
       )).to(be(false))
     end
   end

@@ -31,7 +31,7 @@ module ERBLint
 
           add_offense(
             source_range,
-            <<~EOF.chomp
+            <<~EOF.chomp,
               Bad ERB comment syntax. Should be #{correct_erb_tag} without a space between.
               Leaving a space between ERB tags and the Ruby comment character can cause parser errors.
             EOF

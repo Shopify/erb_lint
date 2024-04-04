@@ -11,20 +11,24 @@ describe ERBLint::Reporters::MultilineReporter do
         found: 2,
         processed_files: {
           "app/views/subscriptions/_loader.html.erb" => offenses,
-        }
+        },
       )
     end
 
     let(:offenses) do
       [
-        instance_double(ERBLint::Offense,
+        instance_double(
+          ERBLint::Offense,
           message: "Extra space detected where there should be no space.",
           line_number: 1,
-          column: 7),
-        instance_double(ERBLint::Offense,
+          column: 7,
+        ),
+        instance_double(
+          ERBLint::Offense,
           message: "Remove newline before `%>` to match start of tag.",
           line_number: 52,
-          column: 10),
+          column: 10,
+        ),
       ]
     end
 

@@ -60,7 +60,7 @@ module ERBLint
 
         if corrected_found_diff > 0
           message = Rainbow(
-            "#{stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
+            "#{stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files",
           ).red
 
           warn(message)

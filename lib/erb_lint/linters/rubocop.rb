@@ -134,7 +134,7 @@ module ERBLint
         source = ::RuboCop::ProcessedSource.new(
           content,
           @rubocop_config.target_ruby_version,
-          filename
+          filename,
         )
         if ::RuboCop::Version::STRING.to_f >= 1.38
           registry = RuboCop::Cop::Registry.global

@@ -1,8 +1,13 @@
 inherit_gem:
   rubocop-shopify: rubocop.yml
 
+Style/ClassMethodsDefinitions:
+  Enabled: false
+
+Style/ArrayIntersect:
+  Enabled: false
+
 AllCops:
-  TargetRubyVersion: 2.7
   Exclude:
     - 'vendor/**/*'
     - 'gemfiles/vendor/**/*'

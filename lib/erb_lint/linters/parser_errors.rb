@@ -9,7 +9,7 @@ module ERBLint
         processed_source.parser.parser_errors.each do |error|
           add_offense(
             error.loc,
-            "#{error.message} (at #{error.loc.source})"
+            "#{error.message} (at #{error.loc.source})",
           )
         end
       end

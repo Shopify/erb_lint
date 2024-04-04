@@ -47,7 +47,7 @@ module ERBLint
 
       def generate_fingerprint(filename, offense)
         Digest::MD5.hexdigest(
-          "#{offense.simple_name}@#{filename}:#{offense.line_number}:#{offense.last_line}"
+          "#{offense.simple_name}@#{filename}:#{offense.line_number}:#{offense.last_line}",
         )
       end
     end

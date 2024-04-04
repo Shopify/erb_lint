@@ -62,9 +62,9 @@ module ERBLint
 
           add_offense(
             tag_node.to_a[1].loc,
-            "Input tag is missing an autocomplete attribute. If no "\
+            "Input tag is missing an autocomplete attribute. If no " \
               "autocomplete behaviour is desired, use the value `off` or `nope`.",
-            [autocomplete_attribute]
+            [autocomplete_attribute],
           )
         end
       end
@@ -96,9 +96,9 @@ module ERBLint
 
           add_offense(
             erb_node.loc,
-            "Input field helper is missing an autocomplete attribute. If no "\
+            "Input field helper is missing an autocomplete attribute. If no " \
               "autocomplete behaviour is desired, use the value `off` or `nope`.",
-            [erb_node, send_node]
+            [erb_node, send_node],
           )
         end
       end

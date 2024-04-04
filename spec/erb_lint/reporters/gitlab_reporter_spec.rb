@@ -12,7 +12,7 @@ describe ERBLint::Reporters::GitlabReporter do
         processed_files: {
           "app/views/subscriptions/_loader.html.erb" => offenses,
         },
-        corrected: 1
+        corrected: 1,
       )
     end
 

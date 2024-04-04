@@ -87,7 +87,7 @@ module ERBLint
         rescue => e
           @stats.exceptions += 1
           puts "Exception occurred when processing: #{relative_filename(filename)}"
-          puts "If this file cannot be processed by erb-lint, "\
+          puts "If this file cannot be processed by erb-lint, " \
             "you can exclude it in your configuration file."
           puts e.message
           puts Rainbow(e.backtrace.join("\n")).red
@@ -303,7 +303,7 @@ module ERBLint
           ERBLint::LinterRegistry.linters.map do |klass|
             linters[klass.simple_name] = { "enabled" => enabled_linter_classes.include?(klass) }
           end
-        end
+        end,
       )
     end
 
@@ -348,8 +348,12 @@ module ERBLint
           @options[:clear_cache] = config
         end
 
-        opts.on("--enable-linters LINTER[,LINTER,...]", Array,
-          "Only use specified linter", "Known linters are: #{known_linter_names.join(", ")}") do |linters|
+        opts.on(
+          "--enable-linters LINTER[,LINTER,...]",
+          Array,
+          "Only use specified linter",
+          "Known linters are: #{known_linter_names.join(", ")}",
+        ) do |linters|
           linters.each do |linter|
             unless known_linter_names.include?(linter)
               failure!("#{linter}: not a valid linter name (#{known_linter_names.join(", ")})")
@@ -382,7 +386,7 @@ module ERBLint
         opts.on(
           "-sFILE",
           "--stdin FILE",
-          "Pipe source from STDIN. Takes the path to be used to check which rules to apply."
+          "Pipe source from STDIN. Takes the path to be used to check which rules to apply.",
         ) do |file|
           @options[:stdin] = [file]
         end
@@ -398,7 +402,7 @@ module ERBLint
     end
 
     def format_options_help
-      "Report offenses in the given format: "\
+      "Report offenses in the given format: " \
         "(#{Reporter.available_formats.join(", ")}) (default: multiline)"
     end
 

@@ -16,7 +16,7 @@ module ERBLint
       file_checksum = checksum(filename, file_content)
       begin
         cache_file_contents_as_offenses = JSON.parse(
-          File.read(File.join(@cache_dir, file_checksum))
+          File.read(File.join(@cache_dir, file_checksum)),
         ).map do |offense_hash|
           ERBLint::CachedOffense.new(offense_hash)
         end
@@ -76,7 +76,7 @@ module ERBLint
       mode = File.stat(filename).mode
 
       digester.update(
-        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{file_content}"
+        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{file_content}",
       )
       digester.hexdigest
     rescue Errno::ENOENT

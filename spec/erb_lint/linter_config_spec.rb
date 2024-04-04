@@ -82,11 +82,11 @@ describe ERBLint::LinterConfig do
       context "when enabled key is not true or false" do
         let(:config_hash) { { enabled: 42 } }
         it do
-          expect { subject }.to(\
+          expect { subject }.to(
             raise_error(
               described_class::Error,
-              "ERBLint::LinterConfig does not accept 42 as value for the property enabled. Only accepts: [true, false]"
-            )
+              "ERBLint::LinterConfig does not accept 42 as value for the property enabled. Only accepts: [true, false]",
+            ),
           )
         end
       end

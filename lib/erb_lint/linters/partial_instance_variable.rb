@@ -13,9 +13,9 @@ module ERBLint
 
         add_offense(
           processed_source.to_source_range(
-            processed_source.file_content =~ instance_variable_regex..processed_source.file_content.size
+            processed_source.file_content =~ instance_variable_regex..processed_source.file_content.size,
           ),
-          "Instance variable detected in partial."
+          "Instance variable detected in partial.",
         )
       end
     end

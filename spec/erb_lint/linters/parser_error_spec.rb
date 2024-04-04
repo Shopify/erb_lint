@@ -44,7 +44,7 @@ describe ERBLint::Linters::ParserErrors do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      message
+      message,
     )
   end
 end

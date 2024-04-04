@@ -132,7 +132,7 @@ describe ERBLint::Linters::ErbSafety do
   context "changing better-html config file works" do
     let(:linter_config) do
       described_class.config_schema.new(
-        "better_html_config" => ".better-html.yml"
+        "better_html_config" => ".better-html.yml",
       )
     end
     let(:file) { <<~FILE }
@@ -158,8 +158,10 @@ describe ERBLint::Linters::ErbSafety do
   private
 
   def unsafe_interpolate(range)
-    build_offense(range,
-      "erb interpolation in javascript attribute must be wrapped in safe helper such as '(...).to_json'")
+    build_offense(
+      range,
+      "erb interpolation in javascript attribute must be wrapped in safe helper such as '(...).to_json'",
+    )
   end
 
   def unsafe_html_safe(range)

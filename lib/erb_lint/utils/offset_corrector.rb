@@ -42,15 +42,12 @@ module ERBLint
         range = to_range(node_or_range)
 
         @processed_source.to_source_range(
-          bound(@offset + range.begin_pos)..bound(@offset + (range.end_pos - 1))
+          bound(@offset + range.begin_pos)..bound(@offset + (range.end_pos - 1)),
         )
       end
 
       def bound(pos)
-        [
-          [pos, @bound_range.min].max,
-          @bound_range.max,
-        ].min
+        pos.clamp(@bound_range.min, @bound_range.max)
       end
 
       private

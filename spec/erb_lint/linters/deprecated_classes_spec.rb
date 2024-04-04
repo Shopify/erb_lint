@@ -5,7 +5,7 @@ require "spec_helper"
 describe ERBLint::Linters::DeprecatedClasses do
   let(:linter_config) do
     described_class.config_schema.new(
-      rule_set: rule_set
+      rule_set: rule_set,
     )
   end
 
@@ -208,7 +208,7 @@ describe ERBLint::Linters::DeprecatedClasses do
     context "when an addendum is absent" do
       let(:linter_config) do
         described_class.config_schema.new(
-          rule_set: rule_set
+          rule_set: rule_set,
         )
       end
 

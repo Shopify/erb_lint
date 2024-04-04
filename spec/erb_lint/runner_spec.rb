@@ -9,9 +9,11 @@ describe ERBLint::Runner do
 
   before do
     allow(ERBLint::LinterRegistry).to(receive(:linters)
-      .and_return([ERBLint::Linters::FakeLinter1,
-                   ERBLint::Linters::FakeLinter2,
-                   ERBLint::Linters::FinalNewline,]))
+      .and_return([
+        ERBLint::Linters::FakeLinter1,
+        ERBLint::Linters::FakeLinter2,
+        ERBLint::Linters::FinalNewline,
+      ]))
   end
 
   module ERBLint
@@ -39,7 +41,7 @@ describe ERBLint::Runner do
           linters: {
             "FakeLinter1" => { "enabled" => true },
             "FakeLinter2" => { "enabled" => true },
-          }
+          },
         )
       end
 
@@ -58,7 +60,7 @@ describe ERBLint::Runner do
           linters: {
             "FakeLinter1" => { "enabled" => true },
             "FakeLinter2" => { "enabled" => false },
-          }
+          },
         )
       end
 
@@ -75,7 +77,7 @@ describe ERBLint::Runner do
           linters: {
             "FakeLinter1" => { "enabled" => false },
             "FakeLinter2" => { "enabled" => false },
-          }
+          },
         )
       end
 
@@ -90,7 +92,7 @@ describe ERBLint::Runner do
           linters: {
             "FakeLinter1" => { "enabled" => true, "exclude" => ["**/otherfolder/**"] },
             "FakeLinter2" => { "enabled" => true, "exclude" => ["somefolder/**.html.erb"] },
-          }
+          },
         )
       end
 
@@ -123,7 +125,7 @@ describe ERBLint::Runner do
           linters: {
             "FakeLinter1" => { "enabled" => true },
             "FakeLinter2" => { "enabled" => true },
-          }
+          },
         )
       end
 
@@ -139,8 +141,10 @@ describe ERBLint::Runner do
       module Linters
         class FakeLinter3 < Linter
           def run(processed_source)
-            add_offense(SpecUtils.source_range_for_code(processed_source, "<span>bad content</span>"),
-              "#{self.class.name} error")
+            add_offense(
+              SpecUtils.source_range_for_code(processed_source, "<span>bad content</span>"),
+              "#{self.class.name} error",
+            )
           end
         end
 
@@ -150,9 +154,11 @@ describe ERBLint::Runner do
 
     before do
       allow(ERBLint::LinterRegistry).to(receive(:linters)
-        .and_return([ERBLint::Linters::FakeLinter2,
-                     ERBLint::Linters::FakeLinter3,
-                     ERBLint::Linters::FakeLinter4,]))
+        .and_return([
+          ERBLint::Linters::FakeLinter2,
+          ERBLint::Linters::FakeLinter3,
+          ERBLint::Linters::FakeLinter4,
+        ]))
       runner.run(processed_source)
     end
     subject { runner.offenses }
@@ -163,7 +169,7 @@ describe ERBLint::Runner do
           "FakeLinter2" => { "enabled" => true },
           "FakeLinter3" => { "enabled" => true },
           "FakeLinter4" => { "enabled" => true },
-        }
+        },
       )
     end
 

@@ -23,9 +23,9 @@ module ERBLint
     end
 
     def inspect
-      "#<#{self.class.name} linter=#{linter.class.name} "\
-        "source_range=#{source_range.begin_pos}...#{source_range.end_pos} "\
-        "message=#{message}> "\
+      "#<#{self.class.name} linter=#{linter.class.name} " \
+        "source_range=#{source_range.begin_pos}...#{source_range.end_pos} " \
+        "message=#{message}> " \
         "severity=#{severity}"
     end
 

@@ -38,7 +38,7 @@ module ERBLint
     def initialize(file_loader, config)
       @file_loader = file_loader
       @config = config
-      raise ArgumentError, "expect `config` to be #{self.class.config_schema} instance, "\
+      raise ArgumentError, "expect `config` to be #{self.class.config_schema} instance, " \
         "not #{config.class}" unless config.is_a?(self.class.config_schema)
       @offenses = []
     end
