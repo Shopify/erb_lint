@@ -362,7 +362,16 @@ module ERBLint
           @options[:enabled_linters] = linters
         end
 
-        opts.on("--fail-level SEVERITY", "Minimum severity for exit with error code") do |level|
+        opts.on(
+          "--fail-level SEVERITY",
+          "Minimum severity for exit with error code.",
+          "   [I] info",
+          "   [R] refactor",
+          "   [C] convention",
+          "   [W] warning",
+          "   [E] error",
+          "   [F] fatal",
+        ) do |level|
           parsed_severity = SEVERITY_CODE_TABLE[level.upcase.to_sym] || (SEVERITY_NAMES & [level.downcase]).first
 
           if parsed_severity.nil?

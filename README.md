@@ -100,6 +100,28 @@ linters:
       - '**/local-lib/**/*'
 ```
 
+## Severity
+
+You can specify the severity of each linter. The severity can be `info`, `refactor`, `convention`, `warning`, `error` or `fatal`. By default the severity of all linters is `error`.
+
+Linters with severity less than `error` will not be included in the total count of errors and will not cause the command to exit with a non-zero status.
+
+```yaml
+---
+linters:
+  ErbSafety:
+    enabled: true
+    severity: info
+```
+
+You can set a custom severity for the command running `erblint` with the `--fail-level` option, this will set the minimum severity level to consider when exiting with a non-zero status.
+
+```sh
+# will exit with a non-zero status if there are any linters with
+# severity warning or greater
+erblint foo.erb --fail-level W
+```
+
 ## Linters
 
 | Available Linters                                | Default  | Description |
