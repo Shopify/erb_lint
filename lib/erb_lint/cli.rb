@@ -31,15 +31,14 @@ module ERBLint
       dupped_args = args.dup
       load_options(dupped_args)
 
-      if cache? && autocorrect?
-        failure!("cannot run autocorrect mode with cache")
-      end
-
       @files = @options[:stdin] || dupped_args
 
       load_config
 
-      cache_dir = @options[:cache_dir]
+      if cache? && autocorrect?
+        failure!("cannot run autocorrect mode with cache")
+      end
+
       @cache = Cache.new(@config, cache_dir) if cache? || clear_cache?
 
       if clear_cache?
@@ -148,7 +147,11 @@ module ERBLint
     end
 
     def cache?
-      @options[:cache]
+      @config.to_hash.dig("cache", "enabled") || @options[:cache]
+    end
+
+    def cache_dir
+      @config.to_hash.dig("cache", "dir") || @options[:cache_dir]
     end
 
     def clear_cache?
