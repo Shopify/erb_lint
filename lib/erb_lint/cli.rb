@@ -74,7 +74,7 @@ module ERBLint
       @stats.linters = enabled_linter_classes.size
       @stats.autocorrectable_linters = enabled_linter_classes.count(&:support_autocorrect?)
 
-      reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?)
+      reporter = Reporter.create_reporter(@options[:format], @stats, autocorrect?, @options[:show_linter_names])
       reporter.preview
 
       runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_configs])
@@ -373,6 +373,10 @@ module ERBLint
 
         opts.on("-a", "--autocorrect", "Correct offenses automatically if possible (default: false)") do |config|
           @options[:autocorrect] = config
+        end
+
+        opts.on("--show-linter-names", "Show linter names") do
+          @options[:show_linter_names] = true
         end
 
         opts.on("--allow-no-files", "When no matching files found, exit successfully (default: false)") do |config|

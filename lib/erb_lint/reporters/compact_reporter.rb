@@ -33,8 +33,9 @@ module ERBLint
           "#{filename}:",
           "#{offense.line_number}:",
           "#{offense.column}: ",
+          ("[#{offense.simple_name}] " if show_linter_names),
           offense.message.to_s,
-        ].join
+        ].compact.join
       end
 
       def footer; end
