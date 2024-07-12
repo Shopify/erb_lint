@@ -146,10 +146,10 @@ module ERBLint
 
       def cop_classes
         if @only_cops.present?
-          selected_cops = ::RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
+          selected_cops = ::RuboCop::Cop::Registry.all.select { |cop| cop.match?(@only_cops) }
           ::RuboCop::Cop::Registry.new(selected_cops)
         else
-          ::RuboCop::Cop::Registry.new(::RuboCop::Cop::Cop.all)
+          ::RuboCop::Cop::Registry.new(::RuboCop::Cop::Registry.all)
         end
       end
 
