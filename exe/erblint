@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift("#{__dir__}/../lib")
-
-require "erb_lint/cli"
-
-cli = ERBLint::CLI.new
-exit(cli.run)
+warn(Rainbow("Calling erblint is deprecated, please call the renamed binstub: `erb_lint` instead.").yellow)
+exec(File.join(__dir__, "erb_lint"), *ARGV)
