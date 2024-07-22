@@ -1,6 +1,6 @@
-# ERB Lint [![Build Status](https://github.com/Shopify/erb-lint/workflows/Tests/badge.svg)](https://github.com/Shopify/erb-lint/actions)
+# ERB Lint [![Build Status](https://github.com/Shopify/erb_lint/workflows/Tests/badge.svg)](https://github.com/Shopify/erb_lint/actions)
 
-`erb-lint` is a tool to help lint your ERB or HTML files using the included linters or by writing your own.
+`erb_lint` is a tool to help lint your ERB or HTML files using the included linters or by writing your own.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ gem 'erb_lint', require: false
 
 ## Configuration
 
-Create a `.erb-lint.yml` file in your project, with the following structure:
+Create a `.erb_lint.yml` file in your project, with the following structure:
 
 ```yaml
 ---
@@ -221,8 +221,8 @@ Linter-Specific Option | Description
 
 ### Rubocop
 
-Runs RuboCop on all ruby statements found in ERB templates. The RuboCop configuration that `erb-lint` uses can inherit from
-the configuration that the rest of your application uses. `erb-lint` can be configured independently however, as it will often
+Runs RuboCop on all ruby statements found in ERB templates. The RuboCop configuration that `erb_lint` uses can inherit from
+the configuration that the rest of your application uses. `erb_lint` can be configured independently however, as it will often
 be necessary to disable specific RuboCop rules that do not apply to ERB files.
 
 **Note**: Each ruby statement (between ERB tags `<% ... %>`) is parsed and analyzed independently of each other. Any rule that requires a broader context can trigger false positives (e.g. `Lint/UselessAssignment` will complaint for an assignment even if used in a subsequent ERB tag).
@@ -523,7 +523,7 @@ Good ✅
 
 ## Custom Linters
 
-`erb-lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your
+`erb_lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your
 repository. See the [linters directory](lib/erb_lint/linters) for examples of how to write linters.
 
 ```ruby
@@ -552,7 +552,7 @@ module ERBLint
 end
 ```
 
-By default, this linter would be disabled. You can enable it by adding an entry to `.erb-lint.yml`:
+By default, this linter would be disabled. You can enable it by adding an entry to `.erb_lint.yml`:
 
 ```yaml
 ---
@@ -582,7 +582,7 @@ Errors were found in ERB files
 To write a linter that can autocorrect offenses it detects, simply add an
 `autocorrect` method that returns a callable. The callable is called with an instance of
 [`RuboCop::Cop::Corrector`](http://www.rubydoc.info/github/bbatsov/RuboCop/RuboCop/Cop/Corrector)
-as argument, and therefore erb-lint correctors work exactly as RuboCop correctors do.
+as argument, and therefore erb_lint correctors work exactly as RuboCop correctors do.
 
 ```ruby
 def autocorrect(_processed_source, offense)
@@ -693,9 +693,9 @@ No errors were found in ERB files
 ```
 
 Cached lint results are stored in the `.erb-lint-cache` directory by default, though a custom directory can be provided
-via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file and `erb-lint` settings.
+via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file and `erb_lint` settings.
 These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes
-necessary to restore the results of running `erb-lint` for output. The cache also automatically prunes outdated files each time it's run.
+necessary to restore the results of running `erb_lint` for output. The cache also automatically prunes outdated files each time it's run.
 
 You can also use the `--clear-cache` option to delete the cache file directory.
 

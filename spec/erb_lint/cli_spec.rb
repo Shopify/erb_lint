@@ -227,7 +227,7 @@ describe ERBLint::CLI do
 
         context "without --config" do
           context "when default config does not exist" do
-            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+            it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
           end
         end
 
@@ -444,7 +444,7 @@ describe ERBLint::CLI do
 
           context "without --config" do
             context "when default config does not exist" do
-              it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+              it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
             end
           end
 
@@ -603,7 +603,7 @@ describe ERBLint::CLI do
 
         context "without --config" do
           context "when default config does not exist" do
-            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+            it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
           end
         end
 

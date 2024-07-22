@@ -223,7 +223,7 @@ describe ERBLint::RunnerConfig do
       after { FileUtils.rm_rf(tmp_root) }
 
       it "inherits from a gem and loads the config" do
-        create_file("#{gem_root}/gemone/config/erb-lint.yml", <<-YAML.strip_indent)
+        create_file("#{gem_root}/gemone/config/erb_lint.yml", <<-YAML.strip_indent)
           MyCustomLinter:
             my_option: custom value
         YAML
@@ -238,7 +238,7 @@ describe ERBLint::RunnerConfig do
         runner_config = described_class.new(
           {
             "inherit_gem" => {
-              "gemone" => "config/erb-lint.yml",
+              "gemone" => "config/erb_lint.yml",
             },
           },
           ERBLint::FileLoader.new(Dir.pwd),
@@ -248,7 +248,7 @@ describe ERBLint::RunnerConfig do
       end
 
       it "inherits from a gem and merges the config" do
-        create_file("#{gem_root}/gemone/config/erb-lint.yml", <<-YAML.strip_indent)
+        create_file("#{gem_root}/gemone/config/erb_lint.yml", <<-YAML.strip_indent)
           MyCustomLinter1:
             a: value to be overwritten
             b: value for b
@@ -264,7 +264,7 @@ describe ERBLint::RunnerConfig do
         runner_config = described_class.new(
           {
             "inherit_gem" => {
-              "gemone" => "config/erb-lint.yml",
+              "gemone" => "config/erb_lint.yml",
             },
             "MyCustomLinter1" => {
               "a" => "value for a",
@@ -332,7 +332,7 @@ describe ERBLint::RunnerConfig do
       end
 
       it "inherits from a gem if file load is not provided" do
-        create_file("#{gem_root}/gemone/config/erb-lint.yml", <<-YAML.strip_indent)
+        create_file("#{gem_root}/gemone/config/erb_lint.yml", <<-YAML.strip_indent)
           MyCustomLinter:
             my_option: custom value
         YAML
@@ -346,7 +346,7 @@ describe ERBLint::RunnerConfig do
 
         runner_config = described_class.new(
           "inherit_gem" => {
-            "gemone" => "config/erb-lint.yml",
+            "gemone" => "config/erb_lint.yml",
           },
         )
 
