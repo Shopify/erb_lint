@@ -13,7 +13,8 @@ module ERBLint
   class CLI
     include Utils::SeverityLevels
 
-    DEFAULT_CONFIG_FILENAME = ".erb-lint.yml"
+    DEPRECATED_CONFIG_FILENAME = ".erb-lint.yml"
+    DEFAULT_CONFIG_FILENAME = ".erb_lint.yml"
     DEFAULT_LINT_ALL_GLOB = "**/*.html{+*,}.erb"
 
     class ExitWithFailure < RuntimeError; end
@@ -87,7 +88,7 @@ module ERBLint
         rescue => e
           @stats.exceptions += 1
           puts "Exception occurred when processing: #{relative_filename(filename)}"
-          puts "If this file cannot be processed by erb-lint, " \
+          puts "If this file cannot be processed by erb_lint, " \
             "you can exclude it in your configuration file."
           puts e.message
           puts Rainbow(e.backtrace.join("\n")).red
@@ -214,6 +215,10 @@ module ERBLint
     def load_config
       if File.exist?(config_filename)
         config = RunnerConfig.new(file_loader.yaml(config_filename), file_loader)
+        @config = RunnerConfig.default_for(config)
+      elsif File.exist?(DEPRECATED_CONFIG_FILENAME)
+        warn(Rainbow("#{DEPRECATED_CONFIG_FILENAME} is soon deprecated. Rename your config to erb_lint.yml.").yellow)
+        config = RunnerConfig.new(file_loader.yaml(DEPRECATED_CONFIG_FILENAME), file_loader)
         @config = RunnerConfig.default_for(config)
       else
         warn(Rainbow("#{config_filename} not found: using default config").yellow)
