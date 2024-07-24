@@ -44,10 +44,10 @@ See below for linter-specific configuration options.
 
 This gem provides a command-line interface which can be run like so:
 
-1. Run `erblint [options]` if the gem is installed standalone.
-2. Run `bundle exec erblint [options]` if the gem is installed as a Gemfile dependency for your app.
+1. Run `erb_lint [options]` if the gem is installed standalone.
+2. Run `bundle exec erb_lint [options]` if the gem is installed as a Gemfile dependency for your app.
 
-For example, `erblint --lint-all --enable-all-linters` will run all available
+For example, `erb_lint --lint-all --enable-all-linters` will run all available
 linters on all ERB files in the current directory or its descendants (`**/*.html{+*,}.erb`).
 
 If you want to change the glob & exclude that is used, you can configure it by adding it to your config file as follows:
@@ -562,10 +562,10 @@ linters:
     custom_message: We suggest you change this file.
 ```
 
-Test your linter by running `erblint`'s command-line interface:
+Test your linter by running `erb_lint`'s command-line interface:
 
 ```bash
-bundle exec erblint --enable-linters custom_linter --lint-all
+bundle exec erb_lint --enable-linters custom_linter --lint-all
 ```
 
 Running this on a random project might yield this output:
@@ -599,7 +599,7 @@ You can change the output format of ERB Lint by specifying formatters with the `
 ### Multiline (default)
 
 ```sh
-$ erblint
+$ erb_lint
 Linting 8 files with 12 linters...
 
 Remove multiple trailing newline at the end of the file.
@@ -614,7 +614,7 @@ In file: app/views/subscriptions/index.html.erb:38
 ### Compact
 
 ```sh
-erblint --format compact
+erb_lint --format compact
 Linting 8 files with 12 linters...
 app/views/users/show.html.erb:95:0: Remove multiple trailing newline at the end of the file.
 app/views/users/_graph.html.erb:27:37: Extra space detected where there should be no space
@@ -624,9 +624,9 @@ app/views/users/_graph.html.erb:27:37: Extra space detected where there should b
 ### JUnit
 
 ```sh
-erblint --format junit
+erb_lint --format junit
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="erblint" tests="2" failures="2">
+<testsuite name="erb_lint" tests="2" failures="2">
   <properties>
     <property name="erb_lint_version" value="%{erb_lint_version}"/>
     <property name="ruby_engine" value="%{ruby_engine}"/>
@@ -684,7 +684,7 @@ Quality](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-cus
 The cache is currently opt-in - to turn it on, use the `--cache` option:
 
 ```sh
-erblint --cache ./app
+erb_lint --cache ./app
 Cache mode is on
 Linting 413 files with 15 linters...
 File names pruned from the cache will be logged
