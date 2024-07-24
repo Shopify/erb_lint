@@ -217,7 +217,10 @@ module ERBLint
         config = RunnerConfig.new(file_loader.yaml(config_filename), file_loader)
         @config = RunnerConfig.default_for(config)
       elsif File.exist?(DEPRECATED_CONFIG_FILENAME)
-        warn(Rainbow("#{DEPRECATED_CONFIG_FILENAME} is deprecated. Rename your config to `erb_lint.yml`.").yellow)
+        deprecation_message = "The config file has been renamed to `#{DEFAULT_CONFIG_FILENAME}` and " \
+          "`#{DEPRECATED_CONFIG_FILENAME}` is deprecated. " \
+          "Please rename your config file to `#{DEFAULT_CONFIG_FILENAME}`."
+        warn(Rainbow(deprecation_message).yellow)
         config = RunnerConfig.new(file_loader.yaml(DEPRECATED_CONFIG_FILENAME), file_loader)
         @config = RunnerConfig.default_for(config)
       else
