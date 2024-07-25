@@ -3,5 +3,5 @@
 
 require "rainbow"
 
-warn(Rainbow("Calling erblint is deprecated, please call the renamed binstub `erb_lint` instead.").yellow)
+warn(Rainbow("Calling `erblint` is deprecated, please call the renamed executable `erb_lint` instead.").yellow)
 exec(File.join(__dir__, "erb_lint"), *ARGV)
