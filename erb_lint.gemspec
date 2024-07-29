@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency("better_html", ">= 2.0.1")
   s.add_dependency("parser", ">= 2.7.1.4")
   s.add_dependency("rainbow")
-  s.add_dependency("rubocop")
+  s.add_dependency("rubocop", "~> 1.0")
   s.add_dependency("smart_properties")
 
   s.add_development_dependency("rspec")

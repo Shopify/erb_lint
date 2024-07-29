@@ -6,7 +6,7 @@ PATH
       better_html (>= 2.0.1)
       parser (>= 2.7.1.4)
       rainbow
-      rubocop
+      rubocop (~> 1.0)
       smart_properties
 
 GEM
