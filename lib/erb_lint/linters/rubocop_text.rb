@@ -29,7 +29,7 @@ module ERBLint
       end
 
       def cop_classes
-        selected_cops = ::RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
+        selected_cops = ::RuboCop::Cop::Registry.all.select { |cop| cop.match?(@only_cops) }
 
         ::RuboCop::Cop::Registry.new(selected_cops)
       end

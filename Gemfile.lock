@@ -6,7 +6,7 @@ PATH
       better_html (>= 2.0.1)
       parser (>= 2.7.1.4)
       rainbow
-      rubocop
+      rubocop (>= 1)
       smart_properties
 
 GEM
@@ -123,4 +123,4 @@ DEPENDENCIES
   rubocop-shopify
 
 BUNDLED WITH
-   2.3.16
+   2.4.20
