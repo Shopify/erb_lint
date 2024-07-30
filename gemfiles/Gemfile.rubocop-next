@@ -1,5 +1,0 @@
-# frozen_string_literal: true
-
-eval_gemfile "../Gemfile"
-
-gem "rubocop", ">= 1.38.0"
