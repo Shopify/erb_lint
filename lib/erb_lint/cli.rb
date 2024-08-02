@@ -80,18 +80,20 @@ module ERBLint
       runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_configs])
       file_content = nil
 
+      out = (@options[:format] == "quiet") ? method(:warn) : method(:puts)
+
       lint_files.each do |filename|
         runner.clear_offenses
         begin
           file_content = run_on_file(runner, filename)
         rescue => e
           @stats.exceptions += 1
-          puts "Exception occurred when processing: #{relative_filename(filename)}"
-          puts "If this file cannot be processed by erb-lint, " \
+          out.call "Exception occurred when processing: #{relative_filename(filename)}"
+          out.call "If this file cannot be processed by erb-lint, " \
             "you can exclude it in your configuration file."
-          puts e.message
-          puts Rainbow(e.backtrace.join("\n")).red
-          puts
+          out.call e.message
+          out.call Rainbow(e.backtrace.join("\n")).red
+          out.call
         end
       end
 
@@ -101,7 +103,7 @@ module ERBLint
 
       if stdin? && autocorrect?
         # When running from stdin, we only lint a single file
-        puts "================ #{lint_files.first} ==================\n"
+        out.call "================ #{lint_files.first} ==================\n"
         puts file_content
       end
 
