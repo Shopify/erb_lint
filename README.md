@@ -123,6 +123,7 @@ linters:
 | [ErbSafety](#erbsafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
 | [Rubocop](#rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
 | [RequireScriptNonce](#requirescriptnonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
+| [HardCodedString](#HardCodedString)              | No       | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
 
 ### DeprecatedClasses
 
@@ -499,6 +500,48 @@ Linter-Specific Option    | Description
 `allowed_types`           | An array of allowed types. Defaults to `["text/javascript"]`.
 `allow_blank`             | True or false, depending on whether or not the `type` attribute may be omitted entirely from a `<script>` tag. Defaults to `true`.
 `disallow_inline_scripts` | Do not allow inline `<script>` tags anywhere in ERB templates. Defaults to `false`.
+
+
+### HardCodedString
+
+`HardCodedString` warns if there is a visible hardcoded string in the DOM. It does not check for a hardcoded string nested inside a JavaScript tag.
+
+Example configuration:
+
+```yaml
+---
+linters:
+  HardCodedString:
+    enabled: true
+    corrector:
+      path: path/to/corrector_file.rb
+      name: I18nCorrector
+      i18n_load_path: config/locales/en.yml
+```
+
+To leverage this linter's autocorrect feature, you must define the configuration for its `corrector`, such that its path, class name, and `i18n_load_path` are resolvable.
+
+Linter-Specific Option    | Description
+--------------------------|---------------------------------------------------------
+path | a string pointing to the path to the corrector file
+name | the name of the corrector class (can [either be `I18nCorrector` or `Rubocop::I18nCorrector`](https://github.com/Shopify/erb-lint/blob/19c9ddb94f0ea1d73ac12e18a7ea822d76adeeab/lib/erb_lint/linters/hard_coded_string.rb#L17))
+i18n_load_path | a string pointing to the path of the file(s) to be translated
+
+Below is an example corrector file. For your project, the actual details of the `autocorrect` method are left up to how you want to correct those offenses.
+
+```ruby
+class I18nCorrector
+  attr_reader :node
+
+  def initialize(node, filename, i18n_load_path, range)
+  end
+
+  def autocorrect(tag_start:, tag_end:)
+    ->(corrector) do
+      node
+    end
+  end
+end
 
 ## CommentSyntax
 
