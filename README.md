@@ -523,11 +523,11 @@ Good ✅
 
 ## Custom Linters
 
-`erb_lint` allows you to create custom linters specific to your project. It will load linters from the `.erb-linters` directory in the root of your
+`erb_lint` allows you to create custom linters specific to your project. It will load linters from the `.erb_linters` directory in the root of your
 repository. See the [linters directory](lib/erb_lint/linters) for examples of how to write linters.
 
 ```ruby
-# .erb-linters/custom_linter.rb
+# .erb_linters/custom_linter.rb
 
 module ERBLint
   module Linters
