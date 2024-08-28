@@ -37,7 +37,8 @@ module ERBLint
             processed_source.to_source_range(
               code[:loc].begin_pos..code[:loc].end_pos,
             ),
-            "Don't use :back option in #{code[:node].method_name} method. It potentially causes XSS attack by HTTP Referer pollution.",
+            "Don't use :back option in #{code[:node].method_name} method. " \
+              "It potentially causes XSS attack by HTTP Referer pollution.",
           )
         end
       end
