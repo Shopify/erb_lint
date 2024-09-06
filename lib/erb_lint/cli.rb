@@ -102,7 +102,7 @@ module ERBLint
 
       if stdin? && autocorrect?
         # When running from stdin, we only lint a single file
-        puts "================ #{lint_files.first} ==================\n"
+        puts "================ #{lint_files.first} ==================\n" unless @options[:no_file_header]
         puts file_content
       end
 
@@ -401,6 +401,10 @@ module ERBLint
           "Pipe source from STDIN. Takes the path to be used to check which rules to apply.",
         ) do |file|
           @options[:stdin] = [file]
+        end
+
+        opts.on("--no-file-header", "Disable file header while reading from stding for autocorrect.") do
+          @options[:no_file_header] = true
         end
 
         opts.on_tail("-h", "--help", "Show this message") do
