@@ -93,7 +93,7 @@ describe ERBLint::CLI do
       it "shows format instructions" do
         expect { subject }.to(
           output(Regexp.new("Report offenses in the given format: " \
-            "\\(compact, gitlab, json, junit, multiline\\) " \
+            "\\(compact, gitlab, json, junit, multiline, none\\) " \
             "\\(default: multiline\\)")).to_stdout,
         )
       end
@@ -532,6 +532,7 @@ describe ERBLint::CLI do
                   - json
                   - junit
                   - multiline
+                  - none
               EOF
             end
 
@@ -654,6 +655,8 @@ describe ERBLint::CLI do
               ["--enable-linter", "final_newline,linter_with_errors", "--stdin", linted_file, "--autocorrect"]
             end
 
+            let(:full_linted_file_path) { "#{Dir.pwd}/#{linted_file}" }
+
             it "tells the user it is autocorrecting" do
               expect { subject }.to(output(/Linting and autocorrecting/).to_stdout)
             end
@@ -662,8 +665,48 @@ describe ERBLint::CLI do
               expect { subject }.to(output(/2 linters \(1 autocorrectable\)/).to_stdout)
             end
 
+            it "outputs file header" do
+              expect { subject }.to(output(/#{linted_file} ==================\n/).to_stdout)
+            end
+
             it "outputs the corrected ERB" do
               expect { subject }.to(output(/#{file_content}\n/).to_stdout)
+            end
+
+            context "when file header was turned of" do
+              let(:args) do
+                [
+                  "--enable-linter",
+                  "final_newline,linter_with_errors",
+                  "--stdin",
+                  linted_file,
+                  "--autocorrect",
+                  "--no-file-header",
+                ]
+              end
+
+              it "does not output file header" do
+                expect { subject }.not_to(output(/#{linted_file} ==================\n/).to_stdout)
+              end
+
+              context "when format is none" do
+                let(:args) do
+                  [
+                    "--enable-linter",
+                    "final_newline,linter_with_errors",
+                    "--stdin",
+                    linted_file,
+                    "--autocorrect",
+                    "--no-file-header",
+                    "--format",
+                    "none",
+                  ]
+                end
+
+                it "outputs only the corrected ERB" do
+                  expect { subject }.to(output("#{file_content}\n").to_stdout)
+                end
+              end
             end
           end
 
