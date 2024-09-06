@@ -103,6 +103,22 @@ describe ERBLint::CLI do
       end
     end
 
+    context "with deprecated config file" do
+      let(:deprecated_config_filename) { ".erb-lint.yml" }
+      let(:config_file_content) { "---\nEnableDefaultLinters: true\n" }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(deprecated_config_filename))
+        File.write(deprecated_config_filename, config_file_content)
+      end
+
+      it "shows a warning but loads the deprecated config file" do
+        expect { subject }.to(output(/`#{Regexp.escape(deprecated_config_filename)}` is deprecated/).to_stderr)
+        config = cli.instance_variable_get(:@config)
+        expect(config).to(be_an_instance_of(ERBLint::RunnerConfig))
+      end
+    end
+
     context "with --disable-inline-configs" do
       module ERBLint
         module Linters
@@ -227,7 +243,7 @@ describe ERBLint::CLI do
 
         context "without --config" do
           context "when default config does not exist" do
-            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+            it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
           end
         end
 
@@ -444,7 +460,7 @@ describe ERBLint::CLI do
 
           context "without --config" do
             context "when default config does not exist" do
-              it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+              it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
             end
           end
 
@@ -603,7 +619,7 @@ describe ERBLint::CLI do
 
         context "without --config" do
           context "when default config does not exist" do
-            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+            it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
           end
         end
 
