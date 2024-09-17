@@ -154,7 +154,7 @@ module ERBLint
       end
 
       def build_team
-        ::RuboCop::Cop::Team.new(
+        ::RuboCop::Cop::Team.mobilize(
           cop_classes,
           @rubocop_config,
           extra_details: true,
