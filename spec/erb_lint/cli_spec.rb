@@ -4,7 +4,6 @@ require "spec_helper"
 require "spec_utils"
 require "erb_lint/cli"
 require "erb_lint/cache"
-require "pp"
 require "fakefs"
 require "fakefs/spec_helpers"
 
