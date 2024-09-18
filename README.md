@@ -542,6 +542,7 @@ class I18nCorrector
     end
   end
 end
+```
 
 ## CommentSyntax
 
