@@ -123,7 +123,7 @@ linters:
 | [ErbSafety](#erbsafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
 | [Rubocop](#rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
 | [RequireScriptNonce](#requirescriptnonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
-| [HardCodedString](#HardCodedString)              | No       | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
+| [HardCodedString](#hardcodedstring)              | No       | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
 
 ### DeprecatedClasses
 
