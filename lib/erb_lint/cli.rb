@@ -162,7 +162,7 @@ module ERBLint
         runner.run(processed_source)
         break unless autocorrect? && runner.offenses.any?
 
-        corrector = correct(processed_source, runner.offenses)
+        corrector = corrector(processed_source, runner.offenses)
         break if corrector.corrections.empty?
         break if processed_source.file_content == corrector.corrected_content
 
@@ -202,10 +202,8 @@ module ERBLint
       $stdin.binmode.read.force_encoding(Encoding::UTF_8)
     end
 
-    def correct(processed_source, offenses)
-      corrector = ERBLint::Corrector.new(processed_source, offenses)
-      failure!(corrector.diagnostics.join(", ")) if corrector.diagnostics.any?
-      corrector
+    def corrector(processed_source, offenses)
+      ERBLint::Corrector.new(processed_source, offenses)
     end
 
     def config_filename
