@@ -79,6 +79,9 @@ module ERBLint
       reporter.preview
 
       runner = ERBLint::Runner.new(file_loader, @config, @options[:disable_inline_configs])
+
+      @cache.set_runner_checksum(runner.checksum) if cache?
+
       file_content = nil
 
       lint_files.each do |filename|
