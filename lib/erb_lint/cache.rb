@@ -2,7 +2,7 @@
 
 module ERBLint
   class Cache
-    CACHE_DIRECTORY = ".erb-lint-cache"
+    CACHE_DIRECTORY = ".erb_lint_cache"
 
     def initialize(config, cache_dir = nil)
       @config = config
