@@ -11,6 +11,11 @@ describe ERBLint::Utils::InlineConfigs do
       expect(utils.rule_disable_comment_for_lines?("AnchorRule", offending_lines)).to(be(true))
     end
 
+    it "supports both erb_lint and erblint naming" do
+      offending_lines = '<a href="#"></a><%# erb_lint:disable AnchorRule %>'
+      expect(utils.rule_disable_comment_for_lines?("AnchorRule", offending_lines)).to(be(true))
+    end
+
     it "true lines when lines contain a erblint:disable comment for rule in Ruby comment" do
       offending_lines = '<%
 			button = {
