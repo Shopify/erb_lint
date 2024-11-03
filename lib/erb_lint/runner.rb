@@ -42,6 +42,15 @@ module ERBLint
       @offenses.concat(offenses)
     end
 
+    def checksum
+      digester = Digest::SHA1.new
+      @linters.each do |linter|
+        linter_checksum = linter.checksum
+        digester.update(linter_checksum) if linter_checksum
+      end
+      digester.hexdigest
+    end
+
     private
 
     def enable_inline_configs?
