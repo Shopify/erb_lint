@@ -63,6 +63,15 @@ module ERBLint
         end
       end
 
+      def checksum
+        digester = Digest::SHA1.new
+        gemfile_lock = File.read("Gemfile.lock") if File.exist?("Gemfile.lock")
+        digester.update(
+          "#{gemfile_lock}#{@rubocop_config.to_hash}"
+          )
+        digester.hexdigest
+      end
+
       private
 
       def descendant_nodes(processed_source)
