@@ -15,7 +15,7 @@ module ERBLint
         return if file_content.empty?
 
         processed_source.ast.descendants(:erb).each do |erb_node|
-          indicator_node, _, code_node, _ = *erb_node
+          indicator_node, trim, code_node, _ = *erb_node
           next if code_node.nil?
 
           indicator_node_str = indicator_node&.deconstruct&.last
@@ -27,7 +27,13 @@ module ERBLint
           range = find_range(erb_node, code_node_str)
           source_range = processed_source.to_source_range(range)
 
-          correct_erb_tag = indicator_node_str == "=" ? "<%#=" : "<%#"
+          correct_erb_tag = if indicator_node_str == "="
+            "<%#= or <%#"
+          elsif trim
+            "<%-#"
+          else
+            "<%#"
+          end
 
           add_offense(
             source_range,

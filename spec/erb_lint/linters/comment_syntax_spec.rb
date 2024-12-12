@@ -52,15 +52,25 @@ describe ERBLint::Linters::CommentSyntax do
     let(:file) { <<~FILE }
       <% # first bad comment %>
       <%= # second bad comment %>
+      <%- # third bad comment %>
     FILE
 
-    it "reports two offenses" do
-      expect(subject.size).to(eq(2))
+    it "reports all offenses" do
+      expect(subject.size).to(eq(file.each_line.count))
     end
 
     it "reports the suggested fixes" do
-      expect(subject.first.message).to(include("Bad ERB comment syntax. Should be <%# without a space between."))
-      expect(subject.last.message).to(include("Bad ERB comment syntax. Should be <%#= without a space between."))
+      expected_messages = [
+        "Bad ERB comment syntax. Should be <%# without a space between.",
+        "Bad ERB comment syntax. Should be <%#= or <%# without a space between.",
+        "Bad ERB comment syntax. Should be <%-# without a space between.",
+      ]
+      actual_messages = subject.map(&:message)
+      expect(actual_messages.size).to(eq(expected_messages.size))
+
+      expected_messages.zip(actual_messages).each do |expected, actual|
+        expect(actual).to(include(expected))
+      end
     end
   end
 end
