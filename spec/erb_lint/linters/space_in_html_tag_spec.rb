@@ -52,6 +52,16 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         it { expect(subject).to(eq([])) }
       end
 
+      context "self-closing tag with valueless attribute" do
+        let(:file) { "<input autofocus />" }
+        it { expect(subject).to(eq([])) }
+      end
+
+      context "self-closing tag with no quotes around attribute value" do
+        let(:file) { "<input class=foo />" }
+        it { expect(subject).to(eq([])) }
+      end
+
       context "between attributes" do
         let(:file) { '<input class="foo" name="bar" />' }
         it { expect(subject).to(eq([])) }
@@ -144,6 +154,24 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         it do
           expect(subject).to(eq([
             build_offense(9..10, "Extra space detected where there should be no space."),
+          ]))
+        end
+      end
+
+      context "at start of value" do
+        let(:file) { "<div foo='  bar'>" }
+        it do
+          expect(subject).to(eq([
+            build_offense(10..11, "Extra space detected where there should be no space."),
+          ]))
+        end
+      end
+
+      context "at end of value" do
+        let(:file) { "<div foo='bar  '>" }
+        it do
+          expect(subject).to(eq([
+            build_offense(13..14, "Extra space detected where there should be no space."),
           ]))
         end
       end
@@ -429,6 +457,16 @@ describe ERBLint::Linters::SpaceInHtmlTag do
 
       context "between attribute equal and value" do
         let(:file) { "<div foo=  'bar'>" }
+        it { expect(subject).to(eq("<div foo='bar'>")) }
+      end
+
+      context "at start of value" do
+        let(:file) { "<div foo='  bar'>" }
+        it { expect(subject).to(eq("<div foo='bar'>")) }
+      end
+
+      context "at end of value" do
+        let(:file) { "<div foo='bar  '>" }
         it { expect(subject).to(eq("<div foo='bar'>")) }
       end
     end
