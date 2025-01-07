@@ -9,14 +9,8 @@ module ERBLint
       @base_path = base_path
     end
 
-    if RUBY_VERSION >= "2.6"
-      def yaml(filename)
-        YAML.safe_load(read_content(filename), permitted_classes: [Regexp, Symbol], filename: filename) || {}
-      end
-    else
-      def yaml(filename)
-        YAML.safe_load(read_content(filename), [Regexp, Symbol], [], false, filename) || {}
-      end
+    def yaml(filename)
+      YAML.safe_load(read_content(filename), permitted_classes: [Regexp, Symbol], filename: filename) || {}
     end
 
     private
