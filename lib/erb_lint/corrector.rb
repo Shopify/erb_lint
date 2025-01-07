@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rubocop/cop/legacy/corrector"
-
 module ERBLint
   class Corrector
     attr_reader :processed_source, :offenses, :corrected_content
@@ -9,6 +7,8 @@ module ERBLint
     def initialize(processed_source, offenses)
       @processed_source = processed_source
       @offenses = offenses
+      corrector = RuboCop::Cop::Corrector.new(@processed_source.source_buffer)
+      correct!(corrector)
       @corrected_content = corrector.rewrite
     end
 
@@ -18,8 +18,10 @@ module ERBLint
       end.compact
     end
 
-    def corrector
-      ::RuboCop::Cop::Legacy::Corrector.new(@processed_source.source_buffer, corrections)
+    def correct!(corrector)
+      corrections.each do |correction|
+        correction.call(corrector)
+      end
     end
   end
 end
