@@ -45,11 +45,11 @@ module ERBLint
           report_corrected_offenses
         elsif stats.ignored > 0 || stats.found > 0
           if stats.ignored > 0
-            warn(Rainbow("#{stats.ignored} error(s) were ignored in ERB files").yellow)
+            $stderr.puts(Rainbow("#{stats.ignored} error(s) were ignored in ERB files").yellow)
           end
 
           if stats.found > 0
-            warn(Rainbow("#{stats.found} error(s) were found in ERB files").red)
+            $stderr.puts(Rainbow("#{stats.found} error(s) were found in ERB files").red)
           end
         else
           puts Rainbow("No errors were found in ERB files").green
@@ -64,7 +64,7 @@ module ERBLint
             "#{stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files",
           ).red
 
-          warn(message)
+          $stderr.puts(message)
         else
           puts Rainbow("#{stats.corrected} error(s) corrected in ERB files").green
         end

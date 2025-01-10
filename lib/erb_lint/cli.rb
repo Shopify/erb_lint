@@ -108,13 +108,13 @@ module ERBLint
 
       @stats.found == 0 && @stats.exceptions == 0
     rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, ExitWithFailure => e
-      warn(Rainbow(e.message).red)
+      $stderr.puts(Rainbow(e.message).red)
       false
     rescue ExitWithSuccess => e
       puts e.message
       true
     rescue => e
-      warn(Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red)
+      $stderr.puts(Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red)
       false
     end
 
@@ -218,11 +218,11 @@ module ERBLint
         deprecation_message = "The config file has been renamed to `#{DEFAULT_CONFIG_FILENAME}` and " \
           "`#{DEPRECATED_CONFIG_FILENAME}` is deprecated. " \
           "Please rename your config file to `#{DEFAULT_CONFIG_FILENAME}`."
-        warn(Rainbow(deprecation_message).yellow)
+        $stderr.puts(Rainbow(deprecation_message).yellow)
         config = RunnerConfig.new(file_loader.yaml(DEPRECATED_CONFIG_FILENAME), file_loader)
         @config = RunnerConfig.default_for(config)
       else
-        warn(Rainbow("#{config_filename} not found: using default config").yellow)
+        $stderr.puts(Rainbow("#{config_filename} not found: using default config").yellow)
         @config = RunnerConfig.default
       end
     rescue Psych::SyntaxError => e
