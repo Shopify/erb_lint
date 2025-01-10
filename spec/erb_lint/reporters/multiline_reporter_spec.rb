@@ -39,7 +39,7 @@ describe ERBLint::Reporters::MultilineReporter do
       let(:show_linter_names) { false }
 
       it "displays formatted offenses output" do
-        expect { subject }.to(output(<<~MESSAGE).to_stdout)
+        expect { subject }.to(output(a_string_starting_with(<<~MESSAGE)).to_stderr)
 
           Extra space detected where there should be no space.
           In file: app/views/subscriptions/_loader.html.erb:1
@@ -56,7 +56,7 @@ describe ERBLint::Reporters::MultilineReporter do
       let(:show_linter_names) { true }
 
       it "displays formatted offenses output" do
-        expect { subject }.to(output(<<~MESSAGE).to_stdout)
+        expect { subject }.to(output(a_string_starting_with(<<~MESSAGE)).to_stderr)
 
           [SpaceInHtmlTag] Extra space detected where there should be no space.
           In file: app/views/subscriptions/_loader.html.erb:1
@@ -73,7 +73,7 @@ describe ERBLint::Reporters::MultilineReporter do
       let(:show_linter_names) { false }
 
       it "displays not autocorrected warning" do
-        expect { subject }.to(output(/(not autocorrected)/).to_stdout)
+        expect { subject }.to(output(/(not autocorrected)/).to_stderr)
       end
     end
   end

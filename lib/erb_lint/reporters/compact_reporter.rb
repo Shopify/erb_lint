@@ -4,13 +4,13 @@ module ERBLint
   module Reporters
     class CompactReporter < Reporter
       def preview
-        puts "#{linting} #{stats.files} files with #{linters}..."
+        $stderr.puts "#{linting} #{stats.files} files with #{linters}..."
       end
 
       def show
         processed_files.each do |filename, offenses|
           offenses.each do |offense|
-            puts format_offense(filename, offense)
+            $stderr.puts format_offense(filename, offense)
           end
         end
 
@@ -52,7 +52,7 @@ module ERBLint
             $stderr.puts(Rainbow("#{stats.found} error(s) were found in ERB files").red)
           end
         else
-          puts Rainbow("No errors were found in ERB files").green
+          $stderr.puts Rainbow("No errors were found in ERB files").green
         end
       end
 
@@ -66,7 +66,7 @@ module ERBLint
 
           $stderr.puts(message)
         else
-          puts Rainbow("#{stats.corrected} error(s) corrected in ERB files").green
+          $stderr.puts Rainbow("#{stats.corrected} error(s) corrected in ERB files").green
         end
       end
     end

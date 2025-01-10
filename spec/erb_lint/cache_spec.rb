@@ -92,7 +92,7 @@ describe ERBLint::Cache do
     it "skips prune if no cache hits" do
       allow(cache).to(receive(:hits).and_return([]))
 
-      expect { cache.prune_cache }.to(output(/Cache being created for the first time, skipping prune/).to_stdout)
+      expect { cache.prune_cache }.to(output(/Cache being created for the first time, skipping prune/).to_stderr)
     end
 
     it "does not prune actual cache hits" do

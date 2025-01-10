@@ -87,12 +87,12 @@ module ERBLint
           file_content = run_on_file(runner, filename)
         rescue => e
           @stats.exceptions += 1
-          puts "Exception occurred when processing: #{relative_filename(filename)}"
-          puts "If this file cannot be processed by erb_lint, " \
+          $stderr.puts "Exception occurred when processing: #{relative_filename(filename)}"
+          $stderr.puts "If this file cannot be processed by erb_lint, " \
             "you can exclude it in your configuration file."
-          puts e.message
-          puts Rainbow(e.backtrace.join("\n")).red
-          puts
+          $stderr.puts e.message
+          $stderr.puts Rainbow(e.backtrace.join("\n")).red
+          $stderr.puts
         end
       end
 
@@ -102,7 +102,7 @@ module ERBLint
 
       if stdin? && autocorrect?
         # When running from stdin, we only lint a single file
-        puts "================ #{lint_files.first} ==================\n"
+        $stderr.puts "================ #{lint_files.first} =================="
         puts file_content
       end
 
@@ -111,7 +111,7 @@ module ERBLint
       $stderr.puts(Rainbow(e.message).red)
       false
     rescue ExitWithSuccess => e
-      puts e.message
+      $stderr.puts e.message
       true
     rescue => e
       $stderr.puts(Rainbow("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}").red)
