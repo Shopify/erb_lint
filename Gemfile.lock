@@ -12,24 +12,28 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (7.1.3.2)
-      activesupport (= 7.1.3.2)
+    actionview (8.0.1)
+      activesupport (= 8.0.1)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (7.1.3.2)
+    activesupport (8.0.1)
       base64
+      benchmark (>= 0.3)
       bigdecimal
-      concurrent-ruby (~> 1.0, >= 1.0.2)
+      concurrent-ruby (~> 1.0, >= 1.3.1)
       connection_pool (>= 2.2.5)
       drb
       i18n (>= 1.6, < 2)
+      logger (>= 1.4.2)
       minitest (>= 5.1)
-      mutex_m
-      tzinfo (~> 2.0)
+      securerandom (>= 0.3)
+      tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     ast (2.4.2)
     base64 (0.2.0)
+    benchmark (0.4.0)
     better_html (2.1.1)
       actionview (>= 6.0)
       activesupport (>= 6.0)
@@ -37,25 +41,25 @@ GEM
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.1.7)
+    bigdecimal (3.1.9)
     builder (3.2.4)
-    concurrent-ruby (1.2.3)
-    connection_pool (2.4.1)
+    concurrent-ruby (1.3.4)
+    connection_pool (2.5.0)
     crass (1.0.6)
     diff-lcs (1.5.0)
     drb (2.2.1)
     erubi (1.12.0)
     fakefs (1.5.1)
-    i18n (1.14.4)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     json (2.9.1)
     language_server-protocol (3.17.0.3)
+    logger (1.6.5)
     loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     mini_portile2 (2.8.8)
-    minitest (5.22.3)
-    mutex_m (0.2.0)
+    minitest (5.25.4)
     nokogiri (1.15.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -102,12 +106,14 @@ GEM
     rubocop-shopify (2.15.1)
       rubocop (~> 1.51)
     ruby-progressbar (1.13.0)
+    securerandom (0.4.1)
     smart_properties (1.17.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.3)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
+    uri (1.0.2)
 
 PLATFORMS
   ruby
@@ -121,4 +127,4 @@ DEPENDENCIES
   rubocop-shopify
 
 BUNDLED WITH
-   2.4.20
+   2.6.2
