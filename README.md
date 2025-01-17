@@ -111,7 +111,6 @@ linters:
 | [FinalNewline](#finalnewline)                    | Yes      | warns about missing newline at the end of a ERB template |
 | [NoJavascriptTagHelper](#nojavascripttaghelper)  | Yes      | prevents the usage of Rails' `javascript_tag` |
 | ParserErrors                                     | Yes      |             |
-| PartialInstanceVariable                          | No       | detects instance variables in partials |
 | [RequireInputAutocomplete](#requireinputautocomplete)        | Yes       | warns about missing autocomplete attributes in input tags |
 | [RightTrim](#righttrim)                          | Yes      | enforces trimming at the right of an ERB tag |
 | [SelfClosingTag](#selfclosingtag)                | Yes      | enforces self closing tag styles for void elements |
@@ -121,9 +120,11 @@ linters:
 | TrailingWhitespace                               | Yes      |             |
 | [DeprecatedClasses](#deprecatedclasses)          | No       | warns about deprecated css classes |
 | [ErbSafety](#erbsafety)                          | No       | detects unsafe interpolation of ruby data into various javascript contexts and enforce usage of safe helpers like `.to_json`. |
+| [HardCodedString](#hardcodedstring)              | No       | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
+| PartialInstanceVariable                          | No       | detects instance variables in partials |
 | [Rubocop](#rubocop)                              | No       | runs RuboCop rules on ruby statements found in ERB templates |
 | [RequireScriptNonce](#requirescriptnonce)        | No       | warns about missing [Content Security Policy nonces](https://guides.rubyonrails.org/security.html#content-security-policy) in script tags |
-| [HardCodedString](#hardcodedstring)              | No       | warns if there is a visible hardcoded string in the DOM (does not check for a hardcoded string nested inside a JavaScript tag)            |
+| [StrictLocals](#strictlocals)                    | No       | enforces the use of strict locals in Rails view partial templates |
 
 ### DeprecatedClasses
 
@@ -543,6 +544,27 @@ class I18nCorrector
   end
 end
 ```
+
+### StrictLocals
+This linter enforces the use of [strict locals](https://guides.rubyonrails.org/layouts_and_rendering.html#strict-locals) in Rails view partial templates.
+
+```
+# app/views/foo/_bar.html.erb
+
+Bad ❌
+<div>
+  My name is <%= @name %>
+</div>
+
+Good ✅
+<%# locals: (name:) %>
+<div>
+  My name is <%= name %>
+</div>
+```
+
+**Note**: This linter does not enforce the use of strict locals in view templates (files that don't start with `_`).
+**Note**: This linter does not prevent the use of instance variables. It merely enforces that a strict locals declaration is present. It's recommended to use this linter in conjunction with the `PartialInstanceVariable` linter to enforce the use of locals.
 
 ## CommentSyntax
 
