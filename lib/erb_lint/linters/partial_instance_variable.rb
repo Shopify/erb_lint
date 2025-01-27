@@ -7,7 +7,7 @@ module ERBLint
       include LinterRegistry
 
       def run(processed_source)
-        instance_variable_regex = /\s@\w+/
+        instance_variable_regex = /[^\w]?@\w+/
         return unless processed_source.filename.match?(%r{(\A|.*/)_[^/\s]*\.html\.erb\z}) &&
           processed_source.file_content.match?(instance_variable_regex)
 
