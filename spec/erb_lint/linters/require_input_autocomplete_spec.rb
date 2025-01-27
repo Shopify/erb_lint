@@ -14,18 +14,31 @@ describe ERBLint::Linters::RequireInputAutocomplete do
   let(:form_helpers_requiring_autocomplete) do
     [
       :date_field_tag,
+      :date_field,
       :color_field_tag,
+      :color_field,
       :email_field_tag,
+      :email_field,
       :text_field_tag,
-      :utf8_enforcer_tag,
+      :text_field,
       :month_field_tag,
+      :month_field,
       :number_field_tag,
+      :number_field,
       :password_field_tag,
+      :password_field,
       :search_field_tag,
+      :search_field,
       :telephone_field_tag,
+      :telephone_field,
+      :phone_field_tag,
+      :phone_field,
       :time_field_tag,
+      :time_field,
       :url_field_tag,
+      :url_field,
       :week_field_tag,
+      :week_field,
     ].freeze
   end
   let(:html_message) do
@@ -65,7 +78,7 @@ describe ERBLint::Linters::RequireInputAutocomplete do
         <br />
         #{
           form_helpers_requiring_autocomplete.inject("") do |s, helper|
-            s + "<%= " + helper.to_s + ' autocomplete: "foo" do %>'
+            s + "<%= " + helper.to_s + ' autocomplete: "foo" %>'
           end
         }
       FILE
@@ -78,27 +91,25 @@ describe ERBLint::Linters::RequireInputAutocomplete do
         <br />
         #{
           form_helpers_requiring_autocomplete.inject("") do |s, helper|
-            s + "<%= " + helper.to_s + " do %>"
+            s + "<%= " + helper.to_s + " %>"
           end
         }
       FILE
 
       it do
-        expect(subject).to(eq([
-          build_offense(7..30, form_helper_message),
-          build_offense(31..55, form_helper_message),
-          build_offense(56..80, form_helper_message),
-          build_offense(81..104, form_helper_message),
-          build_offense(105..131, form_helper_message),
-          build_offense(132..156, form_helper_message),
-          build_offense(157..182, form_helper_message),
-          build_offense(183..210, form_helper_message),
-          build_offense(211..236, form_helper_message),
-          build_offense(237..265, form_helper_message),
-          build_offense(266..289, form_helper_message),
-          build_offense(290..312, form_helper_message),
-          build_offense(313..336, form_helper_message),
-        ]))
+        form_helpers_requiring_autocomplete.each do |helper|
+          tag = "<%= #{helper} %>"
+          index = processed_source.file_content.index(tag)
+
+          expect(subject).to(
+            include(
+              build_offense(
+                Range.new(index, index + tag.length - 1),
+                form_helper_message
+              )
+            )
+          )
+        end
       end
     end
   end
