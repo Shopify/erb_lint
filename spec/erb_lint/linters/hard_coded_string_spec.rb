@@ -89,6 +89,24 @@ describe ERBLint::Linters::HardCodedString do
     it { expect(subject).to(eq([])) }
   end
 
+  context "when file contains hard coded number" do
+    let(:file) { <<~FILE }
+      &copy; 2024
+    FILE
+
+    it { expect(subject).to(eq([])) }
+  end
+
+  context "when file contains hard coded string added to the list of ignored words" do
+    let(:file) { <<~FILE }
+      &copy; My brand 2024
+    FILE
+
+    let(:linter_options) { { ignored_words: ["My brand"] } }
+
+    it { expect(subject).to(eq([])) }
+  end
+
   context "when file contains irrelevant hard coded string" do
     let(:file) { <<~FILE }
       <span class="example">
