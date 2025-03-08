@@ -64,6 +64,7 @@ module ERBLint
             TrailingWhitespace: { enabled: default_enabled },
             RequireInputAutocomplete: { enabled: default_enabled },
             CommentSyntax: { enabled: default_enabled },
+            StrictLocals: { enabled: default_enabled },
           },
         )
       end
