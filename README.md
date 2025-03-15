@@ -267,6 +267,7 @@ Linter-Specific Option | Description
 
 ### RequireInputAutocomplete
 This linter prevents the usage of certain types of HTML `<input>` without an `autocomplete` argument: `color`, `date`, `datetime-local`, `email`, `month`, `number`, `password`, `range`, `search`, `tel`, `text`, `time`, `url`, or `week`.
+
 The HTML autocomplete helps users to complete filling in forms by using data stored in the browser. This is particularly useful for people with **motor disabilities** or **cognitive impairment** who may have difficulties filling out forms online.
 
 ```
@@ -452,6 +453,7 @@ This linter prevent the addition of `<script>` tags that have `type` attributes 
 
 It is common practice for web developers to use `<script>` tags with non-executable
 `type` attributes, such as `application/json` or `text/html` to pass arbitrary data into an html page.
+
 Despite not being executable, these tags are subject to the same parsing quirks as executable script tags, and
 it is therefore more difficult to prevent security issues from creeping in. Consider for instance an application
 where it is possible to inject the string `</script><script>` unescaped into a `text/html` tag, the application
@@ -563,7 +565,7 @@ Good ✅
 </div>
 ```
 
-**Note**: This linter does not enforce the use of strict locals in view templates (files that don't start with `_`).
+**Note**: This linter does not enforce the use of strict locals in view templates (files that don't start with `_`).  
 **Note**: This linter does not prevent the use of instance variables. It merely enforces that a strict locals declaration is present. It's recommended to use this linter in conjunction with the `PartialInstanceVariable` linter to enforce the use of locals.
 
 ## CommentSyntax
@@ -760,6 +762,7 @@ No errors were found in ERB files
 
 Cached lint results are stored in the `.erb_lint_cache` directory by default, though a custom directory can be provided
 via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file and `erb_lint` settings.
+
 These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes
 necessary to restore the results of running `erb_lint` for output. The cache also automatically prunes outdated files each time it's run.
 
