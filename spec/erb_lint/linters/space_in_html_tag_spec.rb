@@ -83,6 +83,13 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         it { expect(subject).to(eq([])) }
       end
 
+      context "tag with erb in attribute value" do
+        let(:file) { <<~HTML }
+          <input class='<%= foo %>' />
+        HTML
+        it { expect(subject).to(eq([])) }
+      end
+
       context "multi-line tag with erb" do
         let(:file) { <<~HTML }
           <input
@@ -167,11 +174,29 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         end
       end
 
+      context "at start of value with embedded ruby" do
+        let(:file) { "<div foo='  <%= foo %>'>" }
+        it do
+          expect(subject).to(eq([
+            build_offense(10..11, "Extra space detected where there should be no space."),
+          ]))
+        end
+      end
+
       context "at end of value" do
         let(:file) { "<div foo='bar  '>" }
         it do
           expect(subject).to(eq([
             build_offense(13..14, "Extra space detected where there should be no space."),
+          ]))
+        end
+      end
+
+      context "at end of value with embedded ruby" do
+        let(:file) { "<div foo='<%= foo %> <%= bar %>  '>" }
+        it do
+          expect(subject).to(eq([
+            build_offense(31..32, "Extra space detected where there should be no space."),
           ]))
         end
       end
