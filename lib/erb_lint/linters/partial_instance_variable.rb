@@ -10,8 +10,8 @@ module ERBLint
 
       def initialize(file_loader, config)
         warn(
-          "PartialInstanceVariable is deprecated. "\
-          "Please use InstanceVariable with partials_only=true."
+          "PartialInstanceVariable is deprecated. " \
+            "Please use InstanceVariable with partials_only=true.",
         )
         config[:partials_only] = true
         super(file_loader, config)

@@ -23,7 +23,7 @@ module ERBLint
             add_offense(
               processed_source.to_source_range(document_pos...(document_pos + spaces.length)),
               "Indent with spaces instead of tabs.",
-              spaces.gsub("\t", " " * @config.tab_width)
+              spaces.gsub("\t", " " * @config.tab_width),
             )
           end
 

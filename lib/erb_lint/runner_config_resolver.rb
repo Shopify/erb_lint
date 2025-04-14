@@ -28,6 +28,7 @@ module ERBLint
       base_configs(file_loader, inherited_files).reverse_each do |base_config|
         base_config.each do |k, v|
           next unless v.is_a?(Hash)
+
           v = v.deep_merge(hash[k]) if hash.key?(k)
           hash[k] = v
         end
@@ -36,7 +37,7 @@ module ERBLint
 
     def resolve_inheritance_from_gems(hash, gems)
       (gems || {}).each_pair do |gem_name, config_path|
-        raise(ArgumentError, "can't inherit configuration from the erb-lint gem") if gem_name == "erb-lint"
+        raise(ArgumentError, "can't inherit configuration from the erb_lint gem") if gem_name == "erb_lint"
 
         hash["inherit_from"] = Array(hash["inherit_from"])
         Array(config_path).reverse_each do |path|

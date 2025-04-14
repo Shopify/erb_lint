@@ -50,7 +50,7 @@ module ERBLint
         add_offense(
           processed_source.to_source_range(range),
           "Extra space detected where there should be no space.",
-          ""
+          "",
         )
       end
 
@@ -69,24 +69,24 @@ module ERBLint
         if non_space && !non_space.captures.empty?
           add_offense(
             processed_source.to_source_range(range),
-            "Non-whitespace character(s) detected: "\
+            "Non-whitespace character(s) detected: " \
               "#{non_space.captures.map(&:inspect).join(", ")}.",
-            expected
+            expected,
           )
         elsif newlines && accept_newline
           if expected != chars
             add_offense(
               processed_source.to_source_range(range),
-              "#{chars.empty? ? "No" : "Extra"} space detected where there should be "\
+              "#{chars.empty? ? "No" : "Extra"} space detected where there should be " \
                 "a single space or a single line break.",
-              expected
+              expected,
             )
           end
         else
           add_offense(
             processed_source.to_source_range(range),
             "#{chars.empty? ? "No" : "Extra"} space detected where there should be a single space.",
-            expected
+            expected,
           )
         end
       end
@@ -98,11 +98,12 @@ module ERBLint
           no_space(processed_source, equal.loc.end_pos...value.loc.begin_pos) if equal && value
 
           next if index >= attributes.children.size - 1
+
           next_attribute = attributes.children[index + 1]
 
           single_space_or_newline(
             processed_source,
-            attribute.loc.end_pos...next_attribute.loc.begin_pos
+            attribute.loc.end_pos...next_attribute.loc.begin_pos,
           )
         end
       end

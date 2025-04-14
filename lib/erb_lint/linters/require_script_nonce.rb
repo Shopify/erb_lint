@@ -29,7 +29,7 @@ module ERBLint
           add_offense(
             tag_node.to_a[1].loc,
             "Missing a nonce attribute. Use request.content_security_policy_nonce",
-            [nonce_attribute]
+            [nonce_attribute],
           )
         end
       end
@@ -67,15 +67,15 @@ module ERBLint
           add_offense(
             erb_node.loc,
             "Missing a nonce attribute. Use nonce: true",
-            [erb_node, send_node]
+            [erb_node, send_node],
           )
         end
       end
 
       def tag_helper?(send_node)
         send_node&.method_name?(:javascript_tag) ||
-        send_node&.method_name?(:javascript_include_tag) ||
-        send_node&.method_name?(:javascript_pack_tag)
+          send_node&.method_name?(:javascript_include_tag) ||
+          send_node&.method_name?(:javascript_pack_tag)
       end
 
       def code_comment?(indicator_node)

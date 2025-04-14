@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "erb_lint/utils/inline_configs"
+
 module ERBLint
   # Defines common functionality available to all linters.
   class Linter
@@ -30,13 +32,13 @@ module ERBLint
       end
     end
 
-    attr_reader :offenses
+    attr_reader :offenses, :config
 
     # Must be implemented by the concrete inheriting class.
     def initialize(file_loader, config)
       @file_loader = file_loader
       @config = config
-      raise ArgumentError, "expect `config` to be #{self.class.config_schema} instance, "\
+      raise ArgumentError, "expect `config` to be #{self.class.config_schema} instance, " \
         "not #{config.class}" unless config.is_a?(self.class.config_schema)
       @offenses = []
     end
@@ -46,11 +48,18 @@ module ERBLint
     end
 
     def excludes_file?(filename)
-      @config.excludes_file?(filename)
+      @config.excludes_file?(filename, @file_loader.base_path)
     end
 
     def run(_processed_source)
       raise NotImplementedError, "must implement ##{__method__}"
+    end
+
+    def run_and_update_offense_status(processed_source, enable_inline_configs = true)
+      run(processed_source)
+      if @offenses.any? && enable_inline_configs
+        update_offense_status(processed_source)
+      end
     end
 
     def add_offense(source_range, message, context = nil, severity = nil)
@@ -59,6 +68,23 @@ module ERBLint
 
     def clear_offenses
       @offenses = []
+    end
+
+    private
+
+    def update_offense_status(processed_source)
+      @offenses.each do |offense|
+        offense_line_range = offense.source_range.line_range
+        offense_lines = source_for_line_range(processed_source, offense_line_range)
+
+        if Utils::InlineConfigs.rule_disable_comment_for_lines?(self.class.simple_name, offense_lines)
+          offense.disabled = true
+        end
+      end
+    end
+
+    def source_for_line_range(processed_source, line_range)
+      processed_source.source_buffer.source_lines[line_range.first - 1..line_range.last - 1].join
     end
   end
 end

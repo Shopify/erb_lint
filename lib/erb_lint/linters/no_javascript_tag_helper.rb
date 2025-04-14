@@ -22,6 +22,7 @@ module ERBLint
           indicator_node, _, code_node, _ = *erb_node
           indicator = indicator_node&.loc&.source
           next if indicator == "#"
+
           source = code_node.loc.source
 
           ruby_node =
@@ -31,14 +32,15 @@ module ERBLint
               nil
             end
           next unless ruby_node
+
           send_node = ruby_node.descendants(:send).first
           next unless send_node&.method_name?(:javascript_tag)
 
           add_offense(
             erb_node.loc,
-            "Avoid using 'javascript_tag do' as it confuses tests "\
-            "that validate html, use inline <script> instead",
-            [erb_node, send_node]
+            "Avoid using 'javascript_tag do' as it confuses tests " \
+              "that validate html, use inline <script> instead",
+            [erb_node, send_node],
           )
         end
       end
@@ -80,8 +82,10 @@ module ERBLint
           corrector.replace(end_node.loc, end_content)
         elsif script_content
           script_content = "\n//<![CDATA[\n#{script_content}\n//]]>\n" if @config.correction_style == :cdata
-          corrector.replace(begin_node.loc,
-            "<script#{arguments}>#{script_content}</script>")
+          corrector.replace(
+            begin_node.loc,
+            "<script#{arguments}>#{script_content}</script>",
+          )
         end
       rescue Utils::RubyToERB::Error, Utils::BlockMap::ParseError
         nil

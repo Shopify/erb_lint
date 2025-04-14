@@ -18,7 +18,7 @@ module ERBLint
 
           add_offense(
             processed_source.to_source_range((document_pos - whitespace.length - 1)...(document_pos - 1)),
-            "Extra whitespace detected at end of line."
+            "Extra whitespace detected at end of line.",
           )
         end
       end

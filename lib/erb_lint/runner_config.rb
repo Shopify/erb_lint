@@ -28,6 +28,7 @@ module ERBLint
       end
       linter_klass = LinterRegistry.find_by_name(klass_name)
       raise Error, "#{klass_name}: linter not found (is it loaded?)" unless linter_klass
+
       linter_klass.config_schema.new(config_hash_for_linter(klass_name))
     end
 
@@ -62,6 +63,7 @@ module ERBLint
             SpaceInHtmlTag: { enabled: default_enabled },
             TrailingWhitespace: { enabled: default_enabled },
             RequireInputAutocomplete: { enabled: default_enabled },
+            CommentSyntax: { enabled: default_enabled },
           },
         )
       end
@@ -81,7 +83,7 @@ module ERBLint
     def config_hash_for_linter(klass_name)
       config_hash = linters_config[klass_name] || {}
       config_hash["exclude"] ||= []
-      config_hash["exclude"].concat(global_exclude) if config_hash["exclude"].is_a?(Array)
+      config_hash["exclude"].concat(global_exclude).uniq! if config_hash["exclude"].is_a?(Array)
       config_hash
     end
 

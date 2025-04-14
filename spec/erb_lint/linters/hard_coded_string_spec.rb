@@ -289,7 +289,7 @@ describe ERBLint::Linters::HardCodedString do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      string
+      string,
     )
   end
 end

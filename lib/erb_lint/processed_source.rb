@@ -27,7 +27,7 @@ module ERBLint
       BetterHtml::Tokenizer::Location.new(
         source_buffer,
         range.begin,
-        range.exclude_end? ? range.end : range.end + 1
+        range.exclude_end? ? range.end : range.end + 1,
       )
     end
   end

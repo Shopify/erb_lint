@@ -26,7 +26,7 @@ module ERBLint
           tester.errors.each do |error|
             add_offense(
               error.location,
-              error.message
+              error.message,
             )
           end
         end

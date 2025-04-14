@@ -25,9 +25,11 @@ describe ERBLint::Linters::AllowedScriptType do
       let(:file) { '<script type="text/yavascript">' }
       it do
         expect(subject).to(eq([
-          build_offense(8..29,
-            "Avoid using \"text/yavascript\" as type for `<script>` tag. "\
-            "Must be one of: text/javascript (or no type attribute)."),
+          build_offense(
+            8..29,
+            "Avoid using \"text/yavascript\" as type for `<script>` tag. " \
+              "Must be one of: text/javascript (or no type attribute).",
+          ),
         ]))
       end
     end
@@ -39,9 +41,11 @@ describe ERBLint::Linters::AllowedScriptType do
         let(:file) { "<script>" }
         it do
           expect(subject).to(eq([
-            build_offense(1..6,
-              "Avoid using inline `<script>` tags altogether. "\
-              "Instead, move javascript code into a static file."),
+            build_offense(
+              1..6,
+              "Avoid using inline `<script>` tags altogether. " \
+                "Instead, move javascript code into a static file.",
+            ),
           ]))
         end
       end
@@ -64,8 +68,10 @@ describe ERBLint::Linters::AllowedScriptType do
         let(:file) { '<script type="">' }
         it "is not valid" do
           expect(subject).to(eq([
-            build_offense(8..14,
-              "Avoid using \"\" as type for `<script>` tag. Must be one of: text/javascript (or no type attribute)."),
+            build_offense(
+              8..14,
+              "Avoid using \"\" as type for `<script>` tag. Must be one of: text/javascript (or no type attribute).",
+            ),
           ]))
         end
       end
@@ -78,8 +84,10 @@ describe ERBLint::Linters::AllowedScriptType do
         let(:file) { "<script>" }
         it do
           expect(subject).to(eq([
-            build_offense(1..6,
-              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag."),
+            build_offense(
+              1..6,
+              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.",
+            ),
           ]))
         end
       end
@@ -88,8 +96,10 @@ describe ERBLint::Linters::AllowedScriptType do
         let(:file) { "<script type>" }
         it do
           expect(subject).to(eq([
-            build_offense(1..6,
-              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag."),
+            build_offense(
+              1..6,
+              "Missing a `type=\"text/javascript\"` attribute to `<script>` tag.",
+            ),
           ]))
         end
       end
@@ -148,7 +158,7 @@ describe ERBLint::Linters::AllowedScriptType do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      message
+      message,
     )
   end
 end

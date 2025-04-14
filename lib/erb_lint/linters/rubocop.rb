@@ -2,7 +2,6 @@
 
 require "better_html"
 require "tempfile"
-require "erb_lint/utils/offset_corrector"
 
 module ERBLint
   module Linters
@@ -13,6 +12,7 @@ module ERBLint
       class ConfigSchema < LinterConfig
         property :only, accepts: array_of?(String)
         property :rubocop_config, accepts: Hash, default: -> { {} }
+        property :config_file_path, accepts: String
       end
 
       self.config_schema = ConfigSchema
@@ -24,7 +24,8 @@ module ERBLint
       def initialize(file_loader, config)
         super
         @only_cops = @config.only
-        custom_config = config_from_hash(@config.rubocop_config)
+        custom_config = config_from_path(@config.config_file_path) if @config.config_file_path
+        custom_config ||= config_from_hash(@config.rubocop_config)
         @rubocop_config = ::RuboCop::ConfigLoader.merge_with_default(custom_config, "")
       end
 
@@ -34,29 +35,14 @@ module ERBLint
         end
       end
 
-      if ::RuboCop::Version::STRING.to_f >= 0.87
-        def autocorrect(_processed_source, offense)
-          return unless offense.context
-          rubocop_correction = offense.context[:rubocop_correction]
-          return unless rubocop_correction
+      def autocorrect(_processed_source, offense)
+        return unless offense.context
 
-          lambda do |corrector|
-            corrector.import!(rubocop_correction, offset: offense.context[:offset])
-          end
-        end
-      else
-        def autocorrect(processed_source, offense)
-          return unless offense.context
+        rubocop_correction = offense.context[:rubocop_correction]
+        return unless rubocop_correction
 
-          lambda do |corrector|
-            passthrough = Utils::OffsetCorrector.new(
-              processed_source,
-              corrector,
-              offense.context[:offset],
-              offense.context[:bound_range],
-            )
-            offense.context[:rubocop_correction].call(passthrough)
-          end
+        lambda do |corrector|
+          corrector.import!(rubocop_correction, offset: offense.context[:offset])
         end
       end
 
@@ -82,39 +68,18 @@ module ERBLint
         activate_team(processed_source, source, offset, code_node, build_team)
       end
 
-      if ::RuboCop::Version::STRING.to_f >= 0.87
-        def activate_team(processed_source, source, offset, code_node, team)
-          report = team.investigate(source)
-          report.offenses.each do |rubocop_offense|
-            next if rubocop_offense.disabled?
+      def activate_team(processed_source, source, offset, code_node, team)
+        report = team.investigate(source)
+        report.offenses.each do |rubocop_offense|
+          next if rubocop_offense.disabled?
 
-            correction = rubocop_offense.corrector if rubocop_offense.corrected?
+          correction = rubocop_offense.corrector if rubocop_offense.corrected?
 
-            offense_range = processed_source
-              .to_source_range(rubocop_offense.location)
-              .offset(offset)
+          offense_range = processed_source
+            .to_source_range(rubocop_offense.location)
+            .offset(offset)
 
-            add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
-          end
-        end
-      else
-        def activate_team(processed_source, source, offset, code_node, team)
-          team.inspect_file(source)
-          team.cops.each do |cop|
-            correction_offset = 0
-            cop.offenses.reject(&:disabled?).each do |rubocop_offense|
-              if rubocop_offense.corrected?
-                correction = cop.corrections[correction_offset]
-                correction_offset += 1
-              end
-
-              offense_range = processed_source
-                .to_source_range(rubocop_offense.location)
-                .offset(offset)
-
-              add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
-            end
-          end
+          add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
         end
       end
 
@@ -128,62 +93,48 @@ module ERBLint
       end
 
       def rubocop_processed_source(content, filename)
-        ::RuboCop::ProcessedSource.new(
+        source = ::RuboCop::ProcessedSource.new(
           content,
           @rubocop_config.target_ruby_version,
-          filename
+          filename,
         )
+        if ::RuboCop::Version::STRING.to_f >= 1.38
+          registry = RuboCop::Cop::Registry.global
+          source.registry = registry
+          source.config = @rubocop_config
+        end
+        source
       end
 
       def cop_classes
         if @only_cops.present?
-          selected_cops = ::RuboCop::Cop::Cop.all.select { |cop| cop.match?(@only_cops) }
+          selected_cops = ::RuboCop::Cop::Registry.all.select { |cop| cop.match?(@only_cops) }
           ::RuboCop::Cop::Registry.new(selected_cops)
         else
-          ::RuboCop::Cop::Registry.new(::RuboCop::Cop::Cop.all)
+          ::RuboCop::Cop::Registry.new(::RuboCop::Cop::Registry.all)
         end
       end
 
       def build_team
-        ::RuboCop::Cop::Team.new(
+        ::RuboCop::Cop::Team.mobilize(
           cop_classes,
           @rubocop_config,
           extra_details: true,
           display_cop_names: true,
+          autocorrect: true,
           auto_correct: true,
           stdin: "",
         )
       end
 
       def config_from_hash(hash)
-        inherit_from = hash&.delete("inherit_from")
-        resolve_inheritance(hash, inherit_from)
-
         tempfile_from(".erblint-rubocop", hash.to_yaml) do |tempfile|
-          ::RuboCop::ConfigLoader.load_file(tempfile.path)
+          config_from_path(tempfile.path)
         end
       end
 
-      def resolve_inheritance(hash, inherit_from)
-        base_configs(inherit_from)
-          .reverse_each do |base_config|
-          base_config.each do |k, v|
-            hash[k] = hash.key?(k) ? ::RuboCop::ConfigLoader.merge(v, hash[k]) : v if v.is_a?(Hash)
-          end
-        end
-      end
-
-      def base_configs(inherit_from)
-        regex = URI::DEFAULT_PARSER.make_regexp(["http", "https"])
-        configs = Array(inherit_from).compact.map do |base_name|
-          if base_name =~ /\A#{regex}\z/
-            ::RuboCop::ConfigLoader.load_file(::RuboCop::RemoteConfig.new(base_name, Dir.pwd))
-          else
-            config_from_hash(@file_loader.yaml(base_name))
-          end
-        end
-
-        configs.compact
+      def config_from_path(path)
+        ::RuboCop::ConfigLoader.load_file(path)
       end
 
       def add_offense(rubocop_offense, offense_range, correction, offset, bound_range)

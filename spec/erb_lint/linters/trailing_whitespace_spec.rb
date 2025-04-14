@@ -93,7 +93,7 @@ describe ERBLint::Linters::TrailingWhitespace do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      message
+      message,
     )
   end
 end

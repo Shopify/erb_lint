@@ -29,6 +29,7 @@ module ERBLint
       if (extra_keys = given_keys - allowed_keys).any?
         raise Error, "Given key is not allowed: #{extra_keys.join(", ")}"
       end
+
       super(config)
     rescue SmartProperties::InitializationError => e
       raise Error, "The following properties are required to be set: #{e.properties}"
@@ -40,6 +41,7 @@ module ERBLint
       unless self.class.properties.key?(name)
         raise Error, "No such property: #{name}"
       end
+
       super
     end
 
@@ -51,9 +53,12 @@ module ERBLint
       end
     end
 
-    def excludes_file?(filename)
+    def excludes_file?(absolute_filename, base_path)
       exclude.any? do |path|
-        File.fnmatch?(path, filename)
+        return true if File.fnmatch?(path, absolute_filename)
+
+        relative_path = absolute_filename.delete_prefix("#{base_path}/")
+        File.fnmatch?(path, relative_path)
       end
     end
   end

@@ -154,7 +154,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { "<div foo='foo'bar='bar'>" }
         it do
           expect(subject).to(eq([
-            build_offense(14..13, "No space detected where there should be "\
+            build_offense(14..13, "No space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -164,7 +164,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { "<div foo='bar'/>" }
         it do
           expect(subject).to(eq([
-            build_offense(14..13, "No space detected where there should be "\
+            build_offense(14..13, "No space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -174,7 +174,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { "<div/>" }
         it do
           expect(subject).to(eq([
-            build_offense(4..3, "No space detected where there should be "\
+            build_offense(4..3, "No space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -195,7 +195,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { '<img   class="hide">' }
         it do
           expect(subject).to(eq([
-            build_offense(4..6, "Extra space detected where there should be "\
+            build_offense(4..6, "Extra space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -205,7 +205,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { "<br   />" }
         it do
           expect(subject).to(eq([
-            build_offense(3..5, "Extra space detected where there should be "\
+            build_offense(3..5, "Extra space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -215,7 +215,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { '<br class="hide"   />' }
         it do
           expect(subject).to(eq([
-            build_offense(16..18, "Extra space detected where there should be "\
+            build_offense(16..18, "Extra space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -225,7 +225,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { '<img class="hide"    >' }
         it do
           expect(subject).to(eq([
-            build_offense(17..20, "Extra space detected where there should be "\
+            build_offense(17..20, "Extra space detected where there should be " \
               "no space."),
           ]))
         end
@@ -235,7 +235,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         let(:file) { "<div foo='foo'      bar='bar'>" }
         it do
           expect(subject).to(eq([
-            build_offense(14..19, "Extra space detected where there should be "\
+            build_offense(14..19, "Extra space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -249,7 +249,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it do
           expect(subject).to(eq([
-            build_offense(6..9, "Extra space detected where there should be "\
+            build_offense(6..9, "Extra space detected where there should be " \
               "a single space or a single line break."),
           ]))
         end
@@ -263,7 +263,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it do
           expect(subject).to(eq([
-            build_offense(6..9, "Extra space detected where there should be "\
+            build_offense(6..9, "Extra space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -278,7 +278,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it do
           expect(subject).to(eq([
-            build_offense(24..27, "Extra space detected where there should be "\
+            build_offense(24..27, "Extra space detected where there should be " \
               "a single space or a single line break."),
           ]))
         end
@@ -293,7 +293,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it do
           expect(subject).to(eq([
-            build_offense(38..40, "Extra space detected where there should be "\
+            build_offense(38..40, "Extra space detected where there should be " \
               "a single space."),
           ]))
         end
@@ -308,7 +308,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
         HTML
         it do
           expect(subject).to(eq([
-            build_offense(38..40, "Extra space detected where there should be "\
+            build_offense(38..40, "Extra space detected where there should be " \
               "no space."),
           ]))
         end
@@ -577,7 +577,7 @@ describe ERBLint::Linters::SpaceInHtmlTag do
     ERBLint::Offense.new(
       linter,
       processed_source.to_source_range(range),
-      message
+      message,
     )
   end
 end

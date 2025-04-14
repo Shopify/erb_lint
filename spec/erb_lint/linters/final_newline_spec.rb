@@ -44,8 +44,8 @@ describe ERBLint::Linters::FinalNewline do
         expect(subject.first.source_range.begin_pos).to(eq(28))
         expect(subject.first.source_range.end_pos).to(eq(30))
         expect(subject.first.source_range.source).to(eq("\n\n"))
-        expect(subject.first.message).to(eq(\
-          "Remove multiple trailing newline at the end of the file."
+        expect(subject.first.message).to(eq(
+          "Remove multiple trailing newline at the end of the file.",
         ))
       end
 

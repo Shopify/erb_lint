@@ -4,8 +4,7 @@ module ERBLint
   module Reporters
     class CompactReporter < Reporter
       def preview
-        puts "Linting #{stats.files} files with "\
-          "#{stats.linters} #{"autocorrectable " if autocorrect}linters..."
+        puts "#{linting} #{stats.files} files with #{linters}..."
       end
 
       def show
@@ -21,13 +20,22 @@ module ERBLint
 
       private
 
+      def linting
+        "Linting" + (autocorrect ? " and autocorrecting" : "")
+      end
+
+      def linters
+        "#{stats.linters} linters" + (autocorrect ? " (#{stats.autocorrectable_linters} autocorrectable)" : "")
+      end
+
       def format_offense(filename, offense)
         [
           "#{filename}:",
           "#{offense.line_number}:",
           "#{offense.column}: ",
+          ("[#{offense.simple_name}] " if show_linter_names),
           offense.message.to_s,
-        ].join
+        ].compact.join
       end
 
       def footer; end
@@ -53,7 +61,7 @@ module ERBLint
 
         if corrected_found_diff > 0
           message = Rainbow(
-            "#{stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files"
+            "#{stats.corrected} error(s) corrected and #{corrected_found_diff} error(s) remaining in ERB files",
           ).red
 
           warn(message)

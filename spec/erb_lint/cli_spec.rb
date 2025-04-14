@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "spec_utils"
 require "erb_lint/cli"
-require "pp"
+require "erb_lint/cache"
 require "fakefs"
 require "fakefs/spec_helpers"
 
@@ -20,10 +21,12 @@ describe ERBLint::CLI do
 
   before do
     allow(ERBLint::LinterRegistry).to(receive(:linters)
-      .and_return([ERBLint::Linters::LinterWithErrors,
-                   ERBLint::Linters::LinterWithInfoErrors,
-                   ERBLint::Linters::LinterWithoutErrors,
-                   ERBLint::Linters::FinalNewline,]))
+      .and_return([
+        ERBLint::Linters::LinterWithErrors,
+        ERBLint::Linters::LinterWithInfoErrors,
+        ERBLint::Linters::LinterWithoutErrors,
+        ERBLint::Linters::FinalNewline,
+      ]))
   end
 
   module ERBLint
@@ -32,7 +35,7 @@ describe ERBLint::CLI do
         def run(processed_source)
           add_offense(
             processed_source.to_source_range(1..1),
-            "fake message from a fake linter"
+            "fake message from a fake linter",
           )
         end
       end
@@ -65,7 +68,7 @@ describe ERBLint::CLI do
 
       it "shows all known linters in stderr" do
         expect { subject }.to(output(
-          /Known linters are: linter_with_errors, linter_with_info_errors, linter_without_errors, final_newline/
+          /Known linters are: linter_with_errors, linter_with_info_errors, linter_without_errors, final_newline/,
         ).to_stderr)
       end
 
@@ -88,12 +91,87 @@ describe ERBLint::CLI do
 
       it "shows format instructions" do
         expect { subject }.to(
-          output(/Report offenses in the given format: \(compact, json, multiline\) \(default: multiline\)/).to_stdout
+          output(Regexp.new("Report offenses in the given format: " \
+            "\\(compact, gitlab, json, junit, multiline\\) " \
+            "\\(default: multiline\\)")).to_stdout,
         )
       end
 
       it "is successful" do
         expect(subject).to(be(true))
+      end
+    end
+
+    context "with deprecated config file" do
+      let(:deprecated_config_filename) { ".erb-lint.yml" }
+      let(:config_file_content) { "---\nEnableDefaultLinters: true\n" }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(deprecated_config_filename))
+        File.write(deprecated_config_filename, config_file_content)
+      end
+
+      it "shows a warning but loads the deprecated config file" do
+        expect { subject }.to(output(/`#{Regexp.escape(deprecated_config_filename)}` is deprecated/).to_stderr)
+        config = cli.instance_variable_get(:@config)
+        expect(config).to(be_an_instance_of(ERBLint::RunnerConfig))
+      end
+    end
+
+    context "with --disable-inline-configs" do
+      module ERBLint
+        module Linters
+          class FakeLinter < Linter
+            def run(processed_source)
+              add_offense(
+                SpecUtils.source_range_for_code(processed_source, "<violation></violation>"),
+                "#{self.class.name} error",
+              )
+            end
+          end
+        end
+      end
+      let(:linted_file) { "app/views/template.html.erb" }
+      let(:args) { ["--disable-inline-configs", "--enable-linter", "fake_linter", linted_file] }
+      let(:file_content) { "<violation></violation> <%# erblint:disable FakeLinter %>" }
+
+      before do
+        allow(ERBLint::LinterRegistry).to(receive(:linters)
+          .and_return([ERBLint::Linters::FakeLinter]))
+        FileUtils.mkdir_p(File.dirname(linted_file))
+        File.write(linted_file, file_content)
+      end
+
+      it "shows all errors regardless of inline disables " do
+        expect { subject }.to(output(/ERBLint::Linters::FakeLinter error/).to_stdout)
+      end
+    end
+
+    context "with --clear-cache" do
+      let(:args) { ["--clear-cache"] }
+      context "without a cache folder" do
+        it { expect { subject }.to(output(/cache directory doesn't exist, skipping deletion/).to_stderr) }
+        it "shows cache not cleared message if cache is empty and fails" do
+          expect(subject).to(be(false))
+        end
+      end
+
+      context "with a cache folder" do
+        before do
+          FileUtils.mkdir_p(ERBLint::Cache::CACHE_DIRECTORY)
+        end
+        it {
+          expect do
+            subject
+          end.to(output(<<~EOF).to_stdout)
+            Cache mode is on
+            Clearing cache by deleting cache directory
+            cache directory cleared
+          EOF
+        }
+        it "is successful and empties the cache if there are cache file" do
+          expect(subject).to(be(true))
+        end
       end
     end
 
@@ -116,6 +194,30 @@ describe ERBLint::CLI do
         it "is successful" do
           expect(subject).to(be(true))
         end
+      end
+
+      context "when file has a syntax error" do
+        before { FakeFS::FileSystem.clone(File.join(__dir__, "../fixtures"), "/") }
+
+        let(:args) { ["--config", "invalid-config.yml", "--lint-all"] }
+
+        it { expect { subject }.to(output(/error parsing config:/).to_stderr) }
+        it "is not successful" do
+          expect(subject).to(be(false))
+        end
+      end
+    end
+
+    context "with custom --cache-dir" do
+      let(:args) { ["--lint-all", "--enable-linter", "linter_with_errors", "--clear-cache", "--cache-dir", cache_dir] }
+      let(:cache_dir) { "tmp/erb_lint" }
+
+      before do
+        FileUtils.mkdir_p(cache_dir)
+      end
+
+      it "uses the specified directory" do
+        expect { subject }.to(output(/cache directory cleared/).to_stdout)
       end
     end
 
@@ -140,7 +242,7 @@ describe ERBLint::CLI do
 
         context "without --config" do
           context "when default config does not exist" do
-            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+            it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
           end
         end
 
@@ -170,7 +272,7 @@ describe ERBLint::CLI do
           end
         end
 
-        context "when only errors with serverity info are found" do
+        context "when only errors with severity info are found" do
           let(:args) { ["--enable-linter", "linter_with_info_errors", linted_file] }
 
           it "shows all error messages and line numbers" do
@@ -216,6 +318,19 @@ describe ERBLint::CLI do
           it "is not able to find the file" do
             expect { subject }.to(output(/no files found\.\.\./).to_stderr)
             expect(subject).to(be(false))
+          end
+        end
+
+        context "with cache" do
+          let(:args) { ["--enable-linter", "linter_without_errors", "--cache", linted_file] }
+
+          it "lints the file and adds it to the cache" do
+            expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
+
+            expect { subject }.to(output(/Cache mode is on/).to_stdout)
+            expect(subject).to(be(true))
+
+            expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
           end
         end
       end
@@ -344,7 +459,7 @@ describe ERBLint::CLI do
 
           context "without --config" do
             context "when default config does not exist" do
-              it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+              it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
             end
           end
 
@@ -377,8 +492,10 @@ describe ERBLint::CLI do
           context "with --format compact" do
             let(:args) do
               [
-                "--enable-linter", "linter_with_errors,final_newline",
-                "--format", "compact",
+                "--enable-linter",
+                "linter_with_errors,final_newline",
+                "--format",
+                "compact",
                 linted_dir,
               ]
             end
@@ -398,8 +515,10 @@ describe ERBLint::CLI do
           context "with invalid --format option" do
             let(:args) do
               [
-                "--enable-linter", "linter_with_errors,final_newline",
-                "--format", "nonexistentformat",
+                "--enable-linter",
+                "linter_with_errors,final_newline",
+                "--format",
+                "nonexistentformat",
                 linted_dir,
               ]
             end
@@ -408,7 +527,9 @@ describe ERBLint::CLI do
               expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF.strip))).to_stderr)
                 nonexistentformat: is not a valid format. Available formats:
                   - compact
+                  - gitlab
                   - json
+                  - junit
                   - multiline
               EOF
             end
@@ -427,6 +548,19 @@ describe ERBLint::CLI do
 
             it "is successful" do
               expect(subject).to(be(true))
+            end
+
+            context "with cache" do
+              let(:args) { ["--enable-linter", "linter_without_errors", "--cache", linted_dir] }
+
+              it "lints the file and adds it to the cache" do
+                expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
+
+                expect { subject }.to(output(/Cache mode is on/).to_stdout)
+                expect(subject).to(be(true))
+
+                expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
+              end
             end
           end
         end
@@ -449,7 +583,7 @@ describe ERBLint::CLI do
 
       it do
         expect { subject }.to(output(
-          /foo: not a valid linter name \(#{known_linters}\)/
+          /foo: not a valid linter name \(#{known_linters}\)/,
         ).to_stderr)
       end
 
@@ -484,7 +618,7 @@ describe ERBLint::CLI do
 
         context "without --config" do
           context "when default config does not exist" do
-            it { expect { subject }.to(output(/\.erb-lint\.yml not found: using default config/).to_stderr) }
+            it { expect { subject }.to(output(/\.erb_lint\.yml not found: using default config/).to_stderr) }
           end
         end
 
@@ -514,10 +648,32 @@ describe ERBLint::CLI do
           end
 
           context "when autocorrecting an error" do
-            let(:args) { ["--enable-linter", "final_newline", "--stdin", linted_file, "--autocorrect"] }
+            # We assume that linter_with_errors is not autocorrectable...
+            let(:args) do
+              ["--enable-linter", "final_newline,linter_with_errors", "--stdin", linted_file, "--autocorrect"]
+            end
+
+            it "tells the user it is autocorrecting" do
+              expect { subject }.to(output(/Linting and autocorrecting/).to_stdout)
+            end
+
+            it "shows how many total and autocorrectable linters are used" do
+              expect { subject }.to(output(/2 linters \(1 autocorrectable\)/).to_stdout)
+            end
 
             it "outputs the corrected ERB" do
               expect { subject }.to(output(/#{file_content}\n/).to_stdout)
+            end
+          end
+
+          context "when autocorrecting and caching are turned on" do
+            # We assume that linter_with_errors is not autocorrectable...
+            let(:args) do
+              ["--enable-linter", "linter_without_errors", "--stdin", linted_file, "--autocorrect", "--cache"]
+            end
+
+            it "throws an error saying the two modes cannot be used together" do
+              expect { subject }.to(output(/cannot run autocorrect mode with cache/).to_stderr)
             end
           end
         end
@@ -549,6 +705,25 @@ describe ERBLint::CLI do
           it "is not able to find the file" do
             expect { subject }.to(output(/no files found\.\.\./).to_stderr)
             expect(subject).to(be(false))
+          end
+
+          context "allowing for no matching files" do
+            let(:args) do
+              [
+                "--config",
+                config_file,
+                "--enable-linter",
+                "linter_with_errors,final_newline",
+                "--stdin",
+                linted_file,
+                "--allow-no-files",
+              ]
+            end
+
+            it "exits with success status" do
+              expect { subject }.to(output(/no files found\.\.\./).to_stdout)
+              expect(subject).to(be(true))
+            end
           end
         end
       end

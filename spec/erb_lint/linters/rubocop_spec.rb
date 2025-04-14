@@ -24,11 +24,17 @@ describe ERBLint::Linters::Rubocop do
   let(:inherit_from_filename) { "custom_rubocop.yml" }
   subject { offenses }
   before do
-    allow(file_loader).to(receive(:yaml).with(inherit_from_filename).and_return(nested_config))
+    allow(RuboCop::ConfigLoader).to(receive(:load_file).and_call_original)
+    allow(RuboCop::ConfigLoader).to(
+      receive(:load_file).with(a_string_ending_with(inherit_from_filename)).and_return(nested_config),
+    )
   end
   before { linter.run(processed_source) }
 
   context "config is valid when rubocop_config is not explicitly provided" do
+    before(:all) { File.rename(".ruby-version", ".ruby-version.bak") }
+    after(:all) { File.rename(".ruby-version.bak", ".ruby-version") }
+
     let(:linter_config) do
       described_class.config_schema.new(only: ["NotALinter"])
     end
@@ -228,6 +234,43 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
+  context "supports config from a provided path" do
+    before(:all) { File.rename(".ruby-version", ".ruby-version.bak") }
+    after(:all) { File.rename(".ruby-version.bak", ".ruby-version") }
+
+    after do
+      config_file.close
+      config_file.unlink
+    end
+
+    let(:config_file) do
+      tempfile = Tempfile.new("config.yml")
+      tempfile.write(nested_config.to_yaml)
+      tempfile.rewind
+      tempfile
+    end
+    let(:linter_config) do
+      described_class.config_schema.new(
+        only: ["ErbLint/AutoCorrectCop"],
+        config_file_path: config_file.path,
+      )
+    end
+    let(:nested_config) do
+      {
+        "ErbLint/AutoCorrectCop": {
+          "Enabled": false,
+        },
+      }.deep_stringify_keys
+    end
+    let(:file) { <<~FILE }
+      <% auto_correct_me %>
+    FILE
+
+    it "loads rubocop config from specified file path" do
+      expect(subject).to(eq([]))
+    end
+  end
+
   context "code is aligned to the column matching start of ruby code" do
     let(:linter_config) do
       described_class.config_schema.new(
@@ -267,9 +310,9 @@ describe ERBLint::Linters::Rubocop do
         expect(subject[0].source_range.end_pos).to(eq(38))
         expect(subject[0].source_range.source).to(eq("checked: true"))
         expect(subject[0].line_range).to(eq(2..2))
-        expect(subject[0].message).to(\
-          eq("Layout/ArgumentAlignment: Use one level of indentation for "\
-             "arguments following the first line of a multi-line method call.")
+        expect(subject[0].message).to(
+          eq("Layout/ArgumentAlignment: Use one level of indentation for " \
+            "arguments following the first line of a multi-line method call."),
         )
       end
     end

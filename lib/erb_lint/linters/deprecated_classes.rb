@@ -49,7 +49,7 @@ module ERBLint
           process_nested_offenses(
             source: sub_source,
             offset: offset + content_node.loc.begin_pos,
-            parent_source: parent_source
+            parent_source: parent_source,
           )
         end
       end
@@ -59,6 +59,7 @@ module ERBLint
           tags(processed_source).each do |tag|
             class_value = tag.attributes["class"]&.value
             next unless class_value
+
             class_value.split(" ").each do |class_name|
               yielder.yield(class_name, tag.loc)
             end
@@ -98,7 +99,7 @@ module ERBLint
 
           add_offense(
             range,
-            format(message, class_name, violated_rule[:class_expr], suggestion)
+            format(message, class_name, violated_rule[:class_expr], suggestion),
           )
         end
       end

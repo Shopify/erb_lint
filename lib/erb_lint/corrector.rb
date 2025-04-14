@@ -7,31 +7,20 @@ module ERBLint
     def initialize(processed_source, offenses)
       @processed_source = processed_source
       @offenses = offenses
+      corrector = RuboCop::Cop::Corrector.new(@processed_source.source_buffer)
+      correct!(corrector)
       @corrected_content = corrector.rewrite
     end
 
     def corrections
       @corrections ||= @offenses.map do |offense|
-        offense.linter.autocorrect(@processed_source, offense)
+        offense.linter.autocorrect(@processed_source, offense) if offense.linter.class.support_autocorrect?
       end.compact
     end
 
-    def corrector
-      BASE.new(@processed_source.source_buffer, corrections)
-    end
-
-    if ::RuboCop::Version::STRING.to_f >= 0.87
-      require "rubocop/cop/legacy/corrector"
-      BASE = ::RuboCop::Cop::Legacy::Corrector
-
-      def diagnostics
-        []
-      end
-    else
-      BASE = ::RuboCop::Cop::Corrector
-
-      def diagnostics
-        corrector.diagnostics
+    def correct!(corrector)
+      corrections.each do |correction|
+        correction.call(corrector)
       end
     end
   end

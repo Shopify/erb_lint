@@ -29,22 +29,22 @@ module ERBLint
             add_offense(
               processed_source.to_source_range(file_content.size...file_content.size),
               "Missing a trailing newline at the end of the file.",
-              :insert
+              :insert,
             )
           else
             add_offense(
               processed_source.to_source_range(
-                (file_content.size - final_newline.size + 1)...file_content.size
+                (file_content.size - final_newline.size + 1)...file_content.size,
               ),
               "Remove multiple trailing newline at the end of the file.",
-              :remove
+              :remove,
             )
           end
         elsif !@new_lines_should_be_present && !final_newline.empty?
           add_offense(
             processed_source.to_source_range(match.begin(0)...match.end(0)),
             "Remove #{final_newline.size} trailing newline at the end of the file.",
-            :remove
+            :remove,
           )
         end
       end
