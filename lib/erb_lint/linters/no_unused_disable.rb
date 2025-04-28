@@ -37,7 +37,7 @@ module ERBLint
           line_numbers.each do |line_number|
             add_offense(
               processed_source.source_buffer.line_range(line_number),
-              "Unused erblint:disable comment for #{rule}",
+              "Unused erb_lint:disable comment for #{rule}",
             )
           end
         end

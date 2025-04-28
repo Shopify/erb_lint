@@ -178,7 +178,7 @@ describe ERBLint::Runner do
       let(:file) { <<~FILE }
         <div>something</div>
         <span>bad content</span>
-        <%# erblint:disable FakeLinter3 %>
+        <%# erb_lint:disable FakeLinter3 %>
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
@@ -194,7 +194,7 @@ describe ERBLint::Runner do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
         <div>something</div>
-        <span>bad content</span><%# erblint:disable FakeLinter3 %>
+        <span>bad content</span><%# erb_lint:disable FakeLinter3 %>
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
@@ -209,7 +209,7 @@ describe ERBLint::Runner do
       let(:filename) { "somefolder/otherfolder/dummyfile.html.erb" }
       let(:file) { <<~FILE }
         <div>something</div>
-        <span>bad content</span> <%# erblint:disable FakeLinter3, FakeLinter4 %>
+        <span>bad content</span> <%# erb_lint:disable FakeLinter3, FakeLinter4 %>
       FILE
       let(:processed_source) { ERBLint::ProcessedSource.new(filename, file) }
 
