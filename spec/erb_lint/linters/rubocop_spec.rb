@@ -271,6 +271,49 @@ describe ERBLint::Linters::Rubocop do
     end
   end
 
+  context "code includes an opening erb tag followed by ruby on subsequent line" do
+    let(:linter_config) do
+      described_class.config_schema.new(
+        only: only_cops,
+        rubocop_config: {
+          AllCops: {
+            TargetRubyVersion: "2.5",
+          },
+        }
+        )
+    end
+
+    let(:only_cops) { ["Layout/TrailingWhitespace"] }
+
+    let(:file) { <<~FILE }
+      <%
+        some_ruby_code
+      %>
+    FILE
+
+    it "does not consider the opening erb line to be a whitespace violation" do
+      expect(subject).to(eq([]))
+    end
+
+    context "when the opening erb line includes other violations" do
+      let(:only_cops) { ["Layout/TrailingWhitespace", "Layout/EmptyComment"] }
+      let(:file) { <<~FILE }
+        <% #
+          some_ruby_code
+        %>
+      FILE
+
+      it "adds offenses" do
+        expect(subject.size).to(eq(1))
+        expect(subject[0].source_range.begin_pos).to(eq(3))
+        expect(subject[0].source_range.end_pos).to(eq(4))
+        expect(subject[0].source_range.source).to(eq("#"))
+        expect(subject[0].line_range).to(eq(1..1))
+        expect(subject[0].message).to(eq("Layout/EmptyComment: Source code comment is empty."))
+      end
+    end
+  end
+
   context "code is aligned to the column matching start of ruby code" do
     let(:linter_config) do
       described_class.config_schema.new(

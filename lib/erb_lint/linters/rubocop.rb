@@ -79,8 +79,19 @@ module ERBLint
             .to_source_range(rubocop_offense.location)
             .offset(offset)
 
+          next if offense_removes_erb_tag(rubocop_offense, processed_source)
+
           add_offense(rubocop_offense, offense_range, correction, offset, code_node.loc.range)
         end
+      end
+
+      def offense_removes_erb_tag(rubocop_offense, processed_source)
+        range = rubocop_offense.location
+
+        removed_lines = processed_source.to_source_range(range).source
+
+        erb_tag_pattern = /\A<%=?\z/
+        removed_lines.match?(erb_tag_pattern)
       end
 
       def tempfile_from(filename, content)
