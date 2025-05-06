@@ -369,7 +369,7 @@ module ERBLint
         end
 
         opts.on("--fail-level SEVERITY", "Minimum severity for exit with error code") do |level|
-          parsed_severity = SEVERITY_CODE_TABLE[level.upcase.to_sym] || (SEVERITY_NAMES & [level.downcase]).first
+          parsed_severity = SEVERITY_CODE_TABLE[level.upcase.to_sym] || (SEVERITY_NAMES & [level.downcase.to_sym]).first
 
           if parsed_severity.nil?
             failure!("#{level}: not a valid failure level (#{SEVERITY_NAMES.join(", ")})")
