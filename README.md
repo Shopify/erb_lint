@@ -38,6 +38,11 @@ linters:
         - .rubocop.yml
 ```
 
+> [!TIP]
+> Creating an `.erb_lint.yml` config file is _not_ mandatory; **the tool works out of the box with default settings**.
+> 
+>  Please note that the two config files referenced in the examples above and below _must_ exist, or you will get an error. (Of course, you can omit the two config file references (i.e. the `better_html_config` key, and the `rubocop_config` section.)
+
 See below for linter-specific configuration options.
 
 ## Usage
