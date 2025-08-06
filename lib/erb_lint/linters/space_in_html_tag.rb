@@ -96,6 +96,29 @@ module ERBLint
           name, equal, value = *attribute
           no_space(processed_source, name.loc.end_pos...equal.loc.begin_pos) if name && equal
           no_space(processed_source, equal.loc.end_pos...value.loc.begin_pos) if equal && value
+          if value && quoted_value?(value)
+            children = value.children.dup
+            open_quote = children.shift
+            close_quote = children.pop
+
+            leading_spaces_count = if children.first.is_a?(String)
+                               children.first.chars.take_while { |char| char == " " }.count
+                             else
+                               # value starts with erb tag
+                               0
+                             end
+
+            trailing_spaces_count = if children.last.is_a?(String)
+                                children.last.chars.reverse.take_while { |char| char == " " }.count
+                              else
+                                # value ends with erb tag
+                                0
+                              end
+            first_non_space_pos = open_quote.loc.end_pos + leading_spaces_count
+            last_non_space_pos = close_quote.loc.begin_pos - trailing_spaces_count
+            no_space(processed_source, (open_quote.loc.end_pos)...first_non_space_pos)
+            no_space(processed_source, last_non_space_pos...close_quote.loc.begin_pos)
+          end
 
           next if index >= attributes.children.size - 1
 
@@ -106,6 +129,12 @@ module ERBLint
             attribute.loc.end_pos...next_attribute.loc.begin_pos,
           )
         end
+      end
+
+      def quoted_value?(value)
+        value.children.length >= 3 &&
+          value.children.first.type == :quote &&
+          value.children.last.type == :quote
       end
     end
   end
