@@ -27,18 +27,31 @@ module ERBLint
 
       FORM_HELPERS_REQUIRING_AUTOCOMPLETE = [
         :date_field_tag,
+        :date_field,
         :color_field_tag,
+        :color_field,
         :email_field_tag,
+        :email_field,
         :text_field_tag,
-        :utf8_enforcer_tag,
+        :text_field,
         :month_field_tag,
+        :month_field,
         :number_field_tag,
+        :number_field,
         :password_field_tag,
+        :password_field,
         :search_field_tag,
+        :search_field,
         :telephone_field_tag,
+        :telephone_field,
+        :phone_field_tag,
+        :phone_field,
         :time_field_tag,
+        :time_field,
         :url_field_tag,
+        :url_field,
         :week_field_tag,
+        :week_field,
       ].freeze
 
       def run(processed_source)
