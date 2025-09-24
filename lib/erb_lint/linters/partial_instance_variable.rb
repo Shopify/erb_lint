@@ -8,7 +8,7 @@ module ERBLint
 
       def run(processed_source)
         instance_variable_regex = /\s@\w+/
-        return unless processed_source.filename.match?(%r{(\A|.*/)_[^/\s]*\.html\.erb\z}) &&
+        return unless processed_source.filename.match?(%r{(\A|.*/)_[^/\s]*\.html(\+[^/\s]+)?\.erb\z}) &&
           processed_source.file_content.match?(instance_variable_regex)
 
         add_offense(
