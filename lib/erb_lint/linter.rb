@@ -70,6 +70,12 @@ module ERBLint
       @offenses = []
     end
 
+    # Allows linters to specify their own checksums to bust caches, etc.
+    # for dependencies and things not represented in the erblint config.
+    def checksum
+      nil
+    end
+
     private
 
     def update_offense_status(processed_source)
