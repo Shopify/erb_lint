@@ -9,7 +9,7 @@ module ERBLint
       @cache_dir = cache_dir || CACHE_DIRECTORY
       @hits = []
       @new_results = []
-      puts "Cache mode is on"
+      $stderr.puts "Cache mode is on"
     end
 
     def get(filename, file_content)
@@ -44,7 +44,7 @@ module ERBLint
 
     def prune_cache
       if hits.empty?
-        puts "Cache being created for the first time, skipping prune"
+        $stderr.puts "Cache being created for the first time, skipping prune"
         return
       end
 
@@ -63,7 +63,7 @@ module ERBLint
     def clear
       return unless cache_dir_exists?
 
-      puts "Clearing cache by deleting cache directory"
+      $stderr.puts "Clearing cache by deleting cache directory"
       FileUtils.rm_r(@cache_dir)
     end
 
