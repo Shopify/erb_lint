@@ -14,7 +14,7 @@ module ERBLint
       @source_range = source_range
       @message = message
       @context = context
-      @severity = severity
+      @severity = severity || linter.config.severity
       @disabled = false
     end
 

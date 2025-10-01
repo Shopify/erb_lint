@@ -13,7 +13,7 @@ describe ERBLint::LinterConfig do
         let(:config_hash) { {} }
 
         it "returns default config" do
-          expect(subject).to(eq("enabled" => false, "exclude" => []))
+          expect(subject).to(eq("enabled" => false, "exclude" => [], "severity" => :error))
         end
       end
 
@@ -94,6 +94,40 @@ describe ERBLint::LinterConfig do
       context "when enabled key is nil" do
         let(:config_hash) { { enabled: nil } }
         it { expect(subject).to(eq(nil)) }
+      end
+    end
+
+    describe "#severity" do
+      subject { linter_config.severity }
+
+      context "when no severity is set" do
+        let(:config_hash) { {} }
+        it { expect(subject).to(eq(:error)) }
+      end
+
+      describe "when severity is a valid value" do
+        valid_severities = ERBLint::Utils::SeverityLevels::SEVERITY_NAMES
+
+        valid_severities.each do |severity|
+          context "when severity is #{severity}" do
+            let(:config_hash) { { severity: severity } }
+            it { expect(subject).to(eq(severity)) }
+          end
+        end
+      end
+
+      context "when severity is an invalid value" do
+        let(:config_hash) { { severity: "bogus" } }
+
+        it do
+          expect { subject }.to(
+            raise_error(
+              described_class::Error,
+              "ERBLint::LinterConfig does not accept :bogus as value for the property severity. Only accepts: \
+[:info, :refactor, :convention, :warning, :error, :fatal]",
+            ),
+          )
+        end
       end
     end
 
