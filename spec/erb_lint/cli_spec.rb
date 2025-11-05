@@ -396,7 +396,7 @@ describe ERBLint::CLI do
       end
 
       context "when fail level is lower or equal than found errors" do
-        let(:args) { ["--lint-all", "--fail-level", "I", "--enable-linter", "linter_with_info_errors"] }
+        let(:args) { ["--lint-all", "--fail-level", "info", "--enable-linter", "linter_with_info_errors"] }
 
         context "with the default glob" do
           it "shows all error messages and line numbers" do
