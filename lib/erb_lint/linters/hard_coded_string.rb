@@ -17,7 +17,7 @@ module ERBLint
       ALLOWED_CORRECTORS = ["I18nCorrector", "RuboCop::Corrector::I18n::HardCodedString"]
 
       NON_TEXT_TAGS = Set.new(["script", "style", "xmp", "iframe", "noembed", "noframes", "listing"])
-      NO_TRANSLATION_NEEDED = Set.new([
+      NO_TRANSLATION_NEEDED = [
         "&nbsp;",
         "&amp;",
         "&lt;",
@@ -43,11 +43,12 @@ module ERBLint
         "&times;",
         "&laquo;",
         "&raquo;",
-      ])
+      ]
 
       class ConfigSchema < LinterConfig
         property :corrector, accepts: Hash, required: false, default: -> { {} }
         property :i18n_load_path, accepts: String, required: false, default: ""
+        property :ignored_words, accepts: array_of?(String), required: false, default: -> { [] }
       end
       self.config_schema = ConfigSchema
 
@@ -98,8 +99,15 @@ module ERBLint
       private
 
       def check_string?(str)
-        string = str.gsub(/\s*/, "")
-        string.length > 1 && !NO_TRANSLATION_NEEDED.include?(string)
+        str
+          .gsub(ignored_words, "")
+          .gsub(/\s*/, "")
+          .gsub(/\d*/, "")
+          .length > 1
+      end
+
+      def ignored_words
+        @ignored_words ||= Regexp.union(*NO_TRANSLATION_NEEDED, *@config.ignored_words)
       end
 
       def load_corrector
