@@ -36,9 +36,8 @@ describe ERBLint::LinterRegistry do
       stub_const("ERBLint::LinterRegistry::DEPRECATED_CUSTOM_LINTERS_DIR", custom_directory)
 
       expected_warning = Rainbow("The '#{custom_directory}' directory for custom linters is deprecated. " \
-        "Please rename it to '.erb_linters'").yellow
-      expect(described_class).to(receive(:warn).with(expected_warning).once)
-      described_class.load_custom_linters
+        "Please rename it to '.erb_linters'").yellow + "\n"
+      expect { described_class.load_custom_linters }.to(output(expected_warning).to_stderr)
     end
   end
 end

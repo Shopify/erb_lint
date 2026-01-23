@@ -74,7 +74,7 @@ describe ERBLint::Reporters::CompactReporter do
     end
 
     it "displays formatted offenses output" do
-      expect { subject }.to(output(<<~MESSAGE).to_stdout)
+      expect { subject }.to(output(a_string_starting_with(<<~MESSAGE)).to_stderr)
         app/views/users/show.html.erb:61:10: Extra space detected where there should be no space.
         app/views/users/show.html.erb:125:1: Remove multiple trailing newline at the end of the file.
         app/views/users/show.html.erb:145:4: Trailing comma expected.
@@ -88,7 +88,7 @@ describe ERBLint::Reporters::CompactReporter do
       let(:show_linter_names) { true }
 
       it "displays formatted offenses output with linter names" do
-        expect { subject }.to(output(<<~MESSAGE).to_stdout)
+        expect { subject }.to(output(a_string_starting_with(<<~MESSAGE)).to_stderr)
           app/views/users/show.html.erb:61:10: [SpaceInHtmlTag] Extra space detected where there should be no space.
           app/views/users/show.html.erb:125:1: [FinalNewline] Remove multiple trailing newline at the end of the file.
           app/views/users/show.html.erb:145:4: [TrailingComma] Trailing comma expected.
@@ -100,7 +100,7 @@ describe ERBLint::Reporters::CompactReporter do
     end
 
     it "outputs offenses summary to stderr" do
-      expect { subject }.to(output(<<~MESSAGE).to_stderr)
+      expect { subject }.to(output(a_string_ending_with(<<~MESSAGE)).to_stderr)
         #{Rainbow("2 error(s) were ignored in ERB files").yellow}
         #{Rainbow("4 error(s) were found in ERB files").red}
       MESSAGE

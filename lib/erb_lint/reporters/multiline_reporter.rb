@@ -21,7 +21,7 @@ module ERBLint
       end
 
       def footer
-        puts
+        $stderr.puts
       end
     end
   end

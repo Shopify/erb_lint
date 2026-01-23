@@ -79,21 +79,21 @@ describe ERBLint::CLI do
 
     context "with --version" do
       let(:args) { ["--version"] }
-      it { expect { subject }.to(output("#{ERBLint::VERSION}\n").to_stdout) }
+      it { expect { subject }.to(output("#{ERBLint::VERSION}\n").to_stderr) }
     end
 
     context "with --help" do
       let(:args) { ["--help"] }
 
       it "shows usage" do
-        expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stdout)
+        expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stderr)
       end
 
       it "shows format instructions" do
         expect { subject }.to(
           output(Regexp.new("Report offenses in the given format: " \
             "\\(compact, gitlab, json, junit, multiline\\) " \
-            "\\(default: multiline\\)")).to_stdout,
+            "\\(default: multiline\\)")).to_stderr,
         )
       end
 
@@ -143,7 +143,7 @@ describe ERBLint::CLI do
       end
 
       it "shows all errors regardless of inline disables " do
-        expect { subject }.to(output(/ERBLint::Linters::FakeLinter error/).to_stdout)
+        expect { subject }.to(output(/ERBLint::Linters::FakeLinter error/).to_stderr)
       end
     end
 
@@ -163,7 +163,8 @@ describe ERBLint::CLI do
         it {
           expect do
             subject
-          end.to(output(<<~EOF).to_stdout)
+          end.to(output(<<~EOF).to_stderr)
+            #{Rainbow(".erb_lint.yml not found: using default config").yellow}
             Cache mode is on
             Clearing cache by deleting cache directory
             cache directory cleared
@@ -217,7 +218,7 @@ describe ERBLint::CLI do
       end
 
       it "uses the specified directory" do
-        expect { subject }.to(output(/cache directory cleared/).to_stdout)
+        expect { subject }.to(output(/cache directory cleared/).to_stderr)
       end
     end
 
@@ -247,12 +248,12 @@ describe ERBLint::CLI do
         end
 
         it "shows how many files and linters are used" do
-          expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
+          expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stderr)
         end
 
         context "when errors are found" do
           it "shows all error messages and line numbers" do
-            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
 
               fake message from a fake linter
               In file: /app/views/template.html.erb:1
@@ -276,7 +277,7 @@ describe ERBLint::CLI do
           let(:args) { ["--enable-linter", "linter_with_info_errors", linted_file] }
 
           it "shows all error messages and line numbers" do
-            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
 
               fake info message from a fake linter
               In file: /app/views/template.html.erb:1
@@ -297,7 +298,7 @@ describe ERBLint::CLI do
           let(:args) { ["--enable-linter", "linter_without_errors", linted_file] }
 
           it "shows that no errors were found to stdout" do
-            expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
+            expect { subject }.to(output(/No errors were found in ERB files/).to_stderr)
           end
 
           it "is successful" do
@@ -327,7 +328,7 @@ describe ERBLint::CLI do
           it "lints the file and adds it to the cache" do
             expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
 
-            expect { subject }.to(output(/Cache mode is on/).to_stdout)
+            expect { subject }.to(output(/Cache mode is on/).to_stderr)
             expect(subject).to(be(true))
 
             expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
@@ -350,7 +351,7 @@ describe ERBLint::CLI do
         context "with the default glob" do
           it "shows how many files and linters are used" do
             allow(cli).to(receive(:glob).and_return(cli.class::DEFAULT_LINT_ALL_GLOB))
-            expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
+            expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stderr)
           end
         end
 
@@ -377,7 +378,7 @@ describe ERBLint::CLI do
 
         context "with the default glob" do
           it "shows all error messages and line numbers" do
-            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
 
               fake info message from a fake linter
               In file: /app/views/template.html.erb:1
@@ -400,7 +401,7 @@ describe ERBLint::CLI do
 
         context "with the default glob" do
           it "shows all error messages and line numbers" do
-            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
 
               fake info message from a fake linter
               In file: /app/views/template.html.erb:1
@@ -464,12 +465,12 @@ describe ERBLint::CLI do
           end
 
           it "shows how many files and linters are used" do
-            expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
+            expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stderr)
           end
 
           context "when errors are found" do
             it "shows all error messages and line numbers" do
-              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
 
                 fake message from a fake linter
                 In file: /app/views/template.html.erb:1
@@ -501,7 +502,7 @@ describe ERBLint::CLI do
             end
 
             it "shows all error messages and line numbers" do
-              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+              expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
                 /app/views/template.html.erb:1:1: fake message from a fake linter
                 /app/views/template.html.erb:1:19: Missing a trailing newline at the end of the file.
               EOF
@@ -543,7 +544,7 @@ describe ERBLint::CLI do
             let(:args) { ["--enable-linter", "linter_without_errors", linted_dir] }
 
             it "shows that no errors were found to stdout" do
-              expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
+              expect { subject }.to(output(/No errors were found in ERB files/).to_stderr)
             end
 
             it "is successful" do
@@ -556,7 +557,7 @@ describe ERBLint::CLI do
               it "lints the file and adds it to the cache" do
                 expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(0))
 
-                expect { subject }.to(output(/Cache mode is on/).to_stdout)
+                expect { subject }.to(output(/Cache mode is on/).to_stderr)
                 expect(subject).to(be(true))
 
                 expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
@@ -623,12 +624,12 @@ describe ERBLint::CLI do
         end
 
         it "shows how many files and linters are used" do
-          expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stdout)
+          expect { subject }.to(output(/Linting 1 files with 2 linters/).to_stderr)
         end
 
         context "when errors are found" do
           it "shows all error messages and line numbers" do
-            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stdout)
+            expect { subject }.to(output(Regexp.new(Regexp.escape(<<~EOF))).to_stderr)
 
               fake message from a fake linter
               In file: /app/views/template.html.erb:1
@@ -654,11 +655,11 @@ describe ERBLint::CLI do
             end
 
             it "tells the user it is autocorrecting" do
-              expect { subject }.to(output(/Linting and autocorrecting/).to_stdout)
+              expect { subject }.to(output(/Linting and autocorrecting/).to_stderr)
             end
 
             it "shows how many total and autocorrectable linters are used" do
-              expect { subject }.to(output(/2 linters \(1 autocorrectable\)/).to_stdout)
+              expect { subject }.to(output(/2 linters \(1 autocorrectable\)/).to_stderr)
             end
 
             it "outputs the corrected ERB" do
@@ -682,7 +683,7 @@ describe ERBLint::CLI do
           let(:args) { ["--enable-linter", "linter_without_errors", "--stdin", linted_file] }
 
           it "shows that no errors were found to stdout" do
-            expect { subject }.to(output(/No errors were found in ERB files/).to_stdout)
+            expect { subject }.to(output(/No errors were found in ERB files/).to_stderr)
           end
 
           it "is successful" do
@@ -721,7 +722,7 @@ describe ERBLint::CLI do
             end
 
             it "exits with success status" do
-              expect { subject }.to(output(/no files found\.\.\./).to_stdout)
+              expect { subject }.to(output(/no files found\.\.\./).to_stderr)
               expect(subject).to(be(true))
             end
           end

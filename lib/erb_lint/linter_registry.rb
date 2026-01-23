@@ -34,7 +34,7 @@ module ERBLint
         if deprecated_ruby_files.any?
           deprecation_message = "The '#{DEPRECATED_CUSTOM_LINTERS_DIR}' directory for custom linters is deprecated. " \
             "Please rename it to '#{CUSTOM_LINTERS_DIR}'"
-          warn(Rainbow(deprecation_message).yellow)
+          $stderr.puts(Rainbow(deprecation_message).yellow)
           ruby_files.concat(deprecated_ruby_files)
         end
 
