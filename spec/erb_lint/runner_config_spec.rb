@@ -126,7 +126,7 @@ describe ERBLint::RunnerConfig do
 
         it { expect(subject.class).to(eq(ERBLint::Linters::FinalNewline::ConfigSchema)) }
         it "fills linter config with defaults from schema" do
-          expect(subject.to_hash).to(eq("enabled" => false, "exclude" => [], "present" => true))
+          expect(subject.to_hash).to(eq("enabled" => false, "exclude" => [], "present" => true, "severity" => :error))
         end
         it "is disabled by default" do
           expect(subject.enabled?).to(eq(false))

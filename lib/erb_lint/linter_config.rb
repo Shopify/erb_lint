@@ -2,6 +2,7 @@
 
 require "active_support"
 require "smart_properties"
+require "erb_lint/utils/severity_levels"
 
 module ERBLint
   class LinterConfig
@@ -21,6 +22,11 @@ module ERBLint
 
     property :enabled, accepts: [true, false], default: false, reader: :enabled?
     property :exclude, accepts: array_of?(String), default: -> { [] }
+    property :severity,
+      accepts: ERBLint::Utils::SeverityLevels::SEVERITY_NAMES,
+      default: :error,
+      reader: :severity,
+      converts: lambda { |value| value.to_sym }
 
     def initialize(config = {})
       config = config.dup.deep_stringify_keys
