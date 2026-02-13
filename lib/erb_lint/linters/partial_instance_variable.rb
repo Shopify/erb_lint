@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 
+require_relative "instance_variable"
+
 module ERBLint
   module Linters
-    # Checks for instance variables in partials.
-    class PartialInstanceVariable < Linter
-      include LinterRegistry
+    # Checks for instance variables in partials only
+    class PartialInstanceVariable < InstanceVariable
+      self.config_schema = ConfigSchema
 
-      def run(processed_source)
-        instance_variable_regex = /\s@\w+/
-        return unless processed_source.filename.match?(%r{(\A|.*/)_[^/\s]*\.html\.erb\z}) &&
-          processed_source.file_content.match?(instance_variable_regex)
-
-        add_offense(
-          processed_source.to_source_range(
-            processed_source.file_content =~ instance_variable_regex..processed_source.file_content.size,
-          ),
-          "Instance variable detected in partial.",
+      def initialize(file_loader, config)
+        warn(
+          "PartialInstanceVariable is deprecated. " \
+            "Please use InstanceVariable with partials_only=true.",
         )
+        config[:partials_only] = true
+        super(file_loader, config)
+      end
+
+      private
+
+      def offense_message
+        "Instance variable detected in partial."
       end
     end
   end

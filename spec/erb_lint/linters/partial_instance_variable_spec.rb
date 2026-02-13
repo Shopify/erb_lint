@@ -26,7 +26,26 @@ describe ERBLint::Linters::PartialInstanceVariable do
       let(:file) { "<h2><%= @user.first_name %></h2>" }
       it do
         expect(subject).to(eq([
-          build_offense(processed_source_one, 7..32, "Instance variable detected in partial."),
+          build_offense(processed_source_one, 8...13, "Instance variable detected in partial."),
+        ]))
+      end
+    end
+
+    context "when a class instance variable is present" do
+      let(:file) { "<h2><%= @@user.first_name %></h2>" }
+      it do
+        expect(subject).to(eq([
+          build_offense(processed_source_one, 8...14, "Instance variable detected in partial."),
+        ]))
+      end
+    end
+
+    context "when multiple instance variables are present" do
+      let(:file) { "<h2><%= @user.first_name %> <%= @user.last_name %></h2>" }
+      it do
+        expect(subject).to(eq([
+          build_offense(processed_source_one, 8...13, "Instance variable detected in partial."),
+          build_offense(processed_source_one, 32...37, "Instance variable detected in partial."),
         ]))
       end
     end
