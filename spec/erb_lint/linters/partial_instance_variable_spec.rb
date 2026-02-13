@@ -30,6 +30,15 @@ describe ERBLint::Linters::PartialInstanceVariable do
         ]))
       end
     end
+
+    context "when instance variable is present without leading whitespace" do
+      let(:file) { "<%= link_to(@user) %>" }
+      it do
+        expect(subject).to(eq([
+          build_offense(processed_source_one, 11..21, "Instance variable detected in partial."),
+        ]))
+      end
+    end
   end
 
   private
