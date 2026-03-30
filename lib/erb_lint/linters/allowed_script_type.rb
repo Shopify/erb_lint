@@ -23,9 +23,12 @@ module ERBLint
       def run(processed_source)
         parser = processed_source.parser
         parser.nodes_with_type(:tag).each do |tag_node|
+          # Fast path: check tag name from AST node directly before creating Tag object
+          tag_name_node = tag_node.to_a[1]
+          next unless tag_name_node&.loc&.source == "script"
+
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           next if tag.closing?
-          next unless tag.name == "script"
 
           if @config.disallow_inline_scripts?
             name_node = tag_node.to_a[1]

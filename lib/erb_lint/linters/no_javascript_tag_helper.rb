@@ -25,6 +25,9 @@ module ERBLint
 
           source = code_node.loc.source
 
+          # Fast path: skip expensive parsing if source can't contain the target method
+          next unless source.include?("javascript_tag")
+
           ruby_node =
             begin
               BetterHtml::TestHelper::RubyNode.parse(source)
