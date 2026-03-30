@@ -49,7 +49,7 @@ module ERBLint
       private
 
       def descendant_nodes(processed_source)
-        processed_source.ast.descendants(:erb)
+        processed_source.erb_nodes
       end
 
       def inspect_content(processed_source, erb_node)

@@ -14,7 +14,7 @@ module ERBLint
         file_content = processed_source.file_content
         return if file_content.empty?
 
-        processed_source.ast.descendants(:erb).each do |erb_node|
+        processed_source.erb_nodes.each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           next if code_node.nil?
 

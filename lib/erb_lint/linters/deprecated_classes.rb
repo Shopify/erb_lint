@@ -89,7 +89,7 @@ module ERBLint
       end
 
       def tag_nodes(processed_source)
-        processed_source.parser.nodes_with_type(:tag)
+        processed_source.tag_nodes
       end
 
       def generate_offenses(class_name, range)

@@ -13,7 +13,7 @@ module ERBLint
       self.config_schema = ConfigSchema
 
       def run(processed_source)
-        processed_source.ast.descendants(:erb).each do |erb_node|
+        processed_source.erb_nodes.each do |erb_node|
           _, _, _, trim_node = *erb_node
           next if trim_node.nil? || trim_node.loc.source == @config.enforced_style
 

@@ -7,7 +7,7 @@ module ERBLint
       include LinterRegistry
 
       def run(processed_source)
-        processed_source.ast.descendants(:tag).each do |tag_node|
+        processed_source.tag_nodes.each do |tag_node|
           start_solidus, name, attributes, end_solidus = *tag_node
 
           next_loc = name&.loc&.begin_pos || attributes&.loc&.begin_pos ||

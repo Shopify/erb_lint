@@ -17,8 +17,7 @@ module ERBLint
       self.config_schema = ConfigSchema
 
       def run(processed_source)
-        parser = processed_source.parser
-        parser.ast.descendants(:erb).each do |erb_node|
+        processed_source.erb_nodes.each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           indicator = indicator_node&.loc&.source
           next if indicator == "#"

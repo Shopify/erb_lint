@@ -32,7 +32,7 @@ module ERBLint
       ]
 
       def run(processed_source)
-        processed_source.ast.descendants(:tag).each do |tag_node|
+        processed_source.tag_nodes.each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           next unless SELF_CLOSING_TAGS.include?(tag.name)
 
