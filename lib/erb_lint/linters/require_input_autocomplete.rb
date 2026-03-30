@@ -52,6 +52,10 @@ module ERBLint
 
       def find_html_input_tags(parser)
         parser.nodes_with_type(:tag).each do |tag_node|
+          # Fast path: check tag name from AST node directly before creating Tag object
+          tag_name_node = tag_node.to_a[1]
+          next unless tag_name_node&.loc&.source == "input"
+
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
 
           autocomplete_attribute = tag.attributes["autocomplete"]
@@ -82,10 +86,16 @@ module ERBLint
         type_present && HTML_INPUT_TYPES_REQUIRING_AUTOCOMPLETE.include?(type_attribute.value)
       end
 
+      FORM_HELPER_NAMES_PATTERN = Regexp.union(FORM_HELPERS_REQUIRING_AUTOCOMPLETE.map(&:to_s)).freeze
+
       def find_rails_helper_input_tags(parser)
         parser.ast.descendants(:erb).each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           source = code_node.loc.source
+
+          # Fast path: skip expensive parsing if source can't contain any form helper name
+          next unless source.match?(FORM_HELPER_NAMES_PATTERN)
+
           ruby_node = extract_ruby_node(source)
           send_node = ruby_node&.descendants(:send)&.first
 

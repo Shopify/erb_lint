@@ -21,6 +21,10 @@ module ERBLint
 
       def find_html_script_tags(parser)
         parser.nodes_with_type(:tag).each do |tag_node|
+          # Fast path: check tag name from AST node directly before creating Tag object
+          tag_name_node = tag_node.to_a[1]
+          next unless tag_name_node&.loc&.source == "script"
+
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           nonce_attribute = tag.attributes["nonce"]
 
@@ -52,10 +56,16 @@ module ERBLint
           type_attribute.value_node.to_a[1] != "application/javascript"
       end
 
+      TAG_HELPER_PATTERN = /javascript_tag|javascript_include_tag|javascript_pack_tag/
+
       def find_rails_helper_script_tags(parser)
         parser.ast.descendants(:erb).each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           source = code_node.loc.source
+
+          # Fast path: skip expensive parsing if source can't contain any tag helper name
+          next unless source.match?(TAG_HELPER_PATTERN)
+
           ruby_node = extract_ruby_node(source)
           send_node = ruby_node&.descendants(:send)&.first
 
