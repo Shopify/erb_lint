@@ -335,6 +335,57 @@ describe ERBLint::Linters::Rubocop do
     it { expect(corrected_content).to(eq("<% dont_auto_correct_me(safe_method(dont_auto_correct_me)) %>\n")) }
   end
 
+  context "batched investigation finds offenses across multiple erb tags" do
+    let(:file) { <<~FILE }
+      <div>
+        <%= auto_correct_me %>
+        <span><%= auto_correct_me(:arg) %></span>
+      </div>
+    FILE
+
+    it "finds offenses in both erb tags" do
+      expect(subject.size).to(eq(2))
+    end
+
+    it "correctly maps offense positions back to source" do
+      expect(subject[0].source_range.source).to(eq("auto_correct_me"))
+      expect(subject[1].source_range.source).to(eq("auto_correct_me"))
+    end
+
+    context "when autocorrecting" do
+      subject { corrected_content }
+
+      it "autocorrects both offenses" do
+        expect(subject).to(include("safe_method"))
+        expect(subject).not_to(include("auto_correct_me"))
+      end
+    end
+  end
+
+  context "batched investigation with mixed valid and invalid syntax" do
+    let(:file) { <<~FILE }
+      <% if condition? %>
+        <%= auto_correct_me %>
+      <% end %>
+      <%= auto_correct_me(:another) %>
+    FILE
+
+    it "finds offenses in valid-syntax erb tags" do
+      expect(subject.size).to(eq(2))
+      expect(subject[0].source_range.source).to(eq("auto_correct_me"))
+      expect(subject[1].source_range.source).to(eq("auto_correct_me"))
+    end
+  end
+
+  context "single erb tag does not use batching" do
+    let(:file) { <<~FILE }
+      <div><%= auto_correct_me %></div>
+    FILE
+
+    it { expect(subject.size).to(eq(1)) }
+    it { expect(subject.first.source_range.source).to(eq("auto_correct_me")) }
+  end
+
   private
 
   def arbitrary_error_message(range)
