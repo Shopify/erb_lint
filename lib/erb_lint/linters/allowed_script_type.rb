@@ -21,8 +21,7 @@ module ERBLint
       self.config_schema = ConfigSchema
 
       def run(processed_source)
-        parser = processed_source.parser
-        parser.nodes_with_type(:tag).each do |tag_node|
+        processed_source.tag_nodes.each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           next if tag.closing?
           next unless tag.name == "script"

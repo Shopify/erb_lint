@@ -18,7 +18,7 @@ module ERBLint
         file_content = processed_source.file_content
         return if file_content.empty?
 
-        strict_locals_node = processed_source.ast.descendants(:erb).find do |erb_node|
+        strict_locals_node = processed_source.erb_nodes.find do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
 
           indicator_node_str = indicator_node&.deconstruct&.last

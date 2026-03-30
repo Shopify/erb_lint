@@ -42,16 +42,14 @@ module ERBLint
       ].freeze
 
       def run(processed_source)
-        parser = processed_source.parser
-
-        find_html_input_tags(parser)
-        find_rails_helper_input_tags(parser)
+        find_html_input_tags(processed_source)
+        find_rails_helper_input_tags(processed_source)
       end
 
       private
 
-      def find_html_input_tags(parser)
-        parser.nodes_with_type(:tag).each do |tag_node|
+      def find_html_input_tags(processed_source)
+        processed_source.tag_nodes.each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
 
           autocomplete_attribute = tag.attributes["autocomplete"]
@@ -82,8 +80,8 @@ module ERBLint
         type_present && HTML_INPUT_TYPES_REQUIRING_AUTOCOMPLETE.include?(type_attribute.value)
       end
 
-      def find_rails_helper_input_tags(parser)
-        parser.ast.descendants(:erb).each do |erb_node|
+      def find_rails_helper_input_tags(processed_source)
+        processed_source.erb_nodes.each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           source = code_node.loc.source
           ruby_node = extract_ruby_node(source)

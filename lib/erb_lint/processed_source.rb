@@ -14,6 +14,15 @@ module ERBLint
       @parser.ast
     end
 
+    # Memoized descendant lookups — many linters traverse the same node types
+    def erb_nodes
+      @erb_nodes ||= ast.descendants(:erb).to_a
+    end
+
+    def tag_nodes
+      @tag_nodes ||= parser.nodes_with_type(:tag).to_a
+    end
+
     def source_buffer
       @source_buffer ||= begin
         buffer = Parser::Source::Buffer.new(filename)

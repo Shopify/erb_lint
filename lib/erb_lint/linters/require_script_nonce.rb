@@ -11,16 +11,14 @@ module ERBLint
       include LinterRegistry
 
       def run(processed_source)
-        parser = processed_source.parser
-
-        find_html_script_tags(parser)
-        find_rails_helper_script_tags(parser)
+        find_html_script_tags(processed_source)
+        find_rails_helper_script_tags(processed_source)
       end
 
       private
 
-      def find_html_script_tags(parser)
-        parser.nodes_with_type(:tag).each do |tag_node|
+      def find_html_script_tags(processed_source)
+        processed_source.tag_nodes.each do |tag_node|
           tag = BetterHtml::Tree::Tag.from_node(tag_node)
           nonce_attribute = tag.attributes["nonce"]
 
@@ -52,8 +50,8 @@ module ERBLint
           type_attribute.value_node.to_a[1] != "application/javascript"
       end
 
-      def find_rails_helper_script_tags(parser)
-        parser.ast.descendants(:erb).each do |erb_node|
+      def find_rails_helper_script_tags(processed_source)
+        processed_source.erb_nodes.each do |erb_node|
           indicator_node, _, code_node, _ = *erb_node
           source = code_node.loc.source
           ruby_node = extract_ruby_node(source)

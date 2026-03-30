@@ -12,7 +12,7 @@ module ERBLint
       END_SPACES = /([[:space:]]*)\z/m
 
       def run(processed_source)
-        processed_source.ast.descendants(:erb).each do |erb_node|
+        processed_source.erb_nodes.each do |erb_node|
           indicator_node, ltrim, code_node, rtrim = *erb_node
           indicator = indicator_node&.loc&.source
           next if indicator == "#" || indicator == "%"

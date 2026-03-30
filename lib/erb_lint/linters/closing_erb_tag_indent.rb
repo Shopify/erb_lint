@@ -11,7 +11,7 @@ module ERBLint
       END_SPACES = /([[:space:]]*)\z/m
 
       def run(processed_source)
-        processed_source.ast.descendants(:erb).each do |erb_node|
+        processed_source.erb_nodes.each do |erb_node|
           _, _, code_node, = *erb_node
           code = code_node.children.first
 
