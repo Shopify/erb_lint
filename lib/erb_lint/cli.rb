@@ -315,7 +315,7 @@ module ERBLint
 
     def option_parser
       OptionParser.new do |opts|
-        opts.banner = "Usage: erblint [options] [file1, file2, ...]"
+        opts.banner = "Usage: erb_lint [options] [file1, file2, ...]"
 
         opts.on("--config FILENAME", "Config file [default: #{DEFAULT_CONFIG_FILENAME}]") do |config|
           if File.exist?(config)
