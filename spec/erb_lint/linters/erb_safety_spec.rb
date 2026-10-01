@@ -155,6 +155,24 @@ describe ERBLint::Linters::ErbSafety do
     end
   end
 
+  describe "#cache_key" do
+    let(:file) { "" }
+
+    it "is nil without a better-html config file" do
+      expect(linter.cache_key).to(be_nil)
+    end
+
+    context "with a better-html config file" do
+      let(:linter_config) { described_class.config_schema.new("better_html_config" => ".better-html.yml") }
+
+      it "changes when the config file changes" do
+        changed_file_loader = MockFileLoader.new(javascript_safe_methods: ["foobar"])
+
+        expect(described_class.new(changed_file_loader, linter_config).cache_key).not_to(eq(linter.cache_key))
+      end
+    end
+  end
+
   private
 
   def unsafe_interpolate(range)

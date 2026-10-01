@@ -46,7 +46,39 @@ module ERBLint
         end
       end
 
+      def cache_key
+        Digest::SHA1.hexdigest("#{rubocop_source_checksum}#{portable_rubocop_config}")
+      end
+
       private
+
+      # RuboCop's own result cache hashes the contents of every loaded file, so
+      # this covers plugins, gems, and project-local cops loaded through
+      # `require:`. It's memoized, which is fine because the runner only asks for
+      # cache keys once every linter has loaded its config. Before RuboCop 1.82.1
+      # it stays nil unless RuboCop's own cache computed it, so fall back to the
+      # versions of `rubocop*` gems.
+      def rubocop_source_checksum
+        ::RuboCop::ResultCache.source_checksum || rubocop_gem_versions.join(",")
+      end
+
+      def rubocop_gem_versions
+        Gem.loaded_specs.each_value.filter_map { |spec| spec.full_name if spec.name.start_with?("rubocop") }.sort
+      end
+
+      # RuboCop expands `Exclude` patterns to absolute paths, which would tie
+      # cached results to the directory the project is checked out in.
+      def portable_rubocop_config
+        base_path = File.expand_path(@file_loader.base_path)
+        @rubocop_config.to_hash.to_h do |name, config|
+          next [name, config] unless config.is_a?(Hash) && config["Exclude"].is_a?(Array)
+
+          excludes = config["Exclude"].map do |pattern|
+            pattern.is_a?(String) ? ::RuboCop::PathUtil.relative_path(pattern, base_path) : pattern
+          end
+          [name, config.merge("Exclude" => excludes)]
+        end
+      end
 
       def descendant_nodes(processed_source)
         processed_source.ast.descendants(:erb)

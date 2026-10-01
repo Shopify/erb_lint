@@ -70,6 +70,15 @@ describe ERBLint::Cache do
     end
   end
 
+  describe "#runner_cache_key=" do
+    it "is part of the checksum of cached results" do
+      cache.runner_cache_key = "runner-cache-key"
+      cache.get(linted_file_path, linted_file_content)
+
+      expect(Digest::SHA1.new).to(have_received(:update).with(a_string_including("runner-cache-key")))
+    end
+  end
+
   describe "#cache_dir_exists?" do
     it "returns true if the cache dir exists" do
       expect(cache.cache_dir_exists?).to(be(true))

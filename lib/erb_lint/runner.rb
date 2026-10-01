@@ -42,6 +42,15 @@ module ERBLint
       @offenses.concat(offenses)
     end
 
+    def cache_key
+      digester = Digest::SHA1.new
+      @linters.each do |linter|
+        linter_cache_key = linter.cache_key
+        digester.update(linter_cache_key) if linter_cache_key
+      end
+      digester.hexdigest
+    end
+
     private
 
     def enable_inline_configs?

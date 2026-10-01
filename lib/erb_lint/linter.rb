@@ -70,6 +70,13 @@ module ERBLint
       @offenses = []
     end
 
+    # Returns a string that changes whenever something besides the linter's
+    # config and the linted file affects its offenses, such as another config
+    # file or a gem version, so that `--cache` doesn't reuse stale results.
+    def cache_key
+      nil
+    end
+
     private
 
     def update_offense_status(processed_source)

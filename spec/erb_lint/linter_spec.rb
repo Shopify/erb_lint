@@ -31,5 +31,11 @@ describe ERBLint::Linter do
         expect(linter.offenses).to(eq([]))
       end
     end
+
+    describe "#cache_key" do
+      it "is nil by default" do
+        expect(linter.cache_key).to(be_nil)
+      end
+    end
   end
 end

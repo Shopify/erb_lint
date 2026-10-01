@@ -32,6 +32,10 @@ module ERBLint
         end
       end
 
+      def cache_key
+        @file_loader.yaml(@config_filename).to_s unless @config_filename.nil?
+      end
+
       private
 
       def tester_classes

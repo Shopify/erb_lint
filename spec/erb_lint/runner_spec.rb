@@ -219,4 +219,37 @@ describe ERBLint::Runner do
       end
     end
   end
+
+  describe "#cache_key" do
+    module ERBLint
+      module Linters
+        class FakeLinterWithCacheKey < FakeLinter1
+          def cache_key
+            "fake cache key"
+          end
+        end
+      end
+    end
+
+    before do
+      allow(ERBLint::LinterRegistry).to(receive(:linters)
+        .and_return([
+          ERBLint::Linters::FakeLinter1,
+          ERBLint::Linters::FakeLinterWithCacheKey,
+        ]))
+    end
+
+    def cache_key_with(linters)
+      config = ERBLint::RunnerConfig.new(linters: linters.to_h { |name| [name, { "enabled" => true }] })
+      described_class.new(file_loader, config).cache_key
+    end
+
+    it "ignores linters without a cache key" do
+      expect(cache_key_with(["FakeLinter1"])).to(eq(cache_key_with([])))
+    end
+
+    it "includes the cache keys of enabled linters" do
+      expect(cache_key_with(["FakeLinter1", "FakeLinterWithCacheKey"])).not_to(eq(cache_key_with(["FakeLinter1"])))
+    end
+  end
 end

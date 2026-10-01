@@ -67,6 +67,8 @@ module ERBLint
       FileUtils.rm_r(@cache_dir)
     end
 
+    attr_writer :runner_cache_key
+
     private
 
     attr_reader :config, :hits, :new_results
@@ -76,7 +78,7 @@ module ERBLint
       mode = File.stat(filename).mode
 
       digester.update(
-        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{file_content}",
+        "#{mode}#{config.to_hash}#{ERBLint::VERSION}#{@runner_cache_key}#{file_content}",
       )
       digester.hexdigest
     rescue Errno::ENOENT

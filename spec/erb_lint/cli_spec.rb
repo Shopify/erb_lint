@@ -332,6 +332,16 @@ describe ERBLint::CLI do
 
             expect(Dir[ERBLint::Cache::CACHE_DIRECTORY].length).to(be(1))
           end
+
+          it "does not reuse cached results once a linter's cache key changes" do
+            allow_any_instance_of(ERBLint::Runner).to(receive(:cache_key).and_return("before"))
+            expect { described_class.new.run(args) }.to(output(/Cache mode is on/).to_stdout)
+
+            allow_any_instance_of(ERBLint::Runner).to(receive(:cache_key).and_return("after"))
+            expect { described_class.new.run(args) }.to(output(/Cache being created for the first time/).to_stdout)
+
+            expect(Dir.children(ERBLint::Cache::CACHE_DIRECTORY).size).to(eq(2))
+          end
         end
       end
     end

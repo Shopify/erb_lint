@@ -665,6 +665,10 @@ def autocorrect(_processed_source, offense)
 end
 ```
 
+If your linter's offenses depend on anything besides its configuration and the file being linted, such as another
+config file or a gem's version, define a `cache_key` method that returns a string that changes whenever those inputs
+do. Otherwise `--cache` keeps returning results computed with the old inputs.
+
 ## Output formats
 
 You can change the output format of ERB Lint by specifying formatters with the `-f/--format` option.
@@ -766,7 +770,8 @@ No errors were found in ERB files
 ```
 
 Cached lint results are stored in the `.erb_lint_cache` directory by default, though a custom directory can be provided
-via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file and `erb_lint` settings.
+via the `--cache-dir` option. Cache filenames are computed with a hash of information about the file, `erb_lint` settings,
+and other inputs that linters depend on, such as the RuboCop configuration and version.
 
 These files store instance attributes of the `CachedOffense` object, which only contain the `Offense` attributes
 necessary to restore the results of running `erb_lint` for output. The cache also automatically prunes outdated files each time it's run.

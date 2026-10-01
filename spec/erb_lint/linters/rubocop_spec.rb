@@ -335,6 +335,112 @@ describe ERBLint::Linters::Rubocop do
     it { expect(corrected_content).to(eq("<% dont_auto_correct_me(safe_method(dont_auto_correct_me)) %>\n")) }
   end
 
+  describe "#cache_key" do
+    let(:linter_config) do
+      described_class.config_schema.new(rubocop_config: { inherit_from: inherit_from_filename })
+    end
+    let(:nested_config) { { "Layout/LineLength" => { "Max" => 100 } } }
+    let(:file) { "" }
+
+    it "changes when an inherited RuboCop config changes" do
+      cache_key = linter.cache_key
+      allow(RuboCop::ConfigLoader).to(
+        receive(:load_file)
+          .with(a_string_ending_with(inherit_from_filename))
+          .and_return({ "Layout/LineLength" => { "Max" => 120 } }),
+      )
+
+      expect(described_class.new(file_loader, linter_config).cache_key).not_to(eq(cache_key))
+    end
+
+    it "changes with RuboCop's source checksum" do
+      allow(RuboCop::ResultCache).to(receive(:source_checksum).and_return("one"))
+      cache_key = linter.cache_key
+      allow(RuboCop::ResultCache).to(receive(:source_checksum).and_return("two"))
+
+      expect(linter.cache_key).not_to(eq(cache_key))
+    end
+
+    context "when RuboCop doesn't compute a source checksum" do
+      before { allow(RuboCop::ResultCache).to(receive(:source_checksum).and_return(nil)) }
+
+      def stub_loaded_gems(versions)
+        loaded_specs = versions.to_h { |name, version| [name, Gem::Specification.new(name, version)] }
+        allow(Gem).to(receive(:loaded_specs).and_return(loaded_specs))
+      end
+
+      it "changes when a RuboCop gem is upgraded" do
+        stub_loaded_gems("rubocop" => "1.0.0", "rubocop-rails" => "2.0.0")
+        cache_key = linter.cache_key
+        stub_loaded_gems("rubocop" => "1.0.0", "rubocop-rails" => "2.0.1")
+
+        expect(linter.cache_key).not_to(eq(cache_key))
+      end
+
+      it "does not change when other gems are upgraded" do
+        stub_loaded_gems("rubocop" => "1.0.0", "rake" => "13.0.0")
+        cache_key = linter.cache_key
+        stub_loaded_gems("rubocop" => "1.0.0", "rake" => "13.0.1")
+
+        expect(linter.cache_key).to(eq(cache_key))
+      end
+    end
+
+    # `ResultCache.source_checksum` is memoized for the life of the process, so
+    # these compute each key in a fresh one, the way a CLI run does.
+    context "in a new process" do
+      def cache_key_in_new_process(required_file)
+        script = <<~RUBY
+          require "erb_lint/all"
+          config = ERBLint::Linters::Rubocop.config_schema.new(rubocop_config: { "require" => [#{required_file.inspect}] })
+          linter = ERBLint::Linters::Rubocop.new(ERBLint::FileLoader.new(Dir.pwd), config)
+          puts "cache_key=\#{linter.cache_key}"
+        RUBY
+        lib_dir = File.expand_path("../../../lib", __dir__)
+        output = IO.popen([RbConfig.ruby, "-I", lib_dir, "-e", script], err: [:child, :out], &:read)
+
+        cache_key = output[/^cache_key=(\h+)$/, 1]
+        expect(cache_key).not_to(be_nil, output)
+        cache_key
+      end
+
+      def write_required_file(dir, content)
+        File.join(dir, "required_by_rubocop_config.rb").tap { |path| File.write(path, content) }
+      end
+
+      it "is the same for identical required files at different paths" do
+        cache_keys = Array.new(2) do
+          Dir.mktmpdir { |dir| cache_key_in_new_process(write_required_file(dir, "ErbLintCacheKeySpec = 1\n")) }
+        end
+
+        expect(cache_keys.first).to(eq(cache_keys.last))
+      end
+
+      it "changes when a file loaded through `require:` changes" do
+        if Gem::Version.new(RuboCop::Version::STRING) < Gem::Version.new("1.82.1")
+          skip("RuboCop #{RuboCop::Version::STRING} doesn't compute `ResultCache.source_checksum`")
+        end
+
+        Dir.mktmpdir do |dir|
+          cache_key = cache_key_in_new_process(write_required_file(dir, "ErbLintCacheKeySpec = 1\n"))
+
+          expect(cache_key_in_new_process(write_required_file(dir, "ErbLintCacheKeySpec = 2\n"))).not_to(eq(cache_key))
+        end
+      end
+    end
+
+    it "does not depend on where the project is checked out" do
+      linter_config = described_class.config_schema.new(rubocop_config: { AllCops: { Exclude: ["vendor/**/*"] } })
+      cache_keys = Array.new(2) do
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) { described_class.new(ERBLint::FileLoader.new(Dir.pwd), linter_config).cache_key }
+        end
+      end
+
+      expect(cache_keys.first).to(eq(cache_keys.last))
+    end
+  end
+
   private
 
   def arbitrary_error_message(range)
