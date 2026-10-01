@@ -20,7 +20,7 @@ module ERBLint
         ).map do |offense_hash|
           ERBLint::CachedOffense.new(offense_hash)
         end
-      rescue Errno::ENOENT
+      rescue Errno::ENOENT, JSON::ParserError
         return false
       end
       @hits.push(file_checksum)
@@ -33,9 +33,14 @@ module ERBLint
 
       FileUtils.mkdir_p(@cache_dir)
 
-      File.open(File.join(@cache_dir, file_checksum), "wb") do |f|
-        f.write(offenses_as_json)
-      end
+      # Write to a per-process file and rename it into place, so that concurrent
+      # runs sharing this cache directory never read a partially written entry.
+      cache_file = File.join(@cache_dir, file_checksum)
+      temp_file = "#{cache_file}.#{Process.pid}.tmp"
+      File.binwrite(temp_file, offenses_as_json)
+      File.rename(temp_file, cache_file)
+    rescue Errno::ENOENT
+      # A concurrent run pruned the temporary file before it was renamed.
     end
 
     def close
@@ -53,6 +58,8 @@ module ERBLint
         next if hits.include?(cache_file) || new_results.include?(cache_file)
 
         File.delete(File.join(@cache_dir, cache_file))
+      rescue Errno::ENOENT
+        # A concurrent run sharing this cache directory already pruned it.
       end
     end
 

@@ -55,6 +55,13 @@ describe ERBLint::Cache do
       expect(cache_result.count).to(eq(2))
       expect(cache.send(:hits)).to(include(checksum))
     end
+
+    it "treats a corrupt cache entry as a miss" do
+      File.write(File.join(cache_dir, checksum), cache_file_content[0, 20])
+
+      expect(cache.get(linted_file_path, linted_file_content)).to(be(false))
+      expect(cache.send(:hits)).not_to(include(checksum))
+    end
   end
 
   describe "#[]=" do
@@ -67,6 +74,22 @@ describe ERBLint::Cache do
         ),
       )).to(be(true))
       expect(cache.send(:new_results)).to(include(checksum))
+    end
+
+    it "does not leave temporary files behind" do
+      cache.set(linted_file_path, linted_file_content, cache_file_content)
+
+      expect(Dir.children(cache_dir)).to(eq([checksum]))
+    end
+
+    it "skips the write if a concurrent run prunes the temporary file first" do
+      allow(File).to(receive(:binwrite).and_wrap_original do |original, path, content|
+        original.call(path, content)
+        File.delete(path)
+      end)
+
+      expect { cache.set(linted_file_path, linted_file_content, cache_file_content) }.not_to(raise_error)
+      expect(Dir.children(cache_dir)).to(eq([checksum]))
     end
   end
 
@@ -141,6 +164,18 @@ describe ERBLint::Cache do
           "fake-checksum",
         ),
       )).to(be(false))
+    end
+
+    it "ignores entries already pruned by a concurrent run" do
+      fakefs_dir = Struct.new(:fakefs_dir)
+      allow(fakefs_dir).to(receive(:children).and_return(["already-pruned", "fake-checksum"]))
+      allow(FakeFS::Dir).to(receive(:new).and_return(fakefs_dir))
+      allow(cache).to(receive(:hits).and_return([checksum]))
+
+      File.write(File.join(cache_dir, "fake-checksum"), cache_file_content)
+
+      expect { cache.prune_cache }.not_to(raise_error)
+      expect(File.exist?(File.join(cache_dir, "fake-checksum"))).to(be(false))
     end
   end
 
