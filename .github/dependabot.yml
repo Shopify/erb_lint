@@ -4,3 +4,14 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+  - package-ecosystem: bundler
+    directory: "/"
+    schedule:
+      interval: weekly
+    versioning-strategy: lockfile-only
+    allow:
+      - dependency-type: all
+    groups:
+      bundler:
+        patterns:
+          - "*"

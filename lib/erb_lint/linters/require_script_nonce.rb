@@ -40,7 +40,7 @@ module ERBLint
 
       def html_javascript_tag?(tag)
         !tag.closing? &&
-          (tag.name == "script" && !html_javascript_type_attribute?(tag))
+          tag.name == "script" && !html_javascript_type_attribute?(tag)
       end
 
       def html_javascript_type_attribute?(tag)
