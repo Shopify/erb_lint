@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "bundler"
+require "tmpdir"
 
 describe ERBLint::RunnerConfig do
   describe ".default" do
@@ -370,6 +372,35 @@ describe ERBLint::RunnerConfig do
       when Array
         file.puts content.join("\n")
       end
+    end
+  end
+end
+
+describe ERBLint::RunnerConfigResolver do
+  describe "Bundler git-source inheritance" do
+    it "inherits configuration from gems installed from git sources by Bundler" do
+      gem_root = Dir.mktmpdir
+      gem_dir = File.join(gem_root, "git_gem-1.0.0")
+      config_path = "config/erb_lint.yml"
+      FileUtils.mkdir_p(File.join(gem_dir, "config"))
+      File.write(File.join(gem_dir, config_path), "InheritedConfig:\n  value: from git gem\n")
+
+      gem_spec = Struct.new(:gem_dir).new(gem_dir)
+      bundler_specs = double(specs: { "git_gem" => [gem_spec] })
+
+      allow(Gem::Specification).to(receive(:find_by_name)
+        .with("git_gem")
+        .and_raise(Gem::LoadError))
+      allow(Bundler).to(receive(:load).and_return(bundler_specs))
+
+      config = ERBLint::RunnerConfig.new(
+        { "inherit_gem" => { "git_gem" => config_path } },
+        ERBLint::FileLoader.new(Dir.pwd),
+      )
+
+      expect(config.to_hash).to(eq("InheritedConfig" => { "value" => "from git gem" }))
+    ensure
+      FileUtils.rm_rf(gem_root) if gem_root
     end
   end
 end

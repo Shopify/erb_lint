@@ -53,6 +53,9 @@ module ERBLint
       spec = Gem::Specification.find_by_name(gem_name)
       File.join(spec.gem_dir, relative_config_path)
     rescue Gem::LoadError => e
+      spec ||= Bundler.load.specs[gem_name].first if defined?(Bundler)
+      return File.join(spec.gem_dir, relative_config_path) if spec
+
       raise Gem::LoadError, "Unable to find gem #{gem_name}; is the gem installed? #{e}"
     end
 
