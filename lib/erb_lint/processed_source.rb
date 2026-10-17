@@ -23,7 +23,7 @@ module ERBLint
     end
 
     def to_source_range(range)
-      range = (range.begin_pos...range.end_pos) if range.is_a?(::Parser::Source::Range)
+      range = (range.begin_pos...range.end_pos) if range.respond_to?(:begin_pos) && range.respond_to?(:end_pos)
       BetterHtml::Tokenizer::Location.new(
         source_buffer,
         range.begin,
