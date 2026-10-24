@@ -121,6 +121,24 @@ describe ERBLint::LinterConfig do
         subject { linter_config.excludes_file?("/src/app/foo.rb", "/src") }
         it { expect(subject).to(eq(false)) }
       end
+
+      context "when a glob matches a direct child of a nested directory" do
+        let(:config_hash) { { exclude: ["**/app/components/**/*"] } }
+        subject { linter_config.excludes_file?("/src/app/components/direct.html.erb", "/src") }
+        it { expect(subject).to(eq(true)) }
+      end
+
+      context "when a relative glob matches a direct child of a nested directory" do
+        let(:config_hash) { { exclude: ["app/components/**/*"] } }
+        subject { linter_config.excludes_file?("/src/app/components/direct.html.erb", "/src") }
+        it { expect(subject).to(eq(true)) }
+      end
+
+      context "when a glob matches a file in a nested subdirectory" do
+        let(:config_hash) { { exclude: ["**/app/components/**/*"] } }
+        subject { linter_config.excludes_file?("/src/app/components/nested/file.html.erb", "/src") }
+        it { expect(subject).to(eq(true)) }
+      end
     end
   end
 end
