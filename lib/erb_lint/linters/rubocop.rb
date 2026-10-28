@@ -41,8 +41,12 @@ module ERBLint
         rubocop_correction = offense.context[:rubocop_correction]
         return unless rubocop_correction
 
+        offset = offense.context[:offset]
+        bound_range = offense.context[:bound_range]
+        return unless correction_within_bound?(rubocop_correction, offset, bound_range)
+
         lambda do |corrector|
-          corrector.import!(rubocop_correction, offset: offense.context[:offset])
+          corrector.import!(rubocop_correction, offset: offset)
         end
       end
 
@@ -50,6 +54,15 @@ module ERBLint
 
       def descendant_nodes(processed_source)
         processed_source.ast.descendants(:erb)
+      end
+
+      def correction_within_bound?(rubocop_correction, offset, bound_range)
+        return false unless bound_range
+
+        # RuboCop sees each snippet as a full file and may propose file-level edits.
+        rubocop_correction.as_replacements.all? do |range, _replacement|
+          range.begin_pos + offset >= bound_range.begin && range.end_pos + offset <= bound_range.end
+        end
       end
 
       def inspect_content(processed_source, erb_node)

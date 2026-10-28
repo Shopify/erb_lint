@@ -126,6 +126,30 @@ describe ERBLint::Linters::Rubocop do
 
       it { expect(subject).to(eq(%(<%= "should_be_double_quoted" %>\n))) }
     end
+
+    context "when a RuboCop correction extends beyond the ERB tag" do
+      let(:file) { <<~FILE }
+        <%= link_to t('blacklight.header_links.search_history'), blacklight.search_history_path, class: 'nav-link' %>
+      FILE
+
+      let(:linter_config) do
+        described_class.config_schema.new(
+          only: ["Style/FrozenStringLiteralComment"],
+          rubocop_config: {
+            AllCops: {
+              TargetRubyVersion: "2.7",
+            },
+            "Style/FrozenStringLiteralComment": {
+              Enabled: true,
+            },
+          },
+        )
+      end
+
+      subject { corrected_content }
+
+      it { expect(subject).to(eq(file)) }
+    end
   end
 
   context "when multiple offenses are found in the same block" do
