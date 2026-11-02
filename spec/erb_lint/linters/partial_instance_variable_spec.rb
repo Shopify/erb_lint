@@ -40,6 +40,24 @@ describe ERBLint::Linters::PartialInstanceVariable do
       let(:file) { "<style>\n  @font-face { font-family: test; }\n</style>" }
       it { expect(subject).to(eq([])) }
     end
+
+    context "when an instance variable is present in an escaped ERB tag" do
+      let(:file) { "<%%= @user.first_name %>" }
+      it { expect(subject).to(eq([])) }
+    end
+
+    context "when active ERB follows an escaped ERB tag" do
+      let(:file) { "<%%= @user.first_name %><%= @real.first_name %>" }
+      it do
+        expect(subject).to(eq([
+          build_offense(
+            processed_source_one,
+            file.index(" @real")..file.size,
+            "Instance variable detected in partial.",
+          ),
+        ]))
+      end
+    end
   end
 
   private

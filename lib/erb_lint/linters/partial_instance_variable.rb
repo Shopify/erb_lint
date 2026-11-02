@@ -12,7 +12,10 @@ module ERBLint
 
         erb_node = processed_source.parser.ast.descendants(:erb).find do |node|
           indicator_node, _, code_node, _ = *node
-          indicator_node&.loc&.source != "#" && code_node.loc.source.match?(instance_variable_regex)
+          indicator = indicator_node&.loc&.source
+          next false if indicator == "#" || indicator == "%"
+
+          code_node.loc.source.match?(instance_variable_regex)
         end
         return unless erb_node
 
