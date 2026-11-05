@@ -161,6 +161,8 @@ module ERBLint
         processed_source = ERBLint::ProcessedSource.new(filename, file_content)
         runner.run(processed_source)
         break unless autocorrect? && runner.offenses.any?
+        # Parser recovery can leave AST locations unreliable for other linters' corrections.
+        break if processed_source.parser.parser_errors.any?
 
         corrector = corrector(processed_source, runner.offenses)
         break if corrector.corrections.empty?
