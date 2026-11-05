@@ -61,6 +61,31 @@ describe ERBLint::CLI do
   describe "#run" do
     subject { cli.run(args) }
 
+    context "when autocorrecting a file with parser errors" do
+      let(:linted_file) { "app/views/template.html.erb" }
+      let(:file_content) { "<div class=\"x\"\n  <span>keep this subtree</span>\n</div>\n" }
+      let(:args) do
+        ["--enable-linters", "parser_errors,space_in_html_tag", "--stdin", linted_file, "--autocorrect"]
+      end
+
+      before do
+        allow(ERBLint::LinterRegistry).to(receive(:linters)
+          .and_return([ERBLint::Linters::ParserErrors, ERBLint::Linters::SpaceInHtmlTag]))
+        FileUtils.mkdir_p(File.dirname(linted_file))
+        FileUtils.touch(linted_file)
+        $stdin = StringIO.new(file_content)
+      end
+
+      after do
+        $stdin = STDIN
+      end
+
+      it "does not apply autocorrections" do
+        expect { subject }.to(output(Regexp.new(Regexp.escape(file_content))).to_stdout)
+        expect(subject).to(be(false))
+      end
+    end
+
     context "with no arguments" do
       it "shows usage" do
         expect { subject }.to(output(/erblint \[options\] \[file1, file2, ...\]/).to_stderr)
